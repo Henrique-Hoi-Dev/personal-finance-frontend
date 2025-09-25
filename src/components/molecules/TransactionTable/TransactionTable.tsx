@@ -67,7 +67,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500"></div>
-          <span className="ml-2 text-gray-600">Carregando transações...</span>
+          <span className="ml-2 text-gray-600">{t('loadingTransactions')}</span>
         </div>
       </div>
     );
@@ -104,7 +104,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        Histórico de Transações ({transacoes.length})
+        {t('transactionHistory')} ({transacoes.length})
       </h3>
 
       <div className="overflow-x-auto">
@@ -112,19 +112,19 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                DESCRIÇÃO
+                {t('description').toUpperCase()}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                CATEGORIA
+                {t('category').toUpperCase()}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                CONTA
+                {t('account').toUpperCase()}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                DATA
+                {t('date').toUpperCase()}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                VALOR
+                {t('value').toUpperCase()}
               </th>
             </tr>
           </thead>

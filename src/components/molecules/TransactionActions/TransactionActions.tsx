@@ -31,7 +31,7 @@ export const TransactionActions: React.FC<TransactionActionsProps> = ({
             d="M12 6v6m0 0v6m0-6h6m-6 0H6"
           />
         </svg>
-        <span>+ Adicionar Entrada</span>
+        <span>+ {t('addIncome')}</span>
       </button>
 
       <button
@@ -51,7 +51,7 @@ export const TransactionActions: React.FC<TransactionActionsProps> = ({
             d="M20 12H4"
           />
         </svg>
-        <span>- Adicionar Saída</span>
+        <span>- {t('addExpense')}</span>
       </button>
     </div>
   );

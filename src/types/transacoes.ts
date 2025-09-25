@@ -36,4 +36,37 @@ export interface TransacaoFilters {
   contaId?: string;
   dataInicio?: string;
   dataFim?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface Balance {
+  total: number;
+  income: number;
+  expenses: number;
+  balance: number;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  type: 'receita' | 'despesa';
+  color?: string;
+  icon?: string;
+}
+
+export interface CreateIncomePayload {
+  descricao: string;
+  valor: number;
+  categoria: string;
+  data: string;
+  contaId: string;
+}
+
+export interface CreateExpensePayload {
+  descricao: string;
+  valor: number;
+  categoria: string;
+  data: string;
+  contaId: string;
 }

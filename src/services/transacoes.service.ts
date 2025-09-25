@@ -4,23 +4,21 @@ import {
   CreateTransacaoPayload,
   UpdateTransacaoPayload,
   TransacaoFilters,
+  Balance,
+  Category,
+  CreateIncomePayload,
+  CreateExpensePayload,
 } from '@/types/transacoes';
 
 export async function getTransacoes(
   filters?: TransacaoFilters
-): Promise<Transacao[]> {
-  const params = new URLSearchParams();
-
-  if (filters?.tipo) params.append('tipo', filters.tipo);
-  if (filters?.categoria) params.append('categoria', filters.categoria);
-  if (filters?.contaId) params.append('contaId', filters.contaId);
-  if (filters?.dataInicio) params.append('dataInicio', filters.dataInicio);
-  if (filters?.dataFim) params.append('dataFim', filters.dataFim);
-
-  const queryString = params.toString();
-  const endpoint = queryString ? `/transacoes?${queryString}` : '/transacoes';
-
-  const response = await apiClient.get<Transacao[]>(endpoint);
+): Promise<{ data: Transacao[]; total: number; page: number; limit: number }> {
+  const response = await apiClient.get<{
+    data: Transacao[];
+    total: number;
+    page: number;
+    limit: number;
+  }>('/transacoes', filters);
   return response.data;
 }
 
@@ -56,5 +54,30 @@ export async function getTransacoesByConta(
   const response = await apiClient.get<Transacao[]>(
     `/contas/${contaId}/transacoes`
   );
+  return response.data;
+}
+
+// New endpoints
+export async function getBalance(): Promise<Balance> {
+  const response = await apiClient.get<Balance>('/transacoes/balance');
+  return response.data;
+}
+
+export async function getCategories(): Promise<Category[]> {
+  const response = await apiClient.get<Category[]>('/transacoes/categories');
+  return response.data;
+}
+
+export async function createIncome(
+  data: CreateIncomePayload
+): Promise<Transacao> {
+  const response = await apiClient.post<Transacao>('/transacoes/income', data);
+  return response.data;
+}
+
+export async function createExpense(
+  data: CreateExpensePayload
+): Promise<Transacao> {
+  const response = await apiClient.post<Transacao>('/transacoes/expense', data);
   return response.data;
 }

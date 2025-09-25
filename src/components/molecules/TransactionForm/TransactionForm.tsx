@@ -41,15 +41,15 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const categorias = [
-    'Alimentação',
-    'Transporte',
-    'Lazer',
-    'Saúde',
-    'Educação',
-    'Trabalho',
-    'Entretenimento',
-    'Utilities',
-    'Outros',
+    { key: 'alimentacao', label: t('categories.alimentacao') },
+    { key: 'transporte', label: t('categories.transporte') },
+    { key: 'lazer', label: t('categories.lazer') },
+    { key: 'saude', label: t('categories.saude') },
+    { key: 'educacao', label: t('categories.educacao') },
+    { key: 'trabalho', label: t('categories.trabalho') },
+    { key: 'entretenimento', label: t('categories.entretenimento') },
+    { key: 'utilities', label: t('categories.utilities') },
+    { key: 'outros', label: t('categories.outros') },
   ];
 
   const handleInputChange = (
@@ -72,15 +72,15 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     const newErrors: Record<string, string> = {};
 
     if (!formData.valor || formData.valor <= 0) {
-      newErrors.valor = 'Valor deve ser maior que zero';
+      newErrors.valor = t('valueRequired');
     }
 
     if (!formData.descricao.trim()) {
-      newErrors.descricao = 'Descrição é obrigatória';
+      newErrors.descricao = t('descriptionRequired');
     }
 
     if (!formData.data) {
-      newErrors.data = 'Data é obrigatória';
+      newErrors.data = t('dateRequired');
     }
 
     setErrors(newErrors);
@@ -121,7 +121,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Valor */}
       <div>
-        <BaseLabel htmlFor="valor">Valor *</BaseLabel>
+        <BaseLabel htmlFor="valor">{t('value')} *</BaseLabel>
         <BaseInput
           id="valor"
           type="text"
@@ -138,30 +138,30 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
 
       {/* Descrição */}
       <div>
-        <BaseLabel htmlFor="descricao">Descrição *</BaseLabel>
+        <BaseLabel htmlFor="descricao">{t('description')} *</BaseLabel>
         <BaseInput
           id="descricao"
           type="text"
           value={formData.descricao}
           onChange={(e) => handleInputChange('descricao', e.target.value)}
-          placeholder="Descrição da transação"
+          placeholder={t('transactionDescription')}
           error={errors.descricao}
         />
       </div>
 
       {/* Categoria */}
       <div>
-        <BaseLabel htmlFor="categoria">Categoria</BaseLabel>
+        <BaseLabel htmlFor="categoria">{t('category')}</BaseLabel>
         <select
           id="categoria"
           value={formData.categoria}
           onChange={(e) => handleInputChange('categoria', e.target.value)}
           className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         >
-          <option value="">Selecione uma categoria</option>
+          <option value="">{t('selectCategory')}</option>
           {categorias.map((categoria) => (
-            <option key={categoria} value={categoria}>
-              {categoria}
+            <option key={categoria.key} value={categoria.key}>
+              {categoria.label}
             </option>
           ))}
         </select>
@@ -169,7 +169,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
 
       {/* Conta */}
       <div>
-        <BaseLabel htmlFor="conta">Conta</BaseLabel>
+        <BaseLabel htmlFor="conta">{t('account')}</BaseLabel>
         <select
           id="conta"
           value={formData.contaId}
@@ -186,7 +186,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
 
       {/* Data */}
       <div>
-        <BaseLabel htmlFor="data">Data *</BaseLabel>
+        <BaseLabel htmlFor="data">{t('date')} *</BaseLabel>
         <div className="relative">
           <BaseInput
             id="data"
@@ -222,7 +222,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           fullWidth={false}
           className="flex-1 max-h-12"
         >
-          Cancelar
+          {t('cancel')}
         </BaseButton>
         <BaseButton
           type="submit"
@@ -231,7 +231,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           fullWidth={false}
           className="flex-1 max-h-12"
         >
-          {tipo === 'receita' ? 'Adicionar Entrada' : 'Adicionar Saída'}
+          {tipo === 'receita' ? t('addIncome') : t('addExpense')}
         </BaseButton>
       </div>
     </form>

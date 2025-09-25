@@ -32,7 +32,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   };
 
   const getTitle = () => {
-    return tipo === 'receita' ? 'Adicionar Entrada' : 'Adicionar Saída';
+    return tipo === 'receita' ? t('addIncome') : t('addExpense');
   };
 
   return (
