@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const { fontFamily } = require('tailwindcss/defaultTheme');
+
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -13,6 +15,10 @@ module.exports = {
           500: '#2563eb',
           600: '#1d4ed8',
         },
+      },
+      fontFamily: {
+        sans: ['var(--font-inter)', ...fontFamily.sans],
+        logo: ['var(--font-dancing-script)', 'cursive'],
       },
     },
   },

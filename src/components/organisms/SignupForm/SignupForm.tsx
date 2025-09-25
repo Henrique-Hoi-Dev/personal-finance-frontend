@@ -4,13 +4,8 @@ import { BaseButton } from '@/components/atoms';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { formatCPF, removeCPFMask } from '@/utils';
-
-interface SignupPayload {
-  name: string;
-  email: string;
-  cpf: string;
-  password: string;
-}
+import { useAuthStore } from '@/store/auth.store';
+import { SignupPayload } from '@/types';
 
 interface SignupFormProps {
   onSubmit?: (data: SignupPayload) => void;
@@ -24,6 +19,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({
   isLoading = false,
 }) => {
   const t = useTranslations('Signup');
+  const { register, loading: storeLoading, error: storeError } = useAuthStore();
   const [formData, setFormData] = useState<SignupPayload>({
     name: '',
     email: '',
@@ -61,8 +57,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({
       onSubmit(dataToSend);
     } else {
       try {
-        // Aqui você pode implementar a lógica de cadastro
-        console.log('Dados para cadastro:', dataToSend);
+        await register(dataToSend);
         toast.success(t('success'));
       } catch (error) {
         toast.error(t('error_signup'));
@@ -114,17 +109,31 @@ export const SignupForm: React.FC<SignupFormProps> = ({
           name="password"
           required
           autoComplete="new-password"
+          showStrength={true}
         />
 
         <div className="pt-6">
-          <BaseButton type="submit" variant="primary" disabled={isLoading}>
-            {isLoading ? t('loading') : t('submit')}
+          <BaseButton
+            type="submit"
+            variant="primary"
+            loading={isLoading || storeLoading}
+            disabled={isLoading || storeLoading}
+          >
+            {t('submit')}
           </BaseButton>
         </div>
       </form>
 
       <div className="mt-8 text-center">
-        <p className="text-base text-gray-600">{t('login')}</p>
+        <p className="text-base text-gray-600">
+          {t('login')}{' '}
+          <a
+            href="/pt/login"
+            className="text-blue-600 hover:text-blue-800 font-medium"
+          >
+            {t('login')}
+          </a>
+        </p>
       </div>
     </div>
   );

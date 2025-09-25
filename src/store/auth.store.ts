@@ -1,7 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { login, logout, getCurrentUser } from '@/services/auth.service';
-import { LoginPayload, User } from '@/types/auth';
+import {
+  login,
+  logout,
+  getCurrentUser,
+  register,
+} from '@/services/auth.service';
+import { LoginPayload, SignupPayload, User } from '@/types/auth';
 import { apiClient } from '@/services/apiClient';
 
 interface AuthState {
@@ -14,6 +19,7 @@ interface AuthState {
 
 interface AuthActions {
   login: (data: LoginPayload) => Promise<void>;
+  register: (data: SignupPayload) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   clearError: () => void;
@@ -47,6 +53,26 @@ export const useAuthStore = create<AuthStore>()(
         } catch (error: any) {
           set({
             error: error.message || 'Erro ao fazer login',
+            loading: false,
+          });
+          throw error;
+        }
+      },
+
+      register: async (data: SignupPayload) => {
+        set({ loading: true, error: null });
+        try {
+          const response = await register(data);
+          set({
+            user: response.user,
+            token: response.token,
+            isAuthenticated: true,
+            loading: false,
+          });
+          apiClient.setToken(response.token);
+        } catch (error: any) {
+          set({
+            error: error.message || 'Erro ao criar conta',
             loading: false,
           });
           throw error;

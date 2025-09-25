@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BaseLabel } from '@/components/atoms';
+import { BaseLabel, PasswordStrength } from '@/components/atoms';
 import { useTranslations } from 'next-intl';
 
 interface PasswordFieldProps {
@@ -11,6 +11,7 @@ interface PasswordFieldProps {
   name?: string;
   required?: boolean;
   autoComplete?: string;
+  showStrength?: boolean;
 }
 
 export const PasswordField: React.FC<PasswordFieldProps> = ({
@@ -22,6 +23,7 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
   name,
   required = false,
   autoComplete,
+  showStrength = false,
 }) => {
   const t = useTranslations('Login');
   const [showPassword, setShowPassword] = useState(false);
@@ -83,6 +85,7 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
           )}
         </button>
       </div>
+      {showStrength && <PasswordStrength password={value} className="mt-3" />}
     </div>
   );
 };

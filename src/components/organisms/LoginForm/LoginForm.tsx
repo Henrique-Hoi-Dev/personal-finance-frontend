@@ -91,14 +91,27 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         />
 
         <div className="pt-6">
-          <BaseButton type="submit" variant="primary" disabled={currentLoading}>
-            {currentLoading ? t('loading') : t('submit')}
+          <BaseButton
+            type="submit"
+            variant="primary"
+            loading={currentLoading}
+            disabled={currentLoading}
+          >
+            {t('submit')}
           </BaseButton>
         </div>
       </form>
 
       <div className="mt-8 text-center">
-        <p className="text-base text-gray-600">{t('signup')}</p>
+        <p className="text-base text-gray-600">
+          {t('signup')}{' '}
+          <a
+            href="/pt/signup"
+            className="text-blue-600 hover:text-blue-800 font-medium"
+          >
+            {t('signup')}
+          </a>
+        </p>
       </div>
     </div>
   );

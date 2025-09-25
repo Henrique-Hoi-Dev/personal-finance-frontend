@@ -1,204 +1,154 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { DashboardLayout } from '@/components/templates';
-import { useAuthStore } from '@/store/auth.store';
+import {
+  TransactionFilters,
+  TransactionActions,
+  TransactionTable,
+} from '@/components/molecules';
+import { TransactionModal } from '@/components/organisms';
+import { useAuth } from '@/hooks/useAuth';
 import { useTransacoesStore } from '@/store/transacoes.store';
+import { useContasStore } from '@/store/contas.store';
+import { Transacao } from '@/types';
+import { TransactionFormData } from '@/components/molecules';
 
 export default function TransacoesPage() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isHydrated } = useAuth();
   const { transacoes, loading, fetchTransacoes } = useTransacoesStore();
+  const { contas, fetchContas } = useContasStore();
   const router = useRouter();
+  const t = useTranslations('Transacoes');
+
+  // Filter states
+  const [tipoFilter, setTipoFilter] = useState('');
+  const [categoriaFilter, setCategoriaFilter] = useState('');
+
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTipo, setModalTipo] = useState<'receita' | 'despesa'>('receita');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isHydrated && !isAuthenticated) {
       router.push('/pt/login');
       return;
     }
-    fetchTransacoes();
-  }, [isAuthenticated, router, fetchTransacoes]);
+
+    if (isHydrated && isAuthenticated) {
+      fetchTransacoes();
+      fetchContas();
+    }
+  }, [isHydrated, isAuthenticated, fetchTransacoes, router]);
+
+  // Filter transactions based on current filters
+  const filteredTransacoes = transacoes.filter((transacao) => {
+    const matchesTipo = !tipoFilter || transacao.tipo === tipoFilter;
+    const matchesCategoria =
+      !categoriaFilter ||
+      transacao.categoria.toLowerCase().includes(categoriaFilter.toLowerCase());
+
+    return matchesTipo && matchesCategoria;
+  });
+
+  const handleAddIncome = () => {
+    setModalTipo('receita');
+    setIsModalOpen(true);
+  };
+
+  const handleAddExpense = () => {
+    setModalTipo('despesa');
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setIsSubmitting(false);
+  };
+
+  const handleSubmitTransaction = async (data: TransactionFormData) => {
+    setIsSubmitting(true);
+    try {
+      // TODO: Implement API call to create transaction
+      console.log('Creating transaction:', data);
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Refresh transactions list
+      await fetchTransacoes();
+
+      // Close modal
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error creating transaction:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!isHydrated) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+          <span className="ml-2 text-gray-600">{t('loading')}</span>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Redirecionando...</p>
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+          <span className="ml-2 text-gray-600">{t('redirecting')}</span>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout
-      title="Transações"
-      subtitle="Histórico de suas movimentações financeiras"
-    >
+    <DashboardLayout>
       <div className="space-y-6">
-        {/* Header com filtros e botão de adicionar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-          <div className="flex space-x-4">
-            <select className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-              <option value="">Todas as transações</option>
-              <option value="receita">Receitas</option>
-              <option value="despesa">Despesas</option>
-            </select>
-            <select className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-              <option value="">Todas as categorias</option>
-              <option value="alimentacao">Alimentação</option>
-              <option value="transporte">Transporte</option>
-              <option value="lazer">Lazer</option>
-              <option value="saude">Saúde</option>
-            </select>
-          </div>
-          <button className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-            Adicionar Transação
-          </button>
+        {/* Page Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+          <p className="mt-1 text-sm text-gray-600">{t('subtitle')}</p>
         </div>
 
-        {/* Loading state */}
-        {loading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-            <span className="ml-2 text-gray-600">Carregando transações...</span>
-          </div>
-        )}
+        {/* Action Buttons */}
+        <div className="flex justify-end">
+          <TransactionActions
+            onAddIncome={handleAddIncome}
+            onAddExpense={handleAddExpense}
+          />
+        </div>
 
-        {/* Transações list */}
-        {!loading && transacoes.length > 0 && (
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <ul className="divide-y divide-gray-200">
-              {transacoes.map((transacao) => (
-                <li key={transacao.id} className="px-6 py-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div
-                        className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
-                          transacao.tipo === 'receita'
-                            ? 'bg-green-100 text-green-600'
-                            : 'bg-red-100 text-red-600'
-                        }`}
-                      >
-                        {transacao.tipo === 'receita' ? (
-                          <svg
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                            />
-                          </svg>
-                        ) : (
-                          <svg
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M20 12H4"
-                            />
-                          </svg>
-                        )}
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {transacao.descricao}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {transacao.categoria} •{' '}
-                          {new Date(transacao.data).toLocaleDateString('pt-BR')}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <div
-                          className={`text-sm font-medium ${
-                            transacao.tipo === 'receita'
-                              ? 'text-green-600'
-                              : 'text-red-600'
-                          }`}
-                        >
-                          {transacao.tipo === 'receita' ? '+' : '-'}R${' '}
-                          {transacao.valor.toFixed(2).replace('.', ',')}
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <button className="text-gray-400 hover:text-gray-600">
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                            />
-                          </svg>
-                        </button>
-                        <button className="text-gray-400 hover:text-red-600">
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {/* Filters */}
+        <TransactionFilters
+          tipo={tipoFilter}
+          categoria={categoriaFilter}
+          onTipoChange={setTipoFilter}
+          onCategoriaChange={setCategoriaFilter}
+        />
 
-        {/* Empty state */}
-        {!loading && transacoes.length === 0 && (
-          <div className="text-center py-12">
-            <div className="mx-auto h-12 w-12 text-gray-400">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
-            </div>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              Nenhuma transação encontrada
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Comece registrando suas primeiras movimentações financeiras.
-            </p>
-            <div className="mt-6">
-              <button className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                Adicionar Transação
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Transactions Table */}
+        <TransactionTable transacoes={filteredTransacoes} loading={loading} />
+
+        {/* Transaction Modal */}
+        <TransactionModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          tipo={modalTipo}
+          contas={contas}
+          onSubmit={handleSubmitTransaction}
+          loading={isSubmitting}
+        />
       </div>
     </DashboardLayout>
   );
