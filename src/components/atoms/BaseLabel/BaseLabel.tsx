@@ -6,7 +6,7 @@ interface LabelProps {
   className?: string;
 }
 
-export const Label: React.FC<LabelProps> = ({
+export const BaseLabel: React.FC<LabelProps> = ({
   children,
   htmlFor,
   className = '',

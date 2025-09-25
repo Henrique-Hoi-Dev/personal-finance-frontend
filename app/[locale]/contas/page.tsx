@@ -13,7 +13,7 @@ export default function ContasPage() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/pt/login');
       return;
     }
     fetchContas();

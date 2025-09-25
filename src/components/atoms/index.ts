@@ -1,3 +1,3 @@
-export { Input } from './Input';
-export { Button } from './Button';
-export { Label } from './Label';
+export { BaseInput } from './BaseInput/BaseInput';
+export { BaseButton } from './BaseButton/BaseButton';
+export { BaseLabel } from './BaseLabel/BaseLabel';

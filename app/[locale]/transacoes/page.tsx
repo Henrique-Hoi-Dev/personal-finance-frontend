@@ -13,7 +13,7 @@ export default function TransacoesPage() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/pt/login');
       return;
     }
     fetchTransacoes();

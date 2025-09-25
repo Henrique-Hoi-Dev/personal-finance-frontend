@@ -1,0 +1,38 @@
+{
+  "Login": {
+    "title": "Sign in to your account",
+    "cpf": "CPF",
+    "password": "Password",
+    "submit": "Sign In",
+    "signup": "Don't have an account? Sign up",
+    "loading": "Loading...",
+    "required": "required",
+    "error_login": "Error cpf or password invalid",
+    "cpfPlaceholder": "000.000.000-00",
+    "passwordPlaceholder": "********",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
+  "Signup": {
+    "title": "Create your account",
+    "name": "Full name",
+    "email": "Email",
+    "cpf": "CPF",
+    "password": "Password",
+    "submit": "Sign Up",
+    "login": "Already have an account? Sign in",
+    "loading": "Creating account...",
+    "success": "Account created successfully!",
+    "error_signup": "Error creating account",
+    "namePlaceholder": "Enter your full name",
+    "emailPlaceholder": "your@email.com",
+    "cpfPlaceholder": "000.000.000-00",
+    "passwordPlaceholder": "********"
+  },
+  "App": {
+    "title": "FinanceApp"
+  },
+  "Common": {
+    "required": "*"
+  }
+}

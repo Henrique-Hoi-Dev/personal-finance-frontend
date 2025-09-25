@@ -1,30 +1,35 @@
 import React, { useState } from 'react';
 import { FormField, PasswordField } from '@/components/molecules';
 import { BaseButton } from '@/components/atoms';
-import { LoginPayload } from '@/types/auth';
-import { useAuthStore } from '@/store/auth.store';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { formatCPF, removeCPFMask } from '@/utils';
 
-interface LoginFormProps {
-  onSubmit?: (data: LoginPayload) => void;
+interface SignupPayload {
+  name: string;
+  email: string;
+  cpf: string;
+  password: string;
+}
+
+interface SignupFormProps {
+  onSubmit?: (data: SignupPayload) => void;
   errorMessage?: string;
   isLoading?: boolean;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({
+export const SignupForm: React.FC<SignupFormProps> = ({
   onSubmit,
   errorMessage,
   isLoading = false,
 }) => {
-  const t = useTranslations('Login');
-  const [formData, setFormData] = useState<LoginPayload>({
+  const t = useTranslations('Signup');
+  const [formData, setFormData] = useState<SignupPayload>({
+    name: '',
+    email: '',
     cpf: '',
     password: '',
   });
-
-  const { login, loading: storeLoading, error: storeError } = useAuthStore();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,19 +61,40 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       onSubmit(dataToSend);
     } else {
       try {
-        await login(dataToSend);
+        // Aqui você pode implementar a lógica de cadastro
+        console.log('Dados para cadastro:', dataToSend);
+        toast.success(t('success'));
       } catch (error) {
-        toast.error(t('error_login'));
+        toast.error(t('error_signup'));
       }
     }
   };
 
-  const currentLoading = isLoading || storeLoading;
-  const currentError = errorMessage || storeError;
-
   return (
     <div className="bg-white py-16 px-12 shadow-lg rounded-lg w-full max-w-xl">
-      <form className="space-y-8" onSubmit={handleSubmit}>
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        <FormField
+          label={t('name')}
+          type="text"
+          placeholder={t('namePlaceholder')}
+          value={formData.name}
+          onChange={handleInputChange}
+          name="name"
+          required
+          autoComplete="name"
+        />
+
+        <FormField
+          label={t('email')}
+          type="email"
+          placeholder={t('emailPlaceholder')}
+          value={formData.email}
+          onChange={handleInputChange}
+          name="email"
+          required
+          autoComplete="email"
+        />
+
         <FormField
           label={t('cpf')}
           type="text"
@@ -87,18 +113,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           onChange={handleInputChange}
           name="password"
           required
-          autoComplete="current-password"
+          autoComplete="new-password"
         />
 
         <div className="pt-6">
-          <BaseButton type="submit" variant="primary" disabled={currentLoading}>
-            {currentLoading ? t('loading') : t('submit')}
+          <BaseButton type="submit" variant="primary" disabled={isLoading}>
+            {isLoading ? t('loading') : t('submit')}
           </BaseButton>
         </div>
       </form>
 
       <div className="mt-8 text-center">
-        <p className="text-base text-gray-600">{t('signup')}</p>
+        <p className="text-base text-gray-600">{t('login')}</p>
       </div>
     </div>
   );

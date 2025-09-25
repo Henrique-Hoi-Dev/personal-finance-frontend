@@ -12,7 +12,7 @@ interface InputProps {
   className?: string;
 }
 
-export const Input: React.FC<InputProps> = ({
+export const BaseInput: React.FC<InputProps> = ({
   type,
   placeholder,
   value,

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Label, Input } from '@/components/atoms';
+import { BaseLabel, BaseInput } from '@/components/atoms';
+import { useTranslations } from 'next-intl';
 
 interface FormFieldProps {
   label: string;
@@ -24,19 +25,20 @@ export const FormField: React.FC<FormFieldProps> = ({
   required = false,
   autoComplete,
 }) => {
+  const t = useTranslations('Common');
   const fieldId = id || name || label.toLowerCase().replace(/\s+/g, '-');
   const fieldName = name || label.toLowerCase().replace(/\s+/g, '_');
 
   return (
     <div>
-      <Label
+      <BaseLabel
         htmlFor={fieldId}
         className="block text-base font-semibold text-gray-700 mb-2"
       >
-        {label} *
-      </Label>
+        {label} {t('required')}
+      </BaseLabel>
       <div>
-        <Input
+        <BaseInput
           id={fieldId}
           name={fieldName}
           type={type}

@@ -1,0 +1,38 @@
+{
+  "Login": {
+    "title": "Entre na sua conta",
+    "cpf": "CPF",
+    "password": "Senha",
+    "submit": "Entrar",
+    "signup": "Não tem conta? Cadastre-se",
+    "loading": "Carregando...",
+    "required": "obrigatório",
+    "error_login": "Erro ao cpf ou senha inválidos",
+    "cpfPlaceholder": "000.000.000-00",
+    "passwordPlaceholder": "********",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha"
+  },
+  "Signup": {
+    "title": "Crie sua conta",
+    "name": "Nome completo",
+    "email": "E-mail",
+    "cpf": "CPF",
+    "password": "Senha",
+    "submit": "Cadastrar",
+    "login": "Já tem conta? Faça login",
+    "loading": "Cadastrando...",
+    "success": "Conta criada com sucesso!",
+    "error_signup": "Erro ao criar conta",
+    "namePlaceholder": "Digite seu nome completo",
+    "emailPlaceholder": "seu@email.com",
+    "cpfPlaceholder": "000.000.000-00",
+    "passwordPlaceholder": "********"
+  },
+  "App": {
+    "title": "FinanceApp"
+  },
+  "Common": {
+    "required": "*"
+  }
+}
