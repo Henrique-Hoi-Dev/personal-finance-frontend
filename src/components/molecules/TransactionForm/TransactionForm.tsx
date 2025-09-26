@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BaseButton, BaseInput, BaseLabel } from '@/components/atoms';
 import { Conta } from '@/types';
+import { formatAmount } from '@/utils';
 
 interface TransactionFormProps {
   tipo: 'receita' | 'despesa';
@@ -102,10 +103,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     // Convert to number and format
     const number = parseInt(numericValue) / 100;
 
-    return number.toLocaleString('pt-BR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+    return formatAmount(number);
   };
 
   const handleCurrencyChange = (value: string) => {

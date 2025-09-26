@@ -14,6 +14,8 @@ interface InputProps {
   step?: string;
   min?: string;
   max?: string;
+  dataFormType?: string;
+  dataLpignore?: boolean;
 }
 
 export const BaseInput: React.FC<InputProps> = ({
@@ -30,6 +32,8 @@ export const BaseInput: React.FC<InputProps> = ({
   step,
   min,
   max,
+  dataFormType,
+  dataLpignore = false,
 }) => {
   return (
     <div>
@@ -45,6 +49,8 @@ export const BaseInput: React.FC<InputProps> = ({
         step={step}
         min={min}
         max={max}
+        data-form-type={dataFormType}
+        data-lpignore={dataLpignore}
         className={`appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
           error ? 'border-red-300' : 'border-gray-300'
         } ${className}`}

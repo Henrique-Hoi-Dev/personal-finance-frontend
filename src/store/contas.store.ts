@@ -23,6 +23,12 @@ interface ContasActions {
   updateConta: (data: UpdateContaPayload) => Promise<void>;
   removeConta: (id: string) => Promise<void>;
   setSelectedConta: (conta: Conta | null) => void;
+  updateInstallmentStatus: (
+    contaId: string,
+    installmentId: string,
+    isPaid: boolean
+  ) => void;
+  updateContaTotalAmount: (contaId: string, newTotalAmount: number) => void;
   clearError: () => void;
 }
 
@@ -42,10 +48,7 @@ export const useContasStore = create<ContasStore>((set, get) => ({
       const contas = await getContas();
       set({ contas, loading: false });
     } catch (error: any) {
-      set({
-        error: error.message || 'Erro ao carregar contas',
-        loading: false,
-      });
+      set({ contas: [], loading: false });
     }
   },
 
@@ -132,6 +135,59 @@ export const useContasStore = create<ContasStore>((set, get) => ({
   },
 
   setSelectedConta: (conta: Conta | null) => set({ selectedConta: conta }),
+
+  updateInstallmentStatus: (
+    contaId: string,
+    installmentId: string,
+    isPaid: boolean
+  ) => {
+    set((state) => ({
+      contas: state.contas.map((conta) =>
+        conta.id === contaId
+          ? {
+              ...conta,
+              installmentList: conta.installmentList?.map((installment) =>
+                installment.id === installmentId
+                  ? {
+                      ...installment,
+                      isPaid,
+                      paidAt: isPaid ? new Date().toISOString() : null,
+                    }
+                  : installment
+              ),
+            }
+          : conta
+      ),
+      selectedConta:
+        state.selectedConta?.id === contaId
+          ? {
+              ...state.selectedConta,
+              installmentList: state.selectedConta.installmentList?.map(
+                (installment) =>
+                  installment.id === installmentId
+                    ? {
+                        ...installment,
+                        isPaid,
+                        paidAt: isPaid ? new Date().toISOString() : null,
+                      }
+                    : installment
+              ),
+            }
+          : state.selectedConta,
+    }));
+  },
+
+  updateContaTotalAmount: (contaId: string, newTotalAmount: number) => {
+    set((state) => ({
+      contas: state.contas.map((conta) =>
+        conta.id === contaId ? { ...conta, totalAmount: newTotalAmount } : conta
+      ),
+      selectedConta:
+        state.selectedConta?.id === contaId
+          ? { ...state.selectedConta, totalAmount: newTotalAmount }
+          : state.selectedConta,
+    }));
+  },
 
   clearError: () => set({ error: null }),
 }));

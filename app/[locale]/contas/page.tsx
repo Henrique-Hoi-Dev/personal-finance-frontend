@@ -34,61 +34,88 @@ export default function ContasPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <div className="h-full bg-gray-50">
+          <div className="flex justify-between">
+            <div className="p-6">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                {t('title')}
+              </h1>
+              <p className="text-gray-600 text-sm">{t('description')}</p>
+            </div>
+            <div className="p-6">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              {t('addAccount')}
-            </button>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                {t('addAccount')}
+              </button>
+            </div>
           </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center min-h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-              <span className="ml-2 text-gray-600">{t('loading')}</span>
-            </div>
-          ) : contas.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {contas.map((conta) => (
-                <ContaCard
-                  key={conta.id}
-                  conta={conta}
-                  isSelected={selectedConta?.id === conta.id}
-                  onClick={() => setSelectedConta(conta)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="text-gray-500 text-lg mb-4">
-                {t('noAccounts')}
+          <div className="flex h-full">
+            {/* Painel Esquerdo - Lista de Contas */}
+            <div className="w-1/2 flex flex-col">
+              <div className="mt-4">
+                <h2 className="pl-6 text-lg font-semibold text-gray-900">
+                  {t('yourAccounts')}
+                </h2>
               </div>
-              <p className="text-gray-400">{t('noAccountsDescription')}</p>
+              {/* Lista de Contas */}
+              <div className="flex-1 w-full p-6 space-y-4 overflow-y-auto">
+                {loading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <span className="ml-2 text-gray-600">{t('loading')}</span>
+                  </div>
+                ) : contas.length > 0 ? (
+                  contas.map((conta) => (
+                    <ContaCard
+                      key={conta.id}
+                      conta={conta}
+                      isSelected={selectedConta?.id === conta.id}
+                      onClick={() => setSelectedConta(conta)}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="text-gray-500 text-lg mb-4">
+                      {t('noAccounts')}
+                    </div>
+                    <p className="text-gray-400">
+                      {t('noAccountsDescription')}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
 
-          {selectedConta && (
-            <ContaDetails
-              conta={selectedConta}
-              onClose={() => setSelectedConta(null)}
-            />
-          )}
+            {/* Painel Direito - Detalhes da Conta */}
+            <div className="w-1/2 flex flex-col">
+              <div className="mt-4">
+                <h2 className="pl-6 text-lg font-semibold text-gray-900">
+                  {t('accountDetails') + ' ' + (selectedConta?.name ?? '')}
+                </h2>
+              </div>
+              <div className="flex-1 p-6">
+                <ContaDetails
+                  conta={selectedConta}
+                  onClose={() => setSelectedConta(null)}
+                />
+              </div>
+            </div>
+          </div>
 
           <ContaModal
             isOpen={isModalOpen}

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
-import { User, UserProfile } from '@/types/auth';
+import { UserProfile } from '@/types/auth';
 import { BaseButton, BaseLoading } from '@/components/atoms';
 import {
   ProfileCard,
@@ -21,9 +21,7 @@ export default function PerfilPage() {
   const router = useRouter();
   const { user, logout, loading } = useAuthStore();
   const [isSaving, setIsSaving] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
 
-  console.log('user', user);
   const handleLogout = async () => {
     try {
       await logout();

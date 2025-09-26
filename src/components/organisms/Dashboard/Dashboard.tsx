@@ -8,7 +8,7 @@ import {
 import { getBalance } from '@/services/transacoes.service';
 import { Balance } from '@/types/transacoes';
 import { BaseLoading } from '@/components/atoms';
-import { formatCurrencyFromCents } from '@/utils';
+import { formatCurrencyFromCents, formatAmount } from '@/utils';
 
 export const Dashboard: React.FC = () => {
   const t = useTranslations('Dashboard');
@@ -107,35 +107,35 @@ export const Dashboard: React.FC = () => {
       description: 'Salário',
       category: 'Trabalho',
       date: '2024-01-15',
-      amount: 'R$ 3.500,00',
+      amount: formatAmount(3500),
       type: 'income' as const,
     },
     {
       description: 'Supermercado',
       category: 'Alimentação',
       date: '2024-01-14',
-      amount: 'R$ 450,00',
+      amount: formatAmount(450),
       type: 'expense' as const,
     },
     {
       description: 'Conta de Luz',
       category: 'Utilities',
       date: '2024-01-13',
-      amount: 'R$ 120,00',
+      amount: formatAmount(120),
       type: 'expense' as const,
     },
     {
       description: 'Freelance',
       category: 'Trabalho',
       date: '2024-01-12',
-      amount: 'R$ 800,00',
+      amount: formatAmount(800),
       type: 'income' as const,
     },
     {
       description: 'Netflix',
       category: 'Entretenimento',
       date: '2024-01-11',
-      amount: 'R$ 60,00',
+      amount: formatAmount(60),
       type: 'expense' as const,
     },
   ];
@@ -143,31 +143,31 @@ export const Dashboard: React.FC = () => {
   const categories = [
     {
       name: 'Alimentação',
-      amount: 'R$ 450,00',
+      amount: formatAmount(450),
       color: 'bg-red-500',
       percentage: 60,
     },
     {
       name: 'Utilities',
-      amount: 'R$ 120,00',
+      amount: formatAmount(120),
       color: 'bg-orange-500',
       percentage: 15,
     },
     {
       name: 'Entretenimento',
-      amount: 'R$ 60,00',
+      amount: formatAmount(60),
       color: 'bg-purple-500',
       percentage: 8,
     },
     {
       name: 'Transporte',
-      amount: 'R$ 200,00',
+      amount: formatAmount(200),
       color: 'bg-blue-400',
       percentage: 25,
     },
     {
       name: 'Saúde',
-      amount: 'R$ 180,00',
+      amount: formatAmount(180),
       color: 'bg-green-600',
       percentage: 20,
     },

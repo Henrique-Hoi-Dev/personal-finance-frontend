@@ -76,3 +76,48 @@ export const formatDate = (date: Date | string): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   return new Intl.DateTimeFormat('pt-BR').format(dateObj);
 };
+
+/**
+ * Formata um valor monetário simples (R$ 1.234,56)
+ * @param amount - Valor numérico
+ * @returns Valor formatado como moeda brasileira
+ */
+export const formatAmount = (amount: number): string => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(amount);
+};
+
+/**
+ * Retorna a cor CSS baseada no valor (verde para positivo, vermelho para negativo)
+ * @param amount - Valor numérico
+ * @returns Classe CSS para cor
+ */
+export const getAmountColor = (amount: number): string => {
+  return amount >= 0 ? 'text-green-600' : 'text-red-600';
+};
+
+/**
+ * Converte o tipo de conta para label em português
+ * @param type - Tipo da conta
+ * @returns Label em português
+ */
+export const getAccountTypeLabel = (type: string): string => {
+  if (!type) return 'Outro';
+
+  switch (type.toUpperCase()) {
+    case 'FIXED':
+      return 'Fixa';
+    case 'LOAN':
+      return 'Empréstimo';
+    case 'CREDIT_CARD':
+      return 'Cartão de Crédito';
+    case 'SUBSCRIPTION':
+      return 'Assinatura';
+    case 'OTHER':
+      return 'Outro';
+    default:
+      return 'Outro';
+  }
+};

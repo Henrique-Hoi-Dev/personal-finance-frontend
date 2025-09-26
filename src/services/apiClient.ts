@@ -30,6 +30,35 @@ class ApiClient {
 
   setToken(token: string | null) {
     this.token = token;
+    if (token && typeof window !== 'undefined') {
+      this.startTokenExpirationCheck();
+    }
+  }
+
+  private startTokenExpirationCheck() {
+    const checkInterval = setInterval(() => {
+      if (this.token && isTokenExpired(this.token)) {
+        console.warn('Token expirado detectado durante verificação periódica');
+        this.handleTokenExpiration();
+        clearInterval(checkInterval);
+      }
+    }, 1860000);
+  }
+
+  private handleTokenExpiration() {
+    this.token = null;
+    if (typeof window !== 'undefined') {
+      // Importa o store dinamicamente para evitar dependência circular
+      import('@/store/auth.store').then(({ useAuthStore }) => {
+        const store = useAuthStore.getState();
+        store.forceLogout();
+      });
+
+      toast.error('Sessão expirada. Faça login novamente.');
+
+      // Redireciona para login
+      window.location.href = '/pt/login';
+    }
   }
 
   private async request<T>(
@@ -38,11 +67,7 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     // Verifica se o token está expirado antes de fazer a requisição
     if (this.token && isTokenExpired(this.token)) {
-      this.token = null;
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        toast.error('Sessão expirada. Faça login novamente.');
-      }
+      this.handleTokenExpiration();
       throw new ApiError('Token expirado', 401);
     }
 
@@ -62,6 +87,11 @@ class ApiClient {
       const data = await response.json();
 
       if (!response.ok) {
+        // Se receber 401, trata como token expirado
+        if (response.status === 401) {
+          this.handleTokenExpiration();
+        }
+
         throw new ApiError(
           data.message || 'Erro na requisição',
           response.status

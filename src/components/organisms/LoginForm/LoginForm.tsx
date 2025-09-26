@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FormField, PasswordField } from '@/components/molecules';
-import { BaseButton } from '@/components/atoms';
+import { PasswordField } from '@/components/molecules';
+import { BaseButton, CPFInput, BaseLabel } from '@/components/atoms';
 import { LoginPayload } from '@/types/auth';
 import { useAuthStore } from '@/store/auth.store';
 import { useTranslations } from 'next-intl';
@@ -73,16 +73,23 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   return (
     <div className="bg-white py-16 px-12 shadow-lg rounded-lg w-full max-w-xl">
       <form className="space-y-8" onSubmit={handleSubmit}>
-        <FormField
-          label={t('cpf')}
-          type="text"
-          placeholder={t('cpfPlaceholder')}
-          value={formData.cpf}
-          onChange={handleInputChange}
-          name="cpf"
-          required
-          autoComplete="username"
-        />
+        <div>
+          <BaseLabel
+            htmlFor="cpf"
+            className="block text-base font-semibold text-gray-700 mb-2"
+          >
+            {t('cpf')} *
+          </BaseLabel>
+          <CPFInput
+            id="cpf"
+            name="cpf"
+            placeholder={t('cpfPlaceholder')}
+            value={formData.cpf}
+            onChange={handleInputChange}
+            required
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+          />
+        </div>
 
         <PasswordField
           label={t('password')}

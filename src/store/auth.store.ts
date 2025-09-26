@@ -24,6 +24,7 @@ interface AuthActions {
   clearError: () => void;
   setToken: (token: string) => void;
   loadUserProfile: () => Promise<void>;
+  forceLogout: () => void;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -130,6 +131,23 @@ export const useAuthStore = create<AuthStore>()(
             loading: false,
           });
         }
+      },
+
+      forceLogout: () => {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('auth-storage');
+        }
+
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          error: null,
+          loading: false,
+        });
+
+        apiClient.setToken(null);
       },
     }),
     {

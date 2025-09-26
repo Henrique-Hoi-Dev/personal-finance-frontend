@@ -131,17 +131,6 @@ export async function getInstallmentById(id: string): Promise<Installment> {
   return response.data;
 }
 
-export async function payInstallment(
-  id: string,
-  data?: PayInstallmentPayload
-): Promise<Installment> {
-  const response = await apiClient.patch<Installment>(
-    `/accounts/installments/${id}/pay`,
-    data
-  );
-  return response.data;
-}
-
 export async function unpayInstallment(id: string): Promise<Installment> {
   const response = await apiClient.patch<Installment>(
     `/accounts/installments/${id}/unpay`
@@ -151,4 +140,26 @@ export async function unpayInstallment(id: string): Promise<Installment> {
 
 export async function deleteInstallment(id: string): Promise<void> {
   await apiClient.delete(`/accounts/installments/${id}`);
+}
+
+// Payment functions
+export async function payInstallment(
+  installmentId: string,
+  paymentAmount: number
+): Promise<Installment> {
+  const response = await apiClient.patch<Installment>(
+    `/accounts/installments/${installmentId}/pay`,
+    { paymentAmount }
+  );
+  return response.data;
+}
+
+export async function payFullAccount(
+  accountId: string,
+  paymentAmount: number
+): Promise<Conta> {
+  const response = await apiClient.patch<Conta>(`/accounts/${accountId}/pay`, {
+    paymentAmount,
+  });
+  return response.data;
 }

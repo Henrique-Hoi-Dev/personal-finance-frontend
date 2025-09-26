@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Transacao } from '@/types';
+import { formatAmount } from '@/utils';
 
 interface TransactionTableProps {
   transacoes: Transacao[];
@@ -22,7 +23,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
   };
 
   const formatValue = (valor: number, tipo: string) => {
-    const formatted = `R$ ${Math.abs(valor).toFixed(2).replace('.', ',')}`;
+    const formatted = formatAmount(Math.abs(valor));
     return tipo === 'receita' ? `+${formatted}` : `-${formatted}`;
   };
 

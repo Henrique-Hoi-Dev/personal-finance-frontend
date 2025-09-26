@@ -1,3 +1,12 @@
+export interface Installment {
+  id: string;
+  amount: number;
+  number: number;
+  dueDate: string;
+  isPaid: boolean;
+  paidAt: string | null;
+}
+
 export interface Conta {
   id: string;
   name: string;
@@ -5,10 +14,12 @@ export interface Conta {
   totalAmount: number;
   installments?: number;
   startDate: string;
+  isPaid: boolean;
   dueDay: number;
   userId: string;
   createdAt: string;
   updatedAt: string;
+  installmentList?: Installment[];
 }
 
 export interface CreateContaPayload {

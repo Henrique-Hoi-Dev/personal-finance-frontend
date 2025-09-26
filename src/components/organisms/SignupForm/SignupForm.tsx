@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { FormField, PasswordField } from '@/components/molecules';
-import { BaseButton } from '@/components/atoms';
+import { PasswordField, FormField } from '@/components/molecules';
+import { BaseButton, CPFInput, BaseLabel } from '@/components/atoms';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { formatCPF, removeCPFMask } from '@/utils';
@@ -88,18 +88,27 @@ export const SignupForm: React.FC<SignupFormProps> = ({
           name="email"
           required
           autoComplete="email"
+          dataFormType="other"
+          dataLpignore={true}
         />
 
-        <FormField
-          label={t('cpf')}
-          type="text"
-          placeholder={t('cpfPlaceholder')}
-          value={formData.cpf}
-          onChange={handleInputChange}
-          name="cpf"
-          required
-          autoComplete="username"
-        />
+        <div>
+          <BaseLabel
+            htmlFor="cpf"
+            className="block text-base font-semibold text-gray-700 mb-2"
+          >
+            {t('cpf')} *
+          </BaseLabel>
+          <CPFInput
+            id="cpf"
+            name="cpf"
+            placeholder={t('cpfPlaceholder')}
+            value={formData.cpf}
+            onChange={handleInputChange}
+            required
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+          />
+        </div>
 
         <PasswordField
           label={t('password')}

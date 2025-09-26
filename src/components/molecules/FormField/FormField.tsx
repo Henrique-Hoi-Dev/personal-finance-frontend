@@ -12,6 +12,8 @@ interface FormFieldProps {
   name?: string;
   required?: boolean;
   autoComplete?: string;
+  dataFormType?: string;
+  dataLpignore?: boolean;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -24,6 +26,8 @@ export const FormField: React.FC<FormFieldProps> = ({
   name,
   required = false,
   autoComplete,
+  dataFormType,
+  dataLpignore,
 }) => {
   const t = useTranslations('Common');
   const fieldId = id || name || label.toLowerCase().replace(/\s+/g, '-');
@@ -47,6 +51,8 @@ export const FormField: React.FC<FormFieldProps> = ({
           onChange={onChange}
           required={required}
           autoComplete={autoComplete}
+          dataFormType={dataFormType}
+          dataLpignore={dataLpignore}
           className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
         />
       </div>
