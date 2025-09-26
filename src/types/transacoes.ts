@@ -78,3 +78,16 @@ export interface CreateExpensePayload {
   data: string;
   contaId: string;
 }
+
+export interface ExpenseByCategory {
+  category: string;
+  name: string;
+  nameEn: string;
+  value: number;
+  percentage: number;
+  color: string;
+}
+
+export interface ExpensesByCategoryResponse {
+  categories: ExpenseByCategory[];
+}

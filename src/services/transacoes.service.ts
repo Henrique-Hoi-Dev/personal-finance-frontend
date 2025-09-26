@@ -8,6 +8,7 @@ import {
   Category,
   CreateIncomePayload,
   CreateExpensePayload,
+  ExpensesByCategoryResponse,
 } from '@/types/transacoes';
 
 const cleanFilters = (filters: TransacaoFilters): Record<string, any> => {
@@ -116,29 +117,9 @@ export async function createExpense(
   return response.data;
 }
 
-export async function getExpensesByCategory(): Promise<{
-  data: {
-    categories: Array<{
-      category: string;
-      name: string;
-      nameEn: string;
-      value: number;
-      percentage: number;
-      color: string;
-    }>;
-  };
-}> {
-  const response = await apiClient.get<{
-    data: {
-      categories: Array<{
-        category: string;
-        name: string;
-        nameEn: string;
-        value: number;
-        percentage: number;
-        color: string;
-      }>;
-    };
-  }>('/transactions/expenses-by-category');
+export async function getExpensesByCategory(): Promise<ExpensesByCategoryResponse> {
+  const response = await apiClient.get<ExpensesByCategoryResponse>(
+    '/transactions/expenses-by-category'
+  );
   return response.data;
 }

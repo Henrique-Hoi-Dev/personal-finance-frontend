@@ -5,8 +5,12 @@ import {
   TransactionItem,
   CategoryItem,
 } from '@/components/molecules';
-import { getBalance, getTransacoes, getExpensesByCategory } from '@/services/transacoes.service';
-import { Balance, Transacao } from '@/types/transacoes';
+import {
+  getBalance,
+  getTransacoes,
+  getExpensesByCategory,
+} from '@/services/transacoes.service';
+import { Balance, Transacao, ExpenseByCategory } from '@/types/transacoes';
 import { BaseLoading } from '@/components/atoms';
 import { formatCurrencyFromCents } from '@/utils';
 
@@ -14,6 +18,7 @@ export const Dashboard: React.FC = () => {
   const t = useTranslations('Dashboard');
   const [balance, setBalance] = useState<Balance | null>(null);
   const [transactions, setTransactions] = useState<Transacao[]>([]);
+  const [categories, setCategories] = useState<ExpenseByCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,13 +26,16 @@ export const Dashboard: React.FC = () => {
       try {
         setLoading(true);
 
-        const [balanceData, transactionsData] = await Promise.all([
-          getBalance(),
-          getTransacoes({ limit: 5, page: 0 }),
-        ]);
+        const [balanceData, transactionsData, categoriesData] =
+          await Promise.all([
+            getBalance(),
+            getTransacoes({ limit: 5, page: 0 }),
+            getExpensesByCategory(),
+          ]);
 
         setBalance(balanceData);
         setTransactions(transactionsData.data);
+        setCategories(categoriesData.categories);
       } catch (error) {
         console.error('Dashboard: Erro ao carregar dados:', error);
       } finally {
@@ -149,38 +157,13 @@ export const Dashboard: React.FC = () => {
     },
   ];
 
-  const categories = [
-    {
-      name: 'Alimentação',
-      amount: formatCurrencyFromCents(45000),
-      color: 'bg-red-500',
-      percentage: 60,
-    },
-    {
-      name: 'Utilities',
-      amount: formatCurrencyFromCents(12000),
-      color: 'bg-orange-500',
-      percentage: 15,
-    },
-    {
-      name: 'Entretenimento',
-      amount: formatCurrencyFromCents(6000),
-      color: 'bg-purple-500',
-      percentage: 8,
-    },
-    {
-      name: 'Transporte',
-      amount: formatCurrencyFromCents(20000),
-      color: 'bg-blue-400',
-      percentage: 25,
-    },
-    {
-      name: 'Saúde',
-      amount: formatCurrencyFromCents(18000),
-      color: 'bg-green-600',
-      percentage: 20,
-    },
-  ];
+  // Transform categories data for CategoryItem component
+  const categoriesData = categories.map((category) => ({
+    name: category.name,
+    amount: formatCurrencyFromCents(category.value),
+    color: category.color, // Use the hex color directly
+    percentage: category.percentage,
+  }));
 
   return (
     <div className="space-y-6">
@@ -244,15 +227,21 @@ export const Dashboard: React.FC = () => {
             {t('expensesByCategory')}
           </h3>
           <div className="space-y-1">
-            {categories.map((category, index) => (
-              <CategoryItem
-                key={index}
-                name={category.name}
-                amount={category.amount}
-                color={category.color}
-                percentage={category.percentage}
-              />
-            ))}
+            {categoriesData.length > 0 ? (
+              categoriesData.map((category, index) => (
+                <CategoryItem
+                  key={index}
+                  name={category.name}
+                  amount={category.amount}
+                  color={category.color}
+                  percentage={category.percentage}
+                />
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                Nenhum gasto por categoria encontrado
+              </div>
+            )}
           </div>
         </div>
       </div>

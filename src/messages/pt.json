@@ -41,6 +41,7 @@
     "income": "Entradas",
     "expenses": "Saídas",
     "fixedAccounts": "Contas Fixas",
+    "noTransactions": "Nenhuma transação encontrada",
     "loans": "Financiamentos",
     "latestTransactions": "Últimas Transações",
     "seeAll": "Ver todas",
