@@ -45,8 +45,16 @@ export interface GetAllInstallmentsParams extends GetInstallmentsParams {
 }
 
 export async function getContas(): Promise<Conta[]> {
-  const response = await apiClient.get<Conta[]>('/accounts');
-  return response.data;
+  const response = await apiClient.get<{
+    docs: Conta[];
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+    limit: number;
+    offset: number;
+    page: number;
+    total: number;
+  }>('/accounts');
+  return response.data.docs;
 }
 
 export async function getContaById(id: string): Promise<Conta> {

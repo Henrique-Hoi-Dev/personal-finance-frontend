@@ -11,13 +11,18 @@ export interface SignupPayload {
 }
 
 export interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    name: string;
-    cpf: string;
-    email?: string;
-  };
+  accessToken: string;
+  expiresIn: number;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  cpf: string;
+  isActive: boolean;
+  emailVerified: boolean;
+  lastLogin: Date;
 }
 
 export interface User {

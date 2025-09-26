@@ -1,19 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   SummaryCard,
   TransactionItem,
   CategoryItem,
 } from '@/components/molecules';
+import { getBalance } from '@/services/transacoes.service';
+import { Balance } from '@/types/transacoes';
+import { BaseLoading } from '@/components/atoms';
+import { formatCurrencyFromCents } from '@/utils';
 
 export const Dashboard: React.FC = () => {
   const t = useTranslations('Dashboard');
+  const [balance, setBalance] = useState<Balance | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Dados mockados baseados no design
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        setLoading(true);
+        const balanceData = await getBalance();
+        setBalance(balanceData);
+      } catch (error) {
+        console.error('Erro ao carregar saldo');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBalance();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <BaseLoading text={t('loading')} />
+      </div>
+    );
+  }
+
   const summaryData = [
     {
       title: t('currentBalance'),
-      value: 'R$ 3.670,00',
+      value: balance ? formatCurrencyFromCents(balance.balance) : 'R$ 0,00',
       color: 'green' as const,
       icon: (
         <svg
@@ -33,7 +62,7 @@ export const Dashboard: React.FC = () => {
     },
     {
       title: t('income'),
-      value: 'R$ 4.300,00',
+      value: balance ? formatCurrencyFromCents(balance.income) : 'R$ 0,00',
       color: 'green' as const,
       icon: (
         <svg
@@ -53,7 +82,7 @@ export const Dashboard: React.FC = () => {
     },
     {
       title: t('expenses'),
-      value: 'R$ 630,00',
+      value: balance ? formatCurrencyFromCents(balance.expense) : 'R$ 0,00',
       color: 'red' as const,
       icon: (
         <svg

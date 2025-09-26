@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { DashboardLayout } from '@/components/templates';
 import {
@@ -10,146 +9,120 @@ import {
   TransactionTable,
 } from '@/components/molecules';
 import { TransactionModal } from '@/components/organisms';
-import { useAuth } from '@/hooks/useAuth';
 import { useTransacoesStore } from '@/store/transacoes.store';
 import { useContasStore } from '@/store/contas.store';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Transacao } from '@/types';
 import { TransactionFormData } from '@/components/molecules';
 
 export default function TransacoesPage() {
-  const { isAuthenticated, isHydrated } = useAuth();
   const { transacoes, loading, fetchTransacoes } = useTransacoesStore();
   const { contas, fetchContas } = useContasStore();
-  const router = useRouter();
-  const t = useTranslations('Transacoes');
-
-  // Filter states
-  const [tipoFilter, setTipoFilter] = useState('');
-  const [categoriaFilter, setCategoriaFilter] = useState('');
-
-  // Modal states
+  const t = useTranslations('Transactions');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalTipo, setModalTipo] = useState<'receita' | 'despesa'>('receita');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (isHydrated && !isAuthenticated) {
-      router.push('/pt/login');
-      return;
-    }
-
-    if (isHydrated && isAuthenticated) {
-      fetchTransacoes();
-      fetchContas();
-    }
-  }, [isHydrated, isAuthenticated, fetchTransacoes, router]);
-
-  // Filter transactions based on current filters
-  const filteredTransacoes = transacoes.filter((transacao) => {
-    const matchesTipo = !tipoFilter || transacao.tipo === tipoFilter;
-    const matchesCategoria =
-      !categoriaFilter ||
-      transacao.categoria.toLowerCase().includes(categoriaFilter.toLowerCase());
-
-    return matchesTipo && matchesCategoria;
+  const [editingTransacao, setEditingTransacao] = useState<Transacao | null>(
+    null
+  );
+  const [filters, setFilters] = useState({
+    contaId: '',
+    tipo: '',
+    dataInicio: '',
+    dataFim: '',
   });
 
-  const handleAddIncome = () => {
-    setModalTipo('receita');
+  useEffect(() => {
+    fetchTransacoes();
+    fetchContas();
+  }, [fetchTransacoes, fetchContas]);
+
+  const handleCreateTransacao = () => {
+    setEditingTransacao(null);
     setIsModalOpen(true);
   };
 
-  const handleAddExpense = () => {
-    setModalTipo('despesa');
+  const handleEditTransacao = (transacao: Transacao) => {
+    setEditingTransacao(transacao);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setIsSubmitting(false);
+    setEditingTransacao(null);
   };
 
-  const handleSubmitTransaction = async (data: TransactionFormData) => {
-    setIsSubmitting(true);
+  const handleSubmitTransacao = async (data: TransactionFormData) => {
     try {
-      // TODO: Implement API call to create transaction
-      console.log('Creating transaction:', data);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Refresh transactions list
+      if (editingTransacao) {
+        // await updateTransacao(editingTransacao.id, data);
+      } else {
+        // await createTransacao(data);
+      }
       await fetchTransacoes();
-
-      // Close modal
       handleCloseModal();
     } catch (error) {
-      console.error('Error creating transaction:', error);
-    } finally {
-      setIsSubmitting(false);
+      console.error('Erro ao salvar transação:', error);
     }
   };
 
-  if (!isHydrated) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-          <span className="ml-2 text-gray-600">{t('loading')}</span>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const handleDeleteTransacao = async (id: string) => {
+    try {
+      // await deleteTransacao(id);
+      await fetchTransacoes();
+    } catch (error) {
+      console.error('Erro ao deletar transação:', error);
+    }
+  };
 
-  if (!isAuthenticated) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-          <span className="ml-2 text-gray-600">{t('redirecting')}</span>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const filteredTransacoes = (transacoes || []).filter((transacao) => {
+    if (filters.contaId && transacao.contaId !== filters.contaId) return false;
+    if (filters.tipo && transacao.tipo !== filters.tipo) return false;
+    // Adicionar filtros de data se necessário
+    return true;
+  });
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="mt-1 text-sm text-gray-600">{t('subtitle')}</p>
-        </div>
+    <ProtectedRoute>
+      <DashboardLayout>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+            <TransactionActions
+              onAddIncome={handleCreateTransacao}
+              onAddExpense={handleCreateTransacao}
+            />
+          </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end">
-          <TransactionActions
-            onAddIncome={handleAddIncome}
-            onAddExpense={handleAddExpense}
+          <TransactionFilters
+            tipo={filters.tipo}
+            categoria={filters.contaId}
+            onTipoChange={(tipo) => setFilters((prev) => ({ ...prev, tipo }))}
+            onCategoriaChange={(contaId) =>
+              setFilters((prev) => ({ ...prev, contaId }))
+            }
+          />
+
+          {loading ? (
+            <div className="flex items-center justify-center min-h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+              <span className="ml-2 text-gray-600">{t('loading')}</span>
+            </div>
+          ) : (
+            <TransactionTable
+              transacoes={filteredTransacoes}
+              onEdit={handleEditTransacao}
+              onDelete={handleDeleteTransacao}
+            />
+          )}
+
+          <TransactionModal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            onSubmit={handleSubmitTransacao}
+            tipo="receita"
+            contas={contas}
           />
         </div>
-
-        {/* Filters */}
-        <TransactionFilters
-          tipo={tipoFilter}
-          categoria={categoriaFilter}
-          onTipoChange={setTipoFilter}
-          onCategoriaChange={setCategoriaFilter}
-        />
-
-        {/* Transactions Table */}
-        <TransactionTable transacoes={filteredTransacoes} loading={loading} />
-
-        {/* Transaction Modal */}
-        <TransactionModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          tipo={modalTipo}
-          contas={contas}
-          onSubmit={handleSubmitTransaction}
-          loading={isSubmitting}
-        />
-      </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </ProtectedRoute>
   );
 }

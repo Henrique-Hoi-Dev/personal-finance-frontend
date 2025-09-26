@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FormField, PasswordField } from '@/components/molecules';
 import { BaseButton } from '@/components/atoms';
 import { LoginPayload } from '@/types/auth';
@@ -19,6 +20,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   isLoading = false,
 }) => {
   const t = useTranslations('Login');
+  const router = useRouter();
   const [formData, setFormData] = useState<LoginPayload>({
     cpf: '',
     password: '',
@@ -57,6 +59,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     } else {
       try {
         await login(dataToSend);
+        // Redireciona após login bem-sucedido
+        router.push('/pt/dashboard');
       } catch (error) {
         toast.error(t('error_login'));
       }

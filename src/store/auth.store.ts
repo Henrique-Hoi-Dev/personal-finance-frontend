@@ -6,11 +6,11 @@ import {
   getCurrentUser,
   register,
 } from '@/services/auth.service';
-import { LoginPayload, SignupPayload, User } from '@/types/auth';
+import { LoginPayload, SignupPayload, UserProfile } from '@/types/auth';
 import { apiClient } from '@/services/apiClient';
 
 interface AuthState {
-  user: User | null;
+  user: UserProfile | null;
   token: string | null;
   loading: boolean;
   error: string | null;
@@ -21,9 +21,9 @@ interface AuthActions {
   login: (data: LoginPayload) => Promise<void>;
   register: (data: SignupPayload) => Promise<void>;
   logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
   clearError: () => void;
   setToken: (token: string) => void;
+  loadUserProfile: () => Promise<void>;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -31,7 +31,6 @@ type AuthStore = AuthState & AuthActions;
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
-      // State
       user: null,
       token: null,
       loading: false,
@@ -43,13 +42,17 @@ export const useAuthStore = create<AuthStore>()(
         set({ loading: true, error: null });
         try {
           const response = await login(data);
+
+          apiClient.setToken(response.accessToken);
+
+          const userProfile = await getCurrentUser();
+
           set({
-            user: response.user,
-            token: response.token,
+            user: userProfile,
+            token: response.accessToken,
             isAuthenticated: true,
             loading: false,
           });
-          apiClient.setToken(response.token);
         } catch (error: any) {
           set({
             error: error.message || 'Erro ao fazer login',
@@ -63,13 +66,17 @@ export const useAuthStore = create<AuthStore>()(
         set({ loading: true, error: null });
         try {
           const response = await register(data);
+
+          apiClient.setToken(response.accessToken);
+
+          const userProfile = await getCurrentUser();
+
           set({
-            user: response.user,
-            token: response.token,
+            user: userProfile,
+            token: response.accessToken,
             isAuthenticated: true,
             loading: false,
           });
-          apiClient.setToken(response.token);
         } catch (error: any) {
           set({
             error: error.message || 'Erro ao criar conta',
@@ -83,8 +90,11 @@ export const useAuthStore = create<AuthStore>()(
         try {
           await logout();
         } catch (error) {
-          // Ignore logout errors
         } finally {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+          }
+
           set({
             user: null,
             token: null,
@@ -95,27 +105,31 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      refreshUser: async () => {
-        const { token } = get();
-        if (!token) return;
-
-        set({ loading: true });
-        try {
-          const user = await getCurrentUser();
-          set({ user, loading: false });
-        } catch (error: any) {
-          set({
-            error: error.message || 'Erro ao carregar usuário',
-            loading: false,
-          });
-        }
-      },
-
       clearError: () => set({ error: null }),
 
       setToken: (token: string) => {
         set({ token, isAuthenticated: true });
         apiClient.setToken(token);
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('token', token);
+        }
+      },
+
+      loadUserProfile: async () => {
+        set({ loading: true, error: null });
+        try {
+          const userProfile = await getCurrentUser();
+          set({
+            user: userProfile,
+            loading: false,
+          });
+        } catch (error: any) {
+          set({
+            error: error.message || 'Erro ao carregar perfil',
+            loading: false,
+          });
+        }
       },
     }),
     {
@@ -125,6 +139,11 @@ export const useAuthStore = create<AuthStore>()(
         token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state?.token) {
+          apiClient.setToken(state.token);
+        }
+      },
     }
   )
 );

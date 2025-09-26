@@ -3,14 +3,14 @@ import { useAuthStore } from '@/store/auth.store';
 
 export const useAuth = () => {
   const [isHydrated, setIsHydrated] = useState(false);
-  const authStore = useAuthStore();
+  const store = useAuthStore();
 
   useEffect(() => {
     setIsHydrated(true);
   }, []);
 
   return {
-    ...authStore,
+    ...store,
     isHydrated,
   };
 };

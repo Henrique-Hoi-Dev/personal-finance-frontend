@@ -37,7 +37,7 @@ export const BaseButton: React.FC<ButtonProps> = ({
     primary:
       'text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed',
     secondary:
-      'text-gray-700 bg-white hover:bg-gray-50 focus:ring-gray-500 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed',
+      'text-gray-700 border bg-white hover:bg-gray-50 focus:ring-gray-500 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed',
     danger:
       'text-white bg-red-600 hover:bg-red-700 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed',
     success:

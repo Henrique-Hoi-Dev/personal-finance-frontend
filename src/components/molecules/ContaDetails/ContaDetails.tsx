@@ -3,9 +3,13 @@ import { Conta } from '@/types';
 
 interface ContaDetailsProps {
   conta: Conta | null;
+  onClose?: () => void;
 }
 
-export const ContaDetails: React.FC<ContaDetailsProps> = ({ conta }) => {
+export const ContaDetails: React.FC<ContaDetailsProps> = ({
+  conta,
+  onClose,
+}) => {
   if (!conta) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">

@@ -48,9 +48,9 @@ export const useTransacoesStore = create<TransacoesStore>((set, get) => ({
   fetchTransacoes: async (filters?: TransacaoFilters) => {
     set({ loading: true, error: null });
     try {
-      const transacoes = await getTransacoes(filters);
+      const response = await getTransacoes(filters);
       set({
-        transacoes,
+        transacoes: response.data, // Extrai o array de transações do objeto de resposta
         filters: filters || {},
         loading: false,
       });

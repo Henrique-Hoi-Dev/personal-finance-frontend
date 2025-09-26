@@ -5,11 +5,15 @@ import { Transacao } from '@/types';
 interface TransactionTableProps {
   transacoes: Transacao[];
   loading?: boolean;
+  onEdit?: (transacao: Transacao) => void;
+  onDelete?: (id: string) => void;
 }
 
 export const TransactionTable: React.FC<TransactionTableProps> = ({
   transacoes,
   loading = false,
+  onEdit,
+  onDelete,
 }) => {
   const t = useTranslations('Transacoes');
 
@@ -146,7 +150,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="text-sm text-gray-900">
-                    {transacao.conta?.nome || 'N/A'}
+                    {transacao.contaId || 'N/A'}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

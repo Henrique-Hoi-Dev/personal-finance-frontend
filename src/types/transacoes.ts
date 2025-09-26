@@ -41,9 +41,8 @@ export interface TransacaoFilters {
 }
 
 export interface Balance {
-  total: number;
   income: number;
-  expenses: number;
+  expense: number;
   balance: number;
 }
 

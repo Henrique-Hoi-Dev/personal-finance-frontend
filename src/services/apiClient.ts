@@ -14,9 +14,15 @@ class ApiClient {
   private token: string | null = null;
 
   constructor(
-    baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'
   ) {
     this.baseURL = baseURL;
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.token = token;
+      }
+    }
   }
 
   setToken(token: string | null) {

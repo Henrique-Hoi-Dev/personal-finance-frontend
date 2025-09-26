@@ -10,3 +10,7 @@ export { TransactionActions } from './TransactionActions';
 export { TransactionTable } from './TransactionTable';
 export { TransactionForm } from './TransactionForm';
 export type { TransactionFormData } from './TransactionForm';
+export { ProfileCard } from './ProfileCard';
+export { PersonalInfoCard } from './PersonalInfoCard';
+export { SecurityCard } from './SecurityCard';
+export { PreferencesCard } from './PreferencesCard';

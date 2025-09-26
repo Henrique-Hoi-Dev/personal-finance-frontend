@@ -49,6 +49,16 @@ export const formatCurrency = (value: number): string => {
 };
 
 /**
+ * Converte centavos para reais e formata como moeda brasileira
+ * @param cents - Valor em centavos
+ * @returns Valor formatado como moeda (ex: "R$ 1.234,56")
+ */
+export const formatCurrencyFromCents = (cents: number): string => {
+  const reais = cents / 100;
+  return formatCurrency(reais);
+};
+
+/**
  * Formata um número com separadores de milhares
  * @param value - Valor numérico
  * @returns Número formatado
