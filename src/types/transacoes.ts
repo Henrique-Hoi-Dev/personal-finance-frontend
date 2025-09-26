@@ -1,41 +1,48 @@
 export interface Transacao {
   id: string;
-  descricao: string;
-  valor: number;
-  tipo: 'receita' | 'despesa';
-  categoria: string;
-  data: string;
-  contaId: string;
+  value: number;
   userId: string;
+  accountId: string;
+  installmentId: string | null;
+  type: 'INCOME' | 'EXPENSE';
+  category: string;
+  description: string;
+  date: string;
   createdAt: string;
   updatedAt: string;
+  account: {
+    totalAmount: number;
+    id: string;
+    name: string;
+    type: string;
+    isPaid: boolean;
+    installmentList: any[];
+  };
 }
 
 export interface CreateTransacaoPayload {
-  descricao: string;
-  valor: number;
-  tipo: 'receita' | 'despesa';
-  categoria: string;
-  data: string;
-  contaId: string;
+  description: string;
+  value: number;
+  category: string;
+  accountId: string | null;
 }
 
 export interface UpdateTransacaoPayload {
   id: string;
-  descricao?: string;
+  description?: string;
   valor?: number;
-  tipo?: 'receita' | 'despesa';
+  tipo?: 'INCOME' | 'EXPENSE';
   categoria?: string;
   data?: string;
   contaId?: string;
 }
 
 export interface TransacaoFilters {
-  tipo?: 'receita' | 'despesa';
-  categoria?: string;
-  contaId?: string;
-  dataInicio?: string;
-  dataFim?: string;
+  type?: 'INCOME' | 'EXPENSE';
+  category?: string;
+  accountId?: string;
+  startDate?: string;
+  endDate?: string;
   page?: number;
   limit?: number;
 }
@@ -49,9 +56,11 @@ export interface Balance {
 export interface Category {
   id: string;
   name: string;
-  type: 'receita' | 'despesa';
-  color?: string;
-  icon?: string;
+  description: string;
+  type: 'INCOME' | 'EXPENSE';
+  isDefault: boolean;
+  ptBr: string;
+  en: string;
 }
 
 export interface CreateIncomePayload {

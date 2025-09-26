@@ -6,3 +6,6 @@ export { useContasStore } from './contas.store';
 
 // Transações Store
 export { useTransacoesStore } from './transacoes.store';
+
+// Categories Store
+export { useCategoriesStore } from './categories.store';

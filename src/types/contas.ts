@@ -27,7 +27,7 @@ export interface CreateContaPayload {
   name: string;
   type: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
   totalAmount: number;
-  installments: number;
+  installments?: number;
   startDate: string;
   dueDay: number;
 }

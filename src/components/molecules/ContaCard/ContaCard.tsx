@@ -1,18 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Conta } from '@/types';
-import { formatAmount, getAmountColor } from '@/utils';
+import { formatCurrencyFromCents, getAmountColor } from '@/utils';
+import { useContasStore } from '@/store/contas.store';
+import { BaseConfirmModal } from '@/components/atoms';
+import { toast } from 'sonner';
 
 interface ContaCardProps {
   conta: Conta;
   isSelected: boolean;
   onClick: () => void;
+  onDelete?: () => void;
 }
 
 export const ContaCard: React.FC<ContaCardProps> = ({
   conta,
   isSelected,
   onClick,
+  onDelete,
 }) => {
+  const { removeConta } = useContasStore();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const getIconColor = (tipo: string) => {
     if (!tipo) return 'bg-gray-400';
 
@@ -158,8 +166,40 @@ export const ContaCard: React.FC<ContaCardProps> = ({
     if (conta.installmentList && conta.installmentList.length > 0) {
       return conta.installmentList.every((inst) => inst.isPaid);
     } else {
-      return conta.totalAmount === 0;
+      return conta.isPaid || false;
     }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Previne o clique no card
+
+    if (isAccountPaid(conta)) {
+      toast.error('Não é possível excluir uma conta que já foi paga');
+      return;
+    }
+
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await removeConta(conta.id);
+      toast.success('Conta excluída com sucesso');
+      setShowDeleteModal(false);
+
+      if (onDelete) {
+        onDelete();
+      }
+    } catch (error) {
+      toast.error('Erro ao excluir conta');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
   };
 
   return (
@@ -187,21 +227,61 @@ export const ContaCard: React.FC<ContaCardProps> = ({
             </p>
           </div>
         </div>
-        <div className="text-right">
-          <p
-            className={`font-bold text-xl ${getAmountColor(conta.totalAmount)}`}
-          >
-            {formatAmount(conta.totalAmount)}
-          </p>
-          {isAccountPaid(conta) ? (
-            <p className="text-xs text-green-600 mt-1 font-medium">✓ Pago</p>
-          ) : getPendingInstallments(conta) ? (
-            <p className="text-xs text-gray-500 mt-1 font-medium">
-              {getPendingInstallments(conta)}
+        <div className="text-right flex items-center gap-3">
+          <div>
+            <p
+              className={`font-bold text-xl ${getAmountColor(
+                conta.totalAmount
+              )}`}
+            >
+              {formatCurrencyFromCents(conta.totalAmount)}
             </p>
-          ) : null}
+            {isAccountPaid(conta) ? (
+              <p className="text-xs text-green-600 mt-1 font-medium">✓ Pago</p>
+            ) : getPendingInstallments(conta) ? (
+              <p className="text-xs text-gray-500 mt-1 font-medium">
+                {getPendingInstallments(conta)}
+              </p>
+            ) : null}
+          </div>
+
+          {/* Ícone de lixeira - só aparece se a conta não estiver paga */}
+          {!isAccountPaid(conta) && (
+            <button
+              onClick={handleDeleteClick}
+              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200"
+              title="Excluir conta"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Modal de Confirmação de Exclusão */}
+      <BaseConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Excluir Conta"
+        message={`Tem certeza que deseja excluir a conta "${conta.name}"? Esta ação não pode ser desfeita.`}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        type="danger"
+        loading={isDeleting}
+      />
     </div>
   );
 };

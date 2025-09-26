@@ -1,0 +1,1 @@
+export { BaseCPFInput } from './BaseCPFInput';

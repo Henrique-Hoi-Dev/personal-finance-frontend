@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BaseInput, BaseLabel, BaseButton } from '@/components/atoms';
+import { PasswordField } from '@/components/molecules';
 
 interface SecurityCardProps {
   onPasswordChange?: (currentPassword: string, newPassword: string) => void;
@@ -25,7 +26,6 @@ export const SecurityCard: React.FC<SecurityCardProps> = ({
 
   const handleSavePassword = () => {
     if (passwords.new !== passwords.confirm) {
-      // TODO: Show error message
       return;
     }
 
@@ -62,7 +62,7 @@ export const SecurityCard: React.FC<SecurityCardProps> = ({
         <div>
           <BaseLabel htmlFor="currentPassword">{t('password')}</BaseLabel>
           <div className="flex items-center justify-between space-x-3 mt-1">
-            <div className="flex-1 max-w-52 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-600 font-mono">
+            <div className="min-w-96 flex-1 max-w-52 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-600 font-mono">
               ••••••••
             </div>
             <BaseButton
@@ -79,43 +79,43 @@ export const SecurityCard: React.FC<SecurityCardProps> = ({
         {showChangePassword && (
           <div className="space-y-4 pt-4 border-t border-gray-200">
             <div>
-              <BaseLabel htmlFor="currentPasswordInput">
-                {t('currentPassword')}
-              </BaseLabel>
-              <BaseInput
-                id="currentPasswordInput"
-                type="password"
+              <PasswordField
+                label={t('currentPassword')}
                 value={passwords.current}
                 onChange={(e) =>
                   handlePasswordChange('current', e.target.value)
                 }
                 placeholder={t('currentPasswordPlaceholder')}
+                id="currentPasswordInput"
+                name="currentPassword"
+                autoComplete="current-password"
               />
             </div>
 
             <div>
-              <BaseLabel htmlFor="newPassword">{t('newPassword')}</BaseLabel>
-              <BaseInput
-                id="newPassword"
-                type="password"
+              <PasswordField
+                label={t('newPassword')}
                 value={passwords.new}
                 onChange={(e) => handlePasswordChange('new', e.target.value)}
                 placeholder={t('newPasswordPlaceholder')}
+                id="newPassword"
+                name="newPassword"
+                autoComplete="new-password"
+                showStrength={true}
               />
             </div>
 
             <div>
-              <BaseLabel htmlFor="confirmPassword">
-                {t('confirmPassword')}
-              </BaseLabel>
-              <BaseInput
-                id="confirmPassword"
-                type="password"
+              <PasswordField
+                label={t('confirmPassword')}
                 value={passwords.confirm}
                 onChange={(e) =>
                   handlePasswordChange('confirm', e.target.value)
                 }
                 placeholder={t('confirmPasswordPlaceholder')}
+                id="confirmPassword"
+                name="confirmPassword"
+                autoComplete="new-password"
               />
             </div>
 

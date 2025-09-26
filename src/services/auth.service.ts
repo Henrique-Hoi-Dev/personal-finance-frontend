@@ -4,6 +4,7 @@ import {
   LoginResponse,
   SignupPayload,
   UserProfile,
+  UpdatePreferencesPayload,
 } from '@/types/auth';
 
 export async function login(data: LoginPayload): Promise<LoginResponse> {
@@ -22,5 +23,15 @@ export async function logout(): Promise<void> {
 
 export async function getCurrentUser(): Promise<UserProfile> {
   const response = await apiClient.get<UserProfile>('/users/profile');
+  return response.data;
+}
+
+export async function updateUserPreferences(
+  data: UpdatePreferencesPayload
+): Promise<UserProfile> {
+  const response = await apiClient.patch<UserProfile>(
+    '/users/preferences',
+    data
+  );
   return response.data;
 }

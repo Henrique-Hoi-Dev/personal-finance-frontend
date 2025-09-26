@@ -9,25 +9,59 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Conta } from '@/types';
 
 export default function ContasPage() {
-  const { contas, loading, fetchContas, addConta } = useContasStore();
+  const { contas, loading, fetchContas, addConta, removeConta } =
+    useContasStore();
   const t = useTranslations('Contas');
   const [selectedConta, setSelectedConta] = useState<Conta | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
+  const [localContas, setLocalContas] = useState<Conta[]>([]);
+
+  const updateSelectedConta = (updatedConta: Conta) => {
+    setSelectedConta(updatedConta);
+
+    setLocalContas((prevContas) =>
+      prevContas.map((conta) =>
+        conta.id === updatedConta.id ? updatedConta : conta
+      )
+    );
+  };
+
   useEffect(() => {
     fetchContas();
   }, [fetchContas]);
+
+  useEffect(() => {
+    if (contas.length > 0) {
+      setLocalContas(contas);
+    }
+  }, [contas]);
 
   const handleCreateConta = async (data: any) => {
     setIsCreating(true);
     try {
       await addConta(data);
       setIsModalOpen(false);
+      await fetchContas();
     } catch (error) {
       console.error('Erro ao criar conta:', error);
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleDeleteConta = async () => {
+    if (!selectedConta) return;
+
+    try {
+      await removeConta(selectedConta.id);
+
+      await fetchContas();
+
+      setSelectedConta(null);
+    } catch (error) {
+      console.error('Erro ao excluir conta:', error);
     }
   };
 
@@ -73,19 +107,20 @@ export default function ContasPage() {
                 </h2>
               </div>
               {/* Lista de Contas */}
-              <div className="flex-1 w-full p-6 space-y-4 overflow-y-auto">
+              <div className="flex-1 w-full p-6 space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
                 {loading ? (
                   <div className="flex items-center justify-center h-32">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                     <span className="ml-2 text-gray-600">{t('loading')}</span>
                   </div>
-                ) : contas.length > 0 ? (
-                  contas.map((conta) => (
+                ) : localContas.length > 0 ? (
+                  localContas.map((conta) => (
                     <ContaCard
                       key={conta.id}
                       conta={conta}
                       isSelected={selectedConta?.id === conta.id}
                       onClick={() => setSelectedConta(conta)}
+                      onDelete={handleDeleteConta}
                     />
                   ))
                 ) : (
@@ -112,6 +147,7 @@ export default function ContasPage() {
                 <ContaDetails
                   conta={selectedConta}
                   onClose={() => setSelectedConta(null)}
+                  onUpdateConta={updateSelectedConta}
                 />
               </div>
             </div>

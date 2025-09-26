@@ -5,8 +5,14 @@ import {
   logout,
   getCurrentUser,
   register,
+  updateUserPreferences,
 } from '@/services/auth.service';
-import { LoginPayload, SignupPayload, UserProfile } from '@/types/auth';
+import {
+  LoginPayload,
+  SignupPayload,
+  UserProfile,
+  UpdatePreferencesPayload,
+} from '@/types/auth';
 import { apiClient } from '@/services/apiClient';
 
 interface AuthState {
@@ -25,6 +31,7 @@ interface AuthActions {
   setToken: (token: string) => void;
   loadUserProfile: () => Promise<void>;
   forceLogout: () => void;
+  updatePreferences: (data: UpdatePreferencesPayload) => Promise<void>;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -148,6 +155,23 @@ export const useAuthStore = create<AuthStore>()(
         });
 
         apiClient.setToken(null);
+      },
+
+      updatePreferences: async (data: UpdatePreferencesPayload) => {
+        set({ loading: true, error: null });
+        try {
+          const updatedUser = await updateUserPreferences(data);
+          set({
+            user: updatedUser,
+            loading: false,
+          });
+        } catch (error: any) {
+          set({
+            error: error.message || 'Erro ao atualizar preferências',
+            loading: false,
+          });
+          throw error;
+        }
       },
     }),
     {

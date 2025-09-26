@@ -35,7 +35,7 @@ export function ContaModal({
       isOpen={isOpen}
       onClose={onClose}
       title={t('addAccount')}
-      size="lg"
+      size="2xl"
     >
       <div className="p-6">
         <ContaForm

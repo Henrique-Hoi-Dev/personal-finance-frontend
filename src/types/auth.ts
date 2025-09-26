@@ -23,6 +23,8 @@ export interface UserProfile {
   isActive: boolean;
   emailVerified: boolean;
   lastLogin: Date;
+  defaultCurrency: string;
+  preferredLanguage: string;
 }
 
 export interface User {
@@ -32,6 +34,16 @@ export interface User {
   email?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface UserPreferences {
+  defaultCurrency: string;
+  preferredLanguage: string;
+}
+
+export interface UpdatePreferencesPayload {
+  defaultCurrency?: string;
+  preferredLanguage?: string;
 }
 
 export interface AuthState {

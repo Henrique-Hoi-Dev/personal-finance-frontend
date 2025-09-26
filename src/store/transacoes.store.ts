@@ -20,13 +20,22 @@ interface TransacoesState {
   loading: boolean;
   error: string | null;
   filters: TransacaoFilters;
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
 }
 
 interface TransacoesActions {
   fetchTransacoes: (filters?: TransacaoFilters) => Promise<void>;
   fetchTransacaoById: (id: string) => Promise<void>;
   fetchTransacoesByConta: (contaId: string) => Promise<void>;
-  addTransacao: (data: CreateTransacaoPayload) => Promise<void>;
+  addTransacao: (
+    data: CreateTransacaoPayload,
+    type: 'INCOME' | 'EXPENSE'
+  ) => Promise<void>;
   updateTransacao: (data: UpdateTransacaoPayload) => Promise<void>;
   removeTransacao: (id: string) => Promise<void>;
   setSelectedTransacao: (transacao: Transacao | null) => void;
@@ -43,15 +52,30 @@ export const useTransacoesStore = create<TransacoesStore>((set, get) => ({
   loading: false,
   error: null,
   filters: {},
+  pagination: {
+    currentPage: 0,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10,
+  },
 
   // Actions
   fetchTransacoes: async (filters?: TransacaoFilters) => {
     set({ loading: true, error: null });
     try {
       const response = await getTransacoes(filters);
+
+      const totalPages = Math.ceil(response.total / response.limit);
+
       set({
         transacoes: response.data, // Extrai o array de transações do objeto de resposta
         filters: filters || {},
+        pagination: {
+          currentPage: response.page,
+          totalPages: totalPages,
+          totalItems: response.total,
+          itemsPerPage: response.limit,
+        },
         loading: false,
       });
     } catch (error: any) {
@@ -88,10 +112,13 @@ export const useTransacoesStore = create<TransacoesStore>((set, get) => ({
     }
   },
 
-  addTransacao: async (data: CreateTransacaoPayload) => {
+  addTransacao: async (
+    data: CreateTransacaoPayload,
+    type: 'INCOME' | 'EXPENSE'
+  ) => {
     set({ loading: true, error: null });
     try {
-      const novaTransacao = await createTransacao(data);
+      const novaTransacao = await createTransacao(data, type);
       set((state) => ({
         transacoes: [novaTransacao, ...state.transacoes],
         loading: false,

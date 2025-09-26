@@ -49,6 +49,38 @@ export const formatCurrency = (value: number): string => {
 };
 
 /**
+ * Formata um valor monetário baseado na moeda preferida do usuário
+ * @param value - Valor numérico
+ * @param currency - Código da moeda (BRL, USD, EUR)
+ * @param locale - Locale para formatação (pt-BR, en-US, etc.)
+ * @returns Valor formatado como moeda
+ */
+export const formatCurrencyByPreference = (
+  value: number,
+  currency: string = 'BRL',
+  locale: string = 'pt-BR'
+): string => {
+  const currencyMap: Record<string, string> = {
+    BRL: 'BRL',
+    USD: 'USD',
+    EUR: 'EUR',
+  };
+
+  const localeMap: Record<string, string> = {
+    pt: 'pt-BR',
+    en: 'en-US',
+  };
+
+  const actualCurrency = currencyMap[currency] || 'BRL';
+  const actualLocale = localeMap[locale] || 'pt-BR';
+
+  return new Intl.NumberFormat(actualLocale, {
+    style: 'currency',
+    currency: actualCurrency,
+  }).format(value);
+};
+
+/**
  * Converte centavos para reais e formata como moeda brasileira
  * @param cents - Valor em centavos
  * @returns Valor formatado como moeda (ex: "R$ 1.234,56")

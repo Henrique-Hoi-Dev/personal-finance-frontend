@@ -10,16 +10,40 @@ import {
   CreateExpensePayload,
 } from '@/types/transacoes';
 
+const cleanFilters = (filters: TransacaoFilters): Record<string, any> => {
+  const cleaned: Record<string, any> = {};
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      cleaned[key] = value;
+    }
+  });
+
+  return cleaned;
+};
+
 export async function getTransacoes(
   filters?: TransacaoFilters
 ): Promise<{ data: Transacao[]; total: number; page: number; limit: number }> {
+  const cleanedFilters = filters ? cleanFilters(filters) : {};
   const response = await apiClient.get<{
-    data: Transacao[];
+    docs: Transacao[];
     total: number;
     page: number;
     limit: number;
-  }>('/transactions', filters);
-  return response.data;
+    offset: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  }>('/transactions', cleanedFilters);
+
+  const result = {
+    data: response.data.docs,
+    total: response.data.total,
+    page: response.data.page,
+    limit: response.data.limit,
+  };
+
+  return result;
 }
 
 export async function getTransacaoById(id: string): Promise<Transacao> {
@@ -28,9 +52,13 @@ export async function getTransacaoById(id: string): Promise<Transacao> {
 }
 
 export async function createTransacao(
-  data: CreateTransacaoPayload
+  data: CreateTransacaoPayload,
+  type: 'INCOME' | 'EXPENSE'
 ): Promise<Transacao> {
-  const response = await apiClient.post<Transacao>('/transactions', data);
+  // Usa rota específica baseada no tipo
+  const endpoint =
+    type === 'INCOME' ? '/transactions/income' : '/transactions/expense';
+  const response = await apiClient.post<Transacao>(endpoint, data);
   return response.data;
 }
 
@@ -59,10 +87,8 @@ export async function getTransacoesByConta(
 
 // New endpoints
 export async function getBalance(): Promise<Balance> {
-  const response = await apiClient.get<{ data: Balance }>(
-    '/transactions/balance'
-  );
-  return response.data.data;
+  const response = await apiClient.get<Balance>('/transactions/balance');
+  return response.data;
 }
 
 export async function getCategories(): Promise<Category[]> {
@@ -87,5 +113,32 @@ export async function createExpense(
     '/transactions/expense',
     data
   );
+  return response.data;
+}
+
+export async function getExpensesByCategory(): Promise<{
+  data: {
+    categories: Array<{
+      category: string;
+      name: string;
+      nameEn: string;
+      value: number;
+      percentage: number;
+      color: string;
+    }>;
+  };
+}> {
+  const response = await apiClient.get<{
+    data: {
+      categories: Array<{
+        category: string;
+        name: string;
+        nameEn: string;
+        value: number;
+        percentage: number;
+        color: string;
+      }>;
+    };
+  }>('/transactions/expenses-by-category');
   return response.data;
 }

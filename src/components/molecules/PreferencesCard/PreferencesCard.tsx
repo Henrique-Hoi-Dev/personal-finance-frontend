@@ -1,28 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { UserProfile } from '@/types/auth';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface PreferencesCardProps {
+  user: UserProfile;
   onSave?: (data: { currency: string; language: string }) => void;
   loading?: boolean;
 }
 
 export const PreferencesCard: React.FC<PreferencesCardProps> = ({
+  user,
   onSave,
   loading = false,
 }) => {
   const t = useTranslations('Profile');
+  const { changeLanguage } = useLanguage();
   const [preferences, setPreferences] = useState({
-    currency: 'BRL',
-    language: 'pt-BR',
+    currency: user.defaultCurrency || 'BRL',
+    language: user.preferredLanguage || 'pt',
   });
+
+  // Update preferences when user data changes
+  useEffect(() => {
+    setPreferences({
+      currency: user.defaultCurrency || 'BRL',
+      language: user.preferredLanguage || 'pt',
+    });
+  }, [user.defaultCurrency, user.preferredLanguage]);
 
   const handlePreferenceChange = (field: string, value: string) => {
     setPreferences((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    if (onSave) {
-      onSave(preferences);
+  const handleSave = async () => {
+    try {
+      // If language changed, update it immediately
+      if (preferences.language !== user.preferredLanguage) {
+        await changeLanguage(preferences.language as 'pt' | 'en');
+      }
+
+      // Call the onSave callback for other preferences
+      if (onSave) {
+        onSave(preferences);
+      }
+    } catch (error) {
+      console.error('Error saving preferences:', error);
     }
   };
 
@@ -110,9 +133,8 @@ export const PreferencesCard: React.FC<PreferencesCardProps> = ({
               }
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white"
             >
-              <option value="pt-BR">Português (Brasil)</option>
-              <option value="en-US">English (US)</option>
-              <option value="es-ES">Español</option>
+              <option value="pt">Português (Brasil)</option>
+              <option value="en">English (US)</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg

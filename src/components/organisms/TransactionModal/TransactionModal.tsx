@@ -7,7 +7,6 @@ import { Conta } from '@/types';
 interface TransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  tipo: 'receita' | 'despesa';
   contas: Conta[];
   onSubmit: (data: TransactionFormData) => void;
   loading?: boolean;
@@ -16,7 +15,6 @@ interface TransactionModalProps {
 export const TransactionModal: React.FC<TransactionModalProps> = ({
   isOpen,
   onClose,
-  tipo,
   contas,
   onSubmit,
   loading = false,
@@ -31,19 +29,14 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     onClose();
   };
 
-  const getTitle = () => {
-    return tipo === 'receita' ? t('addIncome') : t('addExpense');
-  };
-
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={getTitle()}
-      className="max-w-lg"
+      title={t('addTransaction')}
+      size="2xl"
     >
       <TransactionForm
-        tipo={tipo}
         contas={contas}
         onSubmit={handleSubmit}
         onCancel={handleCancel}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PasswordField } from '@/components/molecules';
-import { BaseButton, CPFInput, BaseLabel } from '@/components/atoms';
+import { BaseButton, BaseCPFInput, BaseLabel } from '@/components/atoms';
 import { LoginPayload } from '@/types/auth';
 import { useAuthStore } from '@/store/auth.store';
 import { useTranslations } from 'next-intl';
@@ -80,7 +80,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           >
             {t('cpf')} *
           </BaseLabel>
-          <CPFInput
+          <BaseCPFInput
             id="cpf"
             name="cpf"
             placeholder={t('cpfPlaceholder')}

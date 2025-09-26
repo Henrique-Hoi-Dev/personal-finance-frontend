@@ -1,7 +1,7 @@
 import React from 'react';
 import { BaseInput } from '../BaseInput/BaseInput';
 
-interface CPFInputProps {
+interface BaseCPFInputProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
@@ -12,7 +12,7 @@ interface CPFInputProps {
   error?: string;
 }
 
-export const CPFInput: React.FC<CPFInputProps> = ({
+export const BaseCPFInput: React.FC<BaseCPFInputProps> = ({
   value,
   onChange,
   placeholder = '000.000.000-00',

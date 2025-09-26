@@ -1,4 +1,5 @@
 import React from 'react';
+import { getCategoryLabel, TransactionCategory } from '@/utils';
 
 interface TransactionItemProps {
   description: string;
@@ -59,7 +60,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
         <div>
           <p className="text-sm font-medium text-gray-900">{description}</p>
           <p className="text-xs text-gray-500">
-            {category} • {date}
+            {getCategoryLabel(category as TransactionCategory, 'pt')} • {date}
           </p>
         </div>
       </div>

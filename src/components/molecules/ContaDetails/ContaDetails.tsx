@@ -1,26 +1,40 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Conta } from '@/types';
-import { payInstallment, payFullAccount } from '@/services/contas.service';
+import {
+  payInstallment,
+  payFullAccount,
+  deleteInstallment,
+} from '@/services/contas.service';
+import { BaseConfirmModal } from '@/components/atoms';
 import { toast } from 'sonner';
-import { useContasStore } from '@/store/contas.store';
-import { formatAmount, getAmountColor, getAccountTypeLabel } from '@/utils';
+import {
+  formatCurrencyFromCents,
+  getAmountColor,
+  getAccountTypeLabel,
+} from '@/utils';
 
 interface ContaDetailsProps {
   conta: Conta | null;
   onClose?: () => void;
+  onUpdateConta?: (updatedConta: Conta) => void;
 }
 
 export const ContaDetails: React.FC<ContaDetailsProps> = ({
   conta,
   onClose,
+  onUpdateConta,
 }) => {
   const t = useTranslations('Contas');
   const [payingInstallments, setPayingInstallments] = useState<Set<string>>(
     new Set()
   );
   const [payingFullAccount, setPayingFullAccount] = useState(false);
-  const { updateInstallmentStatus, updateContaTotalAmount } = useContasStore();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [installmentToDelete, setInstallmentToDelete] = useState<string | null>(
+    null
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handlePayInstallment = async (installmentId: string) => {
     try {
@@ -33,9 +47,21 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
 
       await payInstallment(installmentId, installment.amount);
 
-      // Atualizar o estado local da parcela
-      if (conta?.id) {
-        updateInstallmentStatus(conta.id, installmentId, true);
+      // Atualizar apenas o selectedAccount local
+      if (conta && onUpdateConta) {
+        const updatedConta = {
+          ...conta,
+          installmentList: conta.installmentList?.map((inst) =>
+            inst.id === installmentId
+              ? {
+                  ...inst,
+                  isPaid: true,
+                  paidAt: new Date().toISOString(),
+                }
+              : inst
+          ),
+        };
+        onUpdateConta(updatedConta);
       }
 
       toast.success('Parcela paga com sucesso');
@@ -67,20 +93,29 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
         totalAmount = conta?.totalAmount || 0;
       }
 
-      console.log('Pagar conta toda:', conta?.id, 'Valor total:', totalAmount);
-
       if (conta?.id) {
         await payFullAccount(conta.id, totalAmount);
 
-        // Atualizar o estado local da conta
-        if (hasInstallments) {
-          // Se tem parcelas, marcar todas como pagas
-          conta.installmentList?.forEach((installment) => {
-            updateInstallmentStatus(conta.id, installment.id, true);
-          });
-        } else {
-          // Se não tem parcelas, zerar o totalAmount
-          updateContaTotalAmount(conta.id, 0);
+        if (onUpdateConta) {
+          let updatedConta: Conta;
+
+          if (hasInstallments) {
+            updatedConta = {
+              ...conta,
+              installmentList: conta.installmentList?.map((installment) => ({
+                ...installment,
+                isPaid: true,
+                paidAt: new Date().toISOString(),
+              })),
+            };
+          } else {
+            updatedConta = {
+              ...conta,
+              isPaid: true,
+            };
+          }
+
+          onUpdateConta(updatedConta);
         }
 
         toast.success('Conta paga com sucesso');
@@ -90,6 +125,44 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
     } finally {
       setPayingFullAccount(false);
     }
+  };
+
+  const handleDeleteInstallmentClick = (installmentId: string) => {
+    setInstallmentToDelete(installmentId);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDeleteInstallment = async () => {
+    if (!installmentToDelete || !conta) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteInstallment(installmentToDelete);
+
+      // Atualiza a conta removendo a parcela excluída
+      if (onUpdateConta) {
+        const updatedConta = {
+          ...conta,
+          installmentList: conta.installmentList?.filter(
+            (inst) => inst.id !== installmentToDelete
+          ),
+        };
+        onUpdateConta(updatedConta);
+      }
+
+      toast.success('Parcela excluída com sucesso');
+      setShowDeleteModal(false);
+      setInstallmentToDelete(null);
+    } catch (error) {
+      toast.error('Erro ao excluir parcela');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCancelDeleteInstallment = () => {
+    setShowDeleteModal(false);
+    setInstallmentToDelete(null);
   };
 
   if (!conta) {
@@ -143,7 +216,7 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
               conta.totalAmount
             )}`}
           >
-            {formatAmount(conta.totalAmount)}
+            {formatCurrencyFromCents(conta.totalAmount)}
           </p>
         </div>
       </div>
@@ -197,10 +270,36 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
                       )}
                     </p>
                     <p className="text-lg font-bold text-gray-900">
-                      {formatAmount(installment.amount)}
+                      {formatCurrencyFromCents(installment.amount)}
                     </p>
                   </div>
-                  <div className="ml-4">
+                  <div className="ml-4 flex items-center gap-2">
+                    {/* Ícone de lixeira - só aparece se a parcela não estiver paga */}
+                    {!installment.isPaid && (
+                      <button
+                        onClick={() =>
+                          handleDeleteInstallmentClick(installment.id)
+                        }
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                        title="Excluir parcela"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    )}
+
+                    {/* Botão de pagar */}
                     {installment.isPaid ? (
                       <button className="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium cursor-not-allowed">
                         {t('paid')}
@@ -303,6 +402,19 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
           </div>
         </div>
       )}
+
+      {/* Modal de Confirmação de Exclusão de Parcela */}
+      <BaseConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleCancelDeleteInstallment}
+        onConfirm={handleConfirmDeleteInstallment}
+        title="Excluir Parcela"
+        message={`Tem certeza que deseja excluir esta parcela? Esta ação não pode ser desfeita.`}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        type="danger"
+        loading={isDeleting}
+      />
     </div>
   );
 };

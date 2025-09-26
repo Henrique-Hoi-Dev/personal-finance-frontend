@@ -16,24 +16,50 @@ import { Transacao } from '@/types';
 import { TransactionFormData } from '@/components/molecules';
 
 export default function TransacoesPage() {
-  const { transacoes, loading, fetchTransacoes } = useTransacoesStore();
+  const { transacoes, loading, fetchTransacoes, pagination, addTransacao } =
+    useTransacoesStore();
   const { contas, fetchContas } = useContasStore();
   const t = useTranslations('Transacoes');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransacao, setEditingTransacao] = useState<Transacao | null>(
     null
   );
-  const [filters, setFilters] = useState({
-    contaId: '',
-    tipo: '',
-    dataInicio: '',
-    dataFim: '',
+  const [filters, setFilters] = useState<{
+    accountId: string;
+    category: string;
+    type: 'INCOME' | 'EXPENSE' | '';
+    startDate: string;
+    endDate: string;
+  }>({
+    accountId: '',
+    category: '',
+    type: '',
+    startDate: '',
+    endDate: '',
   });
 
   useEffect(() => {
-    fetchTransacoes();
-    fetchContas();
-  }, [fetchTransacoes, fetchContas]);
+    fetchTransacoes({
+      ...filters,
+      type: filters.type || undefined,
+      startDate: filters.startDate || undefined,
+      endDate: filters.endDate || undefined,
+      page: pagination.currentPage,
+      limit: pagination.itemsPerPage,
+    });
+  }, [
+    fetchTransacoes,
+    filters,
+    pagination.currentPage,
+    pagination.itemsPerPage,
+  ]);
+
+  // Carrega contas apenas quando o modal é aberto
+  useEffect(() => {
+    if (isModalOpen) {
+      fetchContas();
+    }
+  }, [isModalOpen, fetchContas]);
 
   const handleCreateTransacao = () => {
     setEditingTransacao(null);
@@ -53,11 +79,28 @@ export default function TransacoesPage() {
   const handleSubmitTransacao = async (data: TransactionFormData) => {
     try {
       if (editingTransacao) {
-        // await updateTransacao(editingTransacao.id, data);
+        // TODO: Implementar updateTransacao quando necessário
+        console.log('Editar transação:', editingTransacao.id, data);
       } else {
-        // await createTransacao(data);
+        const payload: any = {
+          description: data.description,
+          value: data.value,
+          category: data.category,
+        };
+
+        if (data.accountId) {
+          payload.accountId = data.accountId;
+        }
+        await addTransacao(payload, data.type);
       }
-      await fetchTransacoes();
+      await fetchTransacoes({
+        ...filters,
+        type: filters.type || undefined,
+        startDate: filters.startDate || undefined,
+        endDate: filters.endDate || undefined,
+        page: pagination.currentPage,
+        limit: pagination.itemsPerPage,
+      });
       handleCloseModal();
     } catch (error) {
       console.error('Erro ao salvar transação:', error);
@@ -67,15 +110,36 @@ export default function TransacoesPage() {
   const handleDeleteTransacao = async (id: string) => {
     try {
       // await deleteTransacao(id);
-      await fetchTransacoes();
+      await fetchTransacoes({
+        ...filters,
+        type: filters.type || undefined,
+        startDate: filters.startDate || undefined,
+        endDate: filters.endDate || undefined,
+        page: pagination.currentPage,
+        limit: pagination.itemsPerPage,
+      });
     } catch (error) {
       console.error('Erro ao deletar transação:', error);
     }
   };
 
+  const handlePageChange = (page: number) => {
+    fetchTransacoes({
+      ...filters,
+      type: filters.type || undefined,
+      startDate: filters.startDate || undefined,
+      endDate: filters.endDate || undefined,
+      page: page,
+      limit: pagination.itemsPerPage,
+    });
+  };
+
   const filteredTransacoes = (transacoes || []).filter((transacao) => {
-    if (filters.contaId && transacao.contaId !== filters.contaId) return false;
-    if (filters.tipo && transacao.tipo !== filters.tipo) return false;
+    if (filters.accountId && transacao.accountId !== filters.accountId)
+      return false;
+    if (filters.category && transacao.category !== filters.category)
+      return false;
+    if (filters.type && transacao.type !== filters.type) return false;
     // Adicionar filtros de data se necessário
     return true;
   });
@@ -86,18 +150,25 @@ export default function TransacoesPage() {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-            <TransactionActions
-              onAddIncome={handleCreateTransacao}
-              onAddExpense={handleCreateTransacao}
-            />
+            <TransactionActions onAddTransaction={handleCreateTransacao} />
           </div>
 
           <TransactionFilters
-            tipo={filters.tipo}
-            categoria={filters.contaId}
-            onTipoChange={(tipo) => setFilters((prev) => ({ ...prev, tipo }))}
-            onCategoriaChange={(contaId) =>
-              setFilters((prev) => ({ ...prev, contaId }))
+            tipo={filters.type}
+            categoria={filters.category}
+            dataInicio={filters.startDate}
+            dataFim={filters.endDate}
+            onTipoChange={(type: 'INCOME' | 'EXPENSE' | '') =>
+              setFilters((prev) => ({ ...prev, type }))
+            }
+            onCategoriaChange={(category) =>
+              setFilters((prev) => ({ ...prev, category }))
+            }
+            onDataInicioChange={(startDate) =>
+              setFilters((prev) => ({ ...prev, startDate }))
+            }
+            onDataFimChange={(endDate) =>
+              setFilters((prev) => ({ ...prev, endDate }))
             }
           />
 
@@ -111,6 +182,11 @@ export default function TransacoesPage() {
               transacoes={filteredTransacoes}
               onEdit={handleEditTransacao}
               onDelete={handleDeleteTransacao}
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalItems}
+              itemsPerPage={pagination.itemsPerPage}
+              onPageChange={handlePageChange}
             />
           )}
 
@@ -118,7 +194,6 @@ export default function TransacoesPage() {
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             onSubmit={handleSubmitTransacao}
-            tipo="receita"
             contas={contas}
           />
         </div>

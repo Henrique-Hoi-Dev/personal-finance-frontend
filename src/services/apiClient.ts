@@ -84,21 +84,35 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
 
       if (!response.ok) {
-        // Se receber 401, trata como token expirado
         if (response.status === 401) {
           this.handleTokenExpiration();
         }
 
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { message: 'Erro na requisição' };
+        }
+
         throw new ApiError(
-          data.message || 'Erro na requisição',
+          errorData.message || 'Erro na requisição',
           response.status
         );
       }
 
-      return data;
+      if (response.status === 204) {
+        return {} as ApiResponse<T>;
+      }
+
+      try {
+        const data = await response.json();
+        return data;
+      } catch {
+        return {} as ApiResponse<T>;
+      }
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;

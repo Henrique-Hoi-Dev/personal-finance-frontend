@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { BaseButton, BaseInput, BaseLabel } from '@/components/atoms';
+import {
+  BaseButton,
+  BaseInput,
+  BaseLabel,
+  BaseSelect,
+} from '@/components/atoms';
 import { Conta } from '@/types';
-import { formatAmount } from '@/utils';
+import { formatCurrency } from '@/utils';
+import { useCategoriesStore } from '@/store/categories.store';
+import { useEndpointOptions, useEnumOptions } from '@/hooks';
 
 interface TransactionFormProps {
-  tipo: 'receita' | 'despesa';
   contas: Conta[];
   onSubmit: (data: TransactionFormData) => void;
   onCancel: () => void;
@@ -13,45 +19,57 @@ interface TransactionFormProps {
 }
 
 export interface TransactionFormData {
-  valor: number;
-  descricao: string;
-  categoria: string;
-  contaId: string;
-  data: string;
-  tipo: 'receita' | 'despesa';
+  value: number;
+  description: string;
+  category: string;
+  accountId: string | null;
+  date: string;
+  type: 'INCOME' | 'EXPENSE';
 }
 
 export const TransactionForm: React.FC<TransactionFormProps> = ({
-  tipo,
   contas,
   onSubmit,
   onCancel,
   loading = false,
 }) => {
   const t = useTranslations('Transacoes');
+  const { categories, fetchCategories } = useCategoriesStore();
 
   const [formData, setFormData] = useState<TransactionFormData>({
-    valor: 0,
-    descricao: '',
-    categoria: '',
-    contaId: contas[0]?.id || '',
-    data: new Date().toISOString().split('T')[0],
-    tipo,
+    value: 0,
+    description: '',
+    category: '',
+    accountId: null,
+    date: new Date().toISOString().split('T')[0],
+    type: 'EXPENSE', // Default to expense
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [displayValue, setDisplayValue] = useState<string>('');
 
-  const categorias = [
-    { key: 'alimentacao', label: t('categories.alimentacao') },
-    { key: 'transporte', label: t('categories.transporte') },
-    { key: 'lazer', label: t('categories.lazer') },
-    { key: 'saude', label: t('categories.saude') },
-    { key: 'educacao', label: t('categories.educacao') },
-    { key: 'trabalho', label: t('categories.trabalho') },
-    { key: 'entretenimento', label: t('categories.entretenimento') },
-    { key: 'utilities', label: t('categories.utilities') },
-    { key: 'outros', label: t('categories.outros') },
-  ];
+  // Carrega as categorias quando o componente monta
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const categoriasFiltradas = categories.filter(
+    (category) => category.type === formData.type
+  );
+
+  const tipoOptions = useEnumOptions(
+    { INCOME: 'INCOME', EXPENSE: 'EXPENSE' },
+    { INCOME: t('income'), EXPENSE: t('expense') }
+  );
+
+  const categoriaOptions = useEndpointOptions(
+    categoriasFiltradas,
+    'name',
+    'ptBr',
+    t('selectCategory')
+  );
+
+  const contaOptions = useEndpointOptions(contas, 'id', 'name', t('noAccount'));
 
   const handleInputChange = (
     field: keyof TransactionFormData,
@@ -72,16 +90,16 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.valor || formData.valor <= 0) {
-      newErrors.valor = t('valueRequired');
+    if (!formData.value || formData.value <= 0) {
+      newErrors.value = t('valueRequired');
     }
 
-    if (!formData.descricao.trim()) {
-      newErrors.descricao = t('descriptionRequired');
+    if (!formData.description.trim()) {
+      newErrors.description = t('descriptionRequired');
     }
 
-    if (!formData.data) {
-      newErrors.data = t('dateRequired');
+    if (!formData.date) {
+      newErrors.date = t('dateRequired');
     }
 
     setErrors(newErrors);
@@ -96,102 +114,90 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     }
   };
 
-  const formatCurrency = (value: string): string => {
-    // Remove non-numeric characters
-    const numericValue = value.replace(/\D/g, '');
+  const handleCurrencyChange = (inputValue: string) => {
+    const numbersOnly = inputValue.replace(/\D/g, '');
 
-    // Convert to number and format
-    const number = parseInt(numericValue) / 100;
+    if (numbersOnly === '') {
+      setDisplayValue('');
+      setFormData((prev) => ({ ...prev, value: 0 }));
+      return;
+    }
 
-    return formatAmount(number);
-  };
+    const valueInCents = parseInt(numbersOnly);
+    const valueInReais = valueInCents / 100;
 
-  const handleCurrencyChange = (value: string) => {
-    const formatted = formatCurrency(value);
-    const numericValue = parseFloat(
-      formatted.replace(/\./g, '').replace(',', '.')
-    );
-
-    handleInputChange('valor', numericValue);
+    setDisplayValue(formatCurrency(valueInReais));
+    setFormData((prev) => ({ ...prev, value: valueInCents }));
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Tipo de Transação */}
+      <BaseSelect
+        value={formData.type}
+        onChange={(value) => {
+          const newType = value as 'INCOME' | 'EXPENSE';
+          handleInputChange('type', newType);
+          // Reset category when type changes
+          handleInputChange('category', '');
+        }}
+        options={tipoOptions}
+        label={t('transactionType')}
+        required
+      />
+
       {/* Valor */}
       <div>
-        <BaseLabel htmlFor="valor">{t('value')} *</BaseLabel>
+        <BaseLabel htmlFor="value">{t('value')} *</BaseLabel>
         <BaseInput
-          id="valor"
+          id="value"
           type="text"
-          value={
-            formData.valor > 0
-              ? formatCurrency((formData.valor * 100).toString())
-              : ''
-          }
+          value={displayValue}
           onChange={(e) => handleCurrencyChange(e.target.value)}
-          placeholder="0,00"
-          error={errors.valor}
+          placeholder="R$ 0,00"
+          error={errors.value}
         />
       </div>
 
       {/* Descrição */}
       <div>
-        <BaseLabel htmlFor="descricao">{t('description')} *</BaseLabel>
+        <BaseLabel htmlFor="description">{t('description')} *</BaseLabel>
         <BaseInput
-          id="descricao"
+          id="description"
           type="text"
-          value={formData.descricao}
-          onChange={(e) => handleInputChange('descricao', e.target.value)}
+          value={formData.description}
+          onChange={(e) => handleInputChange('description', e.target.value)}
           placeholder={t('transactionDescription')}
-          error={errors.descricao}
+          error={errors.description}
         />
       </div>
 
       {/* Categoria */}
-      <div>
-        <BaseLabel htmlFor="categoria">{t('category')}</BaseLabel>
-        <select
-          id="categoria"
-          value={formData.categoria}
-          onChange={(e) => handleInputChange('categoria', e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-        >
-          <option value="">{t('selectCategory')}</option>
-          {categorias.map((categoria) => (
-            <option key={categoria.key} value={categoria.key}>
-              {categoria.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <BaseSelect
+        value={formData.category}
+        onChange={(value) => handleInputChange('category', value)}
+        options={categoriaOptions}
+        label={t('category')}
+      />
 
       {/* Conta */}
-      <div>
-        <BaseLabel htmlFor="conta">{t('account')}</BaseLabel>
-        <select
-          id="conta"
-          value={formData.contaId}
-          onChange={(e) => handleInputChange('contaId', e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-        >
-          {contas.map((conta) => (
-            <option key={conta.id} value={conta.id}>
-              {conta.nome}
-            </option>
-          ))}
-        </select>
-      </div>
+      <BaseSelect
+        value={formData.accountId || ''}
+        onChange={(value) => handleInputChange('accountId', value)}
+        options={contaOptions}
+        label={t('account')}
+      />
 
       {/* Data */}
       <div>
-        <BaseLabel htmlFor="data">{t('date')} *</BaseLabel>
+        <BaseLabel htmlFor="date">{t('date')} *</BaseLabel>
         <div className="relative">
           <BaseInput
-            id="data"
+            id="date"
             type="date"
-            value={formData.data}
-            onChange={(e) => handleInputChange('data', e.target.value)}
-            error={errors.data}
+            value={formData.date}
+            onChange={(e) => handleInputChange('date', e.target.value)}
+            error={errors.date}
           />
           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
             <svg
@@ -229,7 +235,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           fullWidth={false}
           className="flex-1 max-h-12"
         >
-          {tipo === 'receita' ? t('addIncome') : t('addExpense')}
+          {t('addTransaction')}
         </BaseButton>
       </div>
     </form>

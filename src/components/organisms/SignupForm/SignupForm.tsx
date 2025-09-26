@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PasswordField, FormField } from '@/components/molecules';
-import { BaseButton, CPFInput, BaseLabel } from '@/components/atoms';
+import { BaseButton, BaseCPFInput, BaseLabel } from '@/components/atoms';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { formatCPF, removeCPFMask } from '@/utils';
@@ -99,7 +99,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({
           >
             {t('cpf')} *
           </BaseLabel>
-          <CPFInput
+          <BaseCPFInput
             id="cpf"
             name="cpf"
             placeholder={t('cpfPlaceholder')}

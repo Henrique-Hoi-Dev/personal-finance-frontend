@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
+import { UpdatePreferencesPayload } from '@/types/auth';
 import { UserProfile } from '@/types/auth';
 import { BaseButton, BaseLoading } from '@/components/atoms';
 import {
@@ -19,7 +20,7 @@ import { toast } from 'sonner';
 export default function PerfilPage() {
   const t = useTranslations('Profile');
   const router = useRouter();
-  const { user, logout, loading } = useAuthStore();
+  const { user, logout, loading, updatePreferences } = useAuthStore();
   const [isSaving, setIsSaving] = useState(false);
 
   const handleLogout = async () => {
@@ -37,6 +38,26 @@ export default function PerfilPage() {
       toast.success('Alterações salvas com sucesso!');
     } catch (error) {
       toast.error('Erro ao salvar alterações');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSavePreferences = async (data: {
+    currency: string;
+    language: string;
+  }) => {
+    setIsSaving(true);
+    try {
+      const preferences: UpdatePreferencesPayload = {
+        defaultCurrency: data.currency,
+        // Language is handled separately by the PreferencesCard component
+      };
+
+      await updatePreferences(preferences);
+      toast.success(t('preferencesUpdated'));
+    } catch (error) {
+      toast.error(t('errorSaving'));
     } finally {
       setIsSaving(false);
     }
@@ -88,7 +109,13 @@ export default function PerfilPage() {
               <div className="lg:col-span-2 space-y-6">
                 {user && <PersonalInfoCard user={user as UserProfile} />}
                 <SecurityCard />
-                <PreferencesCard />
+                {user && (
+                  <PreferencesCard
+                    user={user as UserProfile}
+                    onSave={handleSavePreferences}
+                    loading={isSaving}
+                  />
+                )}
               </div>
             </div>
 

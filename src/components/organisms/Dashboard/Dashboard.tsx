@@ -5,30 +5,37 @@ import {
   TransactionItem,
   CategoryItem,
 } from '@/components/molecules';
-import { getBalance } from '@/services/transacoes.service';
-import { Balance } from '@/types/transacoes';
+import { getBalance, getTransacoes, getExpensesByCategory } from '@/services/transacoes.service';
+import { Balance, Transacao } from '@/types/transacoes';
 import { BaseLoading } from '@/components/atoms';
-import { formatCurrencyFromCents, formatAmount } from '@/utils';
+import { formatCurrencyFromCents } from '@/utils';
 
 export const Dashboard: React.FC = () => {
   const t = useTranslations('Dashboard');
   const [balance, setBalance] = useState<Balance | null>(null);
+  const [transactions, setTransactions] = useState<Transacao[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBalance = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const balanceData = await getBalance();
+
+        const [balanceData, transactionsData] = await Promise.all([
+          getBalance(),
+          getTransacoes({ limit: 5, page: 0 }),
+        ]);
+
         setBalance(balanceData);
+        setTransactions(transactionsData.data);
       } catch (error) {
-        console.error('Erro ao carregar saldo');
+        console.error('Dashboard: Erro ao carregar dados:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBalance();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -100,74 +107,76 @@ export const Dashboard: React.FC = () => {
         </svg>
       ),
     },
-  ];
-
-  const transactions = [
     {
-      description: 'Salário',
-      category: 'Trabalho',
-      date: '2024-01-15',
-      amount: formatAmount(3500),
-      type: 'income' as const,
+      title: t('fixedAccounts'),
+      value: 'R$ 0,00', // TODO: Conectar com dados do backend
+      color: 'blue' as const,
+      icon: (
+        <svg
+          className="w-6 h-6 text-blue-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+      ),
     },
     {
-      description: 'Supermercado',
-      category: 'Alimentação',
-      date: '2024-01-14',
-      amount: formatAmount(450),
-      type: 'expense' as const,
-    },
-    {
-      description: 'Conta de Luz',
-      category: 'Utilities',
-      date: '2024-01-13',
-      amount: formatAmount(120),
-      type: 'expense' as const,
-    },
-    {
-      description: 'Freelance',
-      category: 'Trabalho',
-      date: '2024-01-12',
-      amount: formatAmount(800),
-      type: 'income' as const,
-    },
-    {
-      description: 'Netflix',
-      category: 'Entretenimento',
-      date: '2024-01-11',
-      amount: formatAmount(60),
-      type: 'expense' as const,
+      title: t('loans'),
+      value: 'R$ 0,00', // TODO: Conectar com dados do backend
+      color: 'purple' as const,
+      icon: (
+        <svg
+          className="w-6 h-6 text-purple-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+          />
+        </svg>
+      ),
     },
   ];
 
   const categories = [
     {
       name: 'Alimentação',
-      amount: formatAmount(450),
+      amount: formatCurrencyFromCents(45000),
       color: 'bg-red-500',
       percentage: 60,
     },
     {
       name: 'Utilities',
-      amount: formatAmount(120),
+      amount: formatCurrencyFromCents(12000),
       color: 'bg-orange-500',
       percentage: 15,
     },
     {
       name: 'Entretenimento',
-      amount: formatAmount(60),
+      amount: formatCurrencyFromCents(6000),
       color: 'bg-purple-500',
       percentage: 8,
     },
     {
       name: 'Transporte',
-      amount: formatAmount(200),
+      amount: formatCurrencyFromCents(20000),
       color: 'bg-blue-400',
       percentage: 25,
     },
     {
       name: 'Saúde',
-      amount: formatAmount(180),
+      amount: formatCurrencyFromCents(18000),
       color: 'bg-green-600',
       percentage: 20,
     },
@@ -210,16 +219,22 @@ export const Dashboard: React.FC = () => {
             </a>
           </div>
           <div className="space-y-1">
-            {transactions.map((transaction, index) => (
-              <TransactionItem
-                key={index}
-                description={transaction.description}
-                category={transaction.category}
-                date={transaction.date}
-                amount={transaction.amount}
-                type={transaction.type}
-              />
-            ))}
+            {transactions.length > 0 ? (
+              transactions.map((transaction, index) => (
+                <TransactionItem
+                  key={transaction.id}
+                  description={transaction.description}
+                  category={transaction.category}
+                  date={transaction.date}
+                  amount={formatCurrencyFromCents(transaction.value)}
+                  type={transaction.type.toLowerCase() as 'income' | 'expense'}
+                />
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                {t('noTransactions')}
+              </div>
+            )}
           </div>
         </div>
 
