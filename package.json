@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@formatjs/intl": "^3.1.6",
     "next": "14.0.4",
     "next-intl": "^4.3.9",
     "react": "^18",

@@ -38,16 +38,31 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
     );
   }
 
-  const formatSaldo = (saldo: number) => {
-    return `R$ ${saldo.toFixed(2).replace('.', ',')}`;
+  const formatAmount = (amount: number) => {
+    return `R$ ${amount.toFixed(2).replace('.', ',')}`;
   };
 
-  const getSaldoColor = (saldo: number) => {
-    return saldo >= 0 ? 'text-green-600' : 'text-red-600';
+  const getAmountColor = (amount: number) => {
+    return amount >= 0 ? 'text-green-600' : 'text-red-600';
   };
 
-  const getStatusColor = (ativa: boolean) => {
-    return ativa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+  const getTypeLabel = (type: string) => {
+    if (!type) return 'Outro';
+
+    switch (type.toUpperCase()) {
+      case 'FIXED':
+        return 'Fixa';
+      case 'LOAN':
+        return 'Empréstimo';
+      case 'CREDIT_CARD':
+        return 'Cartão de Crédito';
+      case 'SUBSCRIPTION':
+        return 'Assinatura';
+      case 'OTHER':
+        return 'Outro';
+      default:
+        return 'Outro';
+    }
   };
 
   return (
@@ -55,23 +70,18 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">{conta.nome}</h2>
-          <p className="text-sm text-gray-500 capitalize">{conta.tipo}</p>
+          <h2 className="text-xl font-semibold text-gray-900">{conta.name}</h2>
+          <p className="text-sm text-gray-500">{getTypeLabel(conta.type)}</p>
         </div>
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-            conta.ativa
-          )}`}
-        >
-          {conta.ativa ? 'Ativa' : 'Inativa'}
-        </span>
       </div>
 
-      {/* Saldo */}
+      {/* Valor Total */}
       <div className="mb-6">
-        <p className="text-sm text-gray-600 mb-1">Saldo Atual</p>
-        <p className={`text-3xl font-bold ${getSaldoColor(conta.saldo)}`}>
-          {formatSaldo(conta.saldo)}
+        <p className="text-sm text-gray-600 mb-1">Valor Total</p>
+        <p
+          className={`text-3xl font-bold ${getAmountColor(conta.totalAmount)}`}
+        >
+          {formatAmount(conta.totalAmount)}
         </p>
       </div>
 
@@ -79,17 +89,29 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
       <div className="space-y-4">
         <div className="flex justify-between items-center py-3 border-b border-gray-100">
           <span className="text-sm text-gray-600">Tipo de Conta</span>
-          <span className="text-sm font-medium text-gray-900 capitalize">
-            {conta.tipo}
+          <span className="text-sm font-medium text-gray-900">
+            {getTypeLabel(conta.type)}
           </span>
         </div>
 
         <div className="flex justify-between items-center py-3 border-b border-gray-100">
-          <span className="text-sm text-gray-600">Status</span>
-          <span
-            className={`text-sm font-medium ${getStatusColor(conta.ativa)}`}
-          >
-            {conta.ativa ? 'Ativa' : 'Inativa'}
+          <span className="text-sm text-gray-600">Parcelas</span>
+          <span className="text-sm font-medium text-gray-900">
+            {conta.installments || 1}
+          </span>
+        </div>
+
+        <div className="flex justify-between items-center py-3 border-b border-gray-100">
+          <span className="text-sm text-gray-600">Data de Início</span>
+          <span className="text-sm font-medium text-gray-900">
+            {new Date(conta.startDate).toLocaleDateString('pt-BR')}
+          </span>
+        </div>
+
+        <div className="flex justify-between items-center py-3 border-b border-gray-100">
+          <span className="text-sm text-gray-600">Dia de Vencimento</span>
+          <span className="text-sm font-medium text-gray-900">
+            {conta.dueDay}
           </span>
         </div>
 
@@ -99,13 +121,6 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
             {new Date(conta.createdAt).toLocaleDateString('pt-BR')}
           </span>
         </div>
-
-        {conta.tipo.toLowerCase() === 'credito' && conta.saldo > 0 && (
-          <div className="flex justify-between items-center py-3 border-b border-gray-100">
-            <span className="text-sm text-gray-600">Parcelas Pendentes</span>
-            <span className="text-sm font-medium text-red-600">2 parcelas</span>
-          </div>
-        )}
       </div>
 
       {/* Ações */}

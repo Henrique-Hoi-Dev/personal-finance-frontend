@@ -62,14 +62,14 @@ export const SecurityCard: React.FC<SecurityCardProps> = ({
         <div>
           <BaseLabel htmlFor="currentPassword">{t('password')}</BaseLabel>
           <div className="flex items-center justify-between space-x-3 mt-1">
-            <div className="flex-1 w-32 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-600 font-mono">
+            <div className="flex-1 max-w-52 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-600 font-mono">
               ••••••••
             </div>
             <BaseButton
               type="button"
               variant="secondary"
               onClick={() => setShowChangePassword(!showChangePassword)}
-              className="w-80 h-8"
+              className="w-60 h-8"
             >
               {t('changePassword')}
             </BaseButton>

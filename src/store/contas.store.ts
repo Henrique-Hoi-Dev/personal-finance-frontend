@@ -7,6 +7,7 @@ import {
   deleteConta,
 } from '@/services/contas.service';
 import { Conta, CreateContaPayload, UpdateContaPayload } from '@/types/contas';
+import { useAuthStore } from './auth.store';
 
 interface ContasState {
   contas: Conta[];
@@ -61,10 +62,20 @@ export const useContasStore = create<ContasStore>((set, get) => ({
     }
   },
 
-  addConta: async (data: CreateContaPayload) => {
+  addConta: async (data: Omit<CreateContaPayload, 'userId'>) => {
     set({ loading: true, error: null });
     try {
-      const novaConta = await createConta(data);
+      const { user } = useAuthStore.getState();
+      if (!user?.id) {
+        throw new Error('Usuário não autenticado');
+      }
+
+      const contaData: CreateContaPayload = {
+        ...data,
+        userId: user.id,
+      };
+
+      const novaConta = await createConta(contaData);
       set((state) => ({
         contas: [...state.contas, novaConta],
         loading: false,

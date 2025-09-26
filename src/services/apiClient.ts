@@ -1,3 +1,6 @@
+import { isTokenExpired } from '@/utils/jwt';
+import { toast } from 'sonner';
+
 interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -33,6 +36,16 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
+    // Verifica se o token está expirado antes de fazer a requisição
+    if (this.token && isTokenExpired(this.token)) {
+      this.token = null;
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        toast.error('Sessão expirada. Faça login novamente.');
+      }
+      throw new ApiError('Token expirado', 401);
+    }
+
     const url = `${this.baseURL}${endpoint}`;
 
     const config: RequestInit = {

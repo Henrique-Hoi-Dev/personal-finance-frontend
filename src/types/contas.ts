@@ -1,30 +1,32 @@
 export interface Conta {
   id: string;
-  nome: string;
-  tipo: 'corrente' | 'poupanca' | 'investimento' | 'cartao';
-  saldo: number;
-  cor: string;
-  icone: string;
-  ativa: boolean;
+  name: string;
+  type: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
+  totalAmount: number;
+  installments?: number;
+  startDate: string;
+  dueDay: number;
   userId: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateContaPayload {
-  nome: string;
-  tipo: 'corrente' | 'poupanca' | 'investimento' | 'cartao';
-  saldo: number;
-  cor: string;
-  icone: string;
+  userId: string;
+  name: string;
+  type: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
+  totalAmount: number;
+  installments: number;
+  startDate: string;
+  dueDay: number;
 }
 
 export interface UpdateContaPayload {
   id: string;
-  nome?: string;
-  tipo?: 'corrente' | 'poupanca' | 'investimento' | 'cartao';
-  saldo?: number;
-  cor?: string;
-  icone?: string;
-  ativa?: boolean;
+  name?: string;
+  type?: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
+  totalAmount?: number;
+  installments?: number;
+  startDate?: string;
+  dueDay?: number;
 }

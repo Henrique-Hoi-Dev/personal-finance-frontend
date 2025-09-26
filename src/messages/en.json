@@ -152,5 +152,12 @@
   },
   "Common": {
     "required": "*"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "subtitle": "Oops! The page you're looking for doesn't exist or has been moved.",
+    "goToDashboard": "Go to Dashboard",
+    "goBack": "Go Back",
+    "contactUs": "If you believe this is an error, please contact us."
   }
 }

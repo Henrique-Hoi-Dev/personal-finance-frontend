@@ -18,7 +18,7 @@ import { TransactionFormData } from '@/components/molecules';
 export default function TransacoesPage() {
   const { transacoes, loading, fetchTransacoes } = useTransacoesStore();
   const { contas, fetchContas } = useContasStore();
-  const t = useTranslations('Transactions');
+  const t = useTranslations('Transacoes');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransacao, setEditingTransacao] = useState<Transacao | null>(
     null

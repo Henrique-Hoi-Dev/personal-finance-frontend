@@ -36,7 +36,6 @@ export default function PerfilPage() {
   const handleSaveChanges = async () => {
     setIsSaving(true);
     try {
-      // TODO: Implementar salvamento das alterações
       toast.success('Alterações salvas com sucesso!');
     } catch (error) {
       toast.error('Erro ao salvar alterações');
@@ -46,7 +45,6 @@ export default function PerfilPage() {
   };
 
   const handlePhotoChange = (file: File) => {
-    // TODO: Implementar upload da foto
     console.log('Arquivo selecionado:', file);
     toast.success('Foto selecionada com sucesso!');
   };
@@ -97,50 +95,52 @@ export default function PerfilPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-8 flex justify-end space-x-4">
-              <BaseButton
-                variant="primary"
-                onClick={handleSaveChanges}
-                loading={isSaving}
-                className=" w-80 h-8 flex items-center space-x-2"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div className="w-full flex justify-end">
+              <div className="w-[757px] mt-8 flex justify-start space-x-4">
+                <BaseButton
+                  variant="primary"
+                  onClick={handleSaveChanges}
+                  loading={isSaving}
+                  className="h-8 flex items-center space-x-2"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
-                <span>Salvar Alterações</span>
-              </BaseButton>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  <span>Salvar Alterações</span>
+                </BaseButton>
 
-              <BaseButton
-                variant="secondary"
-                onClick={handleLogout}
-                loading={loading}
-                className=" w-80 h-8 flex items-center space-x-2 border-red-300 text-red-600 hover:bg-red-50"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <BaseButton
+                  variant="secondary"
+                  onClick={handleLogout}
+                  loading={loading}
+                  className="h-8 flex items-center space-x-2 border-red-300 text-red-600 hover:bg-red-50"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
-                <span>Sair</span>
-              </BaseButton>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                  <span>Sair</span>
+                </BaseButton>
+              </div>
             </div>
           </div>
         </div>

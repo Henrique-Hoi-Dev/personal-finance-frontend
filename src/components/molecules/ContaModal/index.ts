@@ -1,0 +1,1 @@
+export { ContaModal } from './ContaModal';

@@ -63,7 +63,23 @@
     "edit": "Editar",
     "delete": "Excluir",
     "noAccountsFound": "Nenhuma conta encontrada",
-    "noAccountsMessage": "Comece criando sua primeira conta bancária."
+    "noAccountsMessage": "Comece criando sua primeira conta bancária.",
+    "name": "Nome",
+    "namePlaceholder": "Digite o nome da conta",
+    "totalAmount": "Valor Total",
+    "installments": "Parcelas",
+    "startDate": "Data de Início",
+    "dueDay": "Dia de Vencimento",
+    "create": "Criar Conta",
+    "creating": "Criando...",
+    "cancel": "Cancelar",
+    "accountTypes": {
+      "FIXED": "Fixa",
+      "LOAN": "Empréstimo",
+      "CREDIT_CARD": "Cartão de Crédito",
+      "SUBSCRIPTION": "Assinatura",
+      "OTHER": "Outro"
+    }
   },
   "Transacoes": {
     "title": "Transações",
@@ -154,5 +170,12 @@
   },
   "Common": {
     "required": "*"
+  },
+  "NotFound": {
+    "title": "Página não encontrada",
+    "subtitle": "Ops! A página que você está procurando não existe ou foi movida.",
+    "goToDashboard": "Ir para Dashboard",
+    "goBack": "Voltar",
+    "contactUs": "Se você acredita que isso é um erro, entre em contato conosco."
   }
 }
