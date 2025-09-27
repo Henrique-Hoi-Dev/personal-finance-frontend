@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import { Transacao } from '@/types';
 import {
   formatCurrencyFromCents,
+  formatDateSafe,
   getCategoryLabel,
   TransactionCategory,
 } from '@/utils';
@@ -67,7 +68,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
   };
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('pt-BR');
+    return formatDateSafe(date);
   };
 
   const formatValue = (valor: number, tipo: string) => {
