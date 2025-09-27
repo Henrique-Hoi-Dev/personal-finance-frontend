@@ -13,6 +13,11 @@ export interface Conta {
   type: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
   totalAmount: number;
   installments?: number;
+  installmentAmount?: number;
+  totalWithInterest?: number;
+  interestRate?: number;
+  monthlyInterestRate?: number;
+  amountPaid?: number;
   startDate: string;
   isPaid: boolean;
   dueDay: number;
@@ -28,6 +33,7 @@ export interface CreateContaPayload {
   type: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
   totalAmount: number;
   installments?: number;
+  installmentAmount?: number;
   startDate: string;
   dueDay: number;
 }

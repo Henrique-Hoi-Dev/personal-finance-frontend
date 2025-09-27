@@ -213,7 +213,7 @@ export const Dashboard: React.FC = () => {
   const categoriesData = categories.map((category) => ({
     name: category.name,
     amount: formatCurrencyFromCents(category.value),
-    color: category.color, // Use the hex color directly
+    color: category.color,
     percentage: category.percentage,
   }));
 
@@ -226,27 +226,75 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Saldo Principal - Linha Única */}
-      <div className="mb-8 ">
-        <SummaryCard
-          title={mainBalance.title}
-          value={mainBalance.value}
-          icon={mainBalance.icon}
-          color={mainBalance.color}
-          className="max-w-md mx-auto"
-        />
+      <div className="mb-8 "></div>
+
+      {/* Big Numbers - Organizados por categoria */}
+
+      {/* Primeira linha - Entradas e Saldo Atual */}
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          Entradas e Saldo
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <SummaryCard
+            title={summaryData[0].title}
+            value={summaryData[0].value}
+            icon={summaryData[0].icon}
+            color={summaryData[0].color}
+          />
+          <SummaryCard
+            title={mainBalance.title}
+            value={mainBalance.value}
+            icon={mainBalance.icon}
+            color={mainBalance.color}
+          />
+        </div>
       </div>
 
-      {/* 6 Big Numbers - Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {summaryData.map((item, index) => (
+      {/* Segunda linha - Saídas */}
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Saídas</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <SummaryCard
-            key={index}
-            title={item.title}
-            value={item.value}
-            icon={item.icon}
-            color={item.color}
+            title={summaryData[1].title}
+            value={summaryData[1].value}
+            icon={summaryData[1].icon}
+            color={summaryData[1].color}
           />
-        ))}
+          <SummaryCard
+            title={summaryData[2].title}
+            value={summaryData[2].value}
+            icon={summaryData[2].icon}
+            color={summaryData[2].color}
+          />
+          <SummaryCard
+            title={summaryData[3].title}
+            value={summaryData[3].value}
+            icon={summaryData[3].icon}
+            color={summaryData[3].color}
+          />
+        </div>
+      </div>
+
+      {/* Terceira linha - Contas e Financiamentos */}
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          Contas e Financiamentos
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <SummaryCard
+            title={summaryData[4].title}
+            value={summaryData[4].value}
+            icon={summaryData[4].icon}
+            color={summaryData[4].color}
+          />
+          <SummaryCard
+            title={summaryData[5].title}
+            value={summaryData[5].value}
+            icon={summaryData[5].icon}
+            color={summaryData[5].color}
+          />
+        </div>
       </div>
 
       {/* Bottom Section */}

@@ -37,6 +37,7 @@ export function ContaForm({
   });
 
   const [hasInstallments, setHasInstallments] = useState(false);
+  const [installmentValue, setInstallmentValue] = useState<string>('');
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof Omit<CreateContaPayload, 'userId'>, string>>
@@ -67,6 +68,35 @@ export function ContaForm({
 
     setDisplayValue(formatCurrency(valueInReais));
     setFormData((prev) => ({ ...prev, totalAmount: valueInCents }));
+  };
+
+  const handleInstallmentValueChange = (inputValue: string) => {
+    const numbersOnly = inputValue.replace(/\D/g, '');
+
+    if (numbersOnly === '') {
+      setInstallmentValue('');
+      return;
+    }
+
+    const valueInCents = parseInt(numbersOnly);
+    const valueInReais = valueInCents / 100;
+
+    setInstallmentValue(formatCurrency(valueInReais));
+  };
+
+  const handleTypeChange = (newType: CreateContaPayload['type']) => {
+    setFormData((prev) => ({ ...prev, type: newType }));
+
+    if (newType === 'LOAN') {
+      setHasInstallments(true);
+      setFormData((prev) => ({ ...prev, installments: 1 }));
+    } else {
+      setInstallmentValue('');
+    }
+
+    if (errors.type) {
+      setErrors((prev) => ({ ...prev, type: undefined }));
+    }
   };
 
   const validateForm = (): boolean => {
@@ -106,15 +136,36 @@ export function ContaForm({
     }
 
     try {
-      const dataToSubmit = hasInstallments
-        ? formData
-        : {
-            name: formData.name,
-            type: formData.type,
-            totalAmount: formData.totalAmount,
-            startDate: formData.startDate,
-            dueDay: formData.dueDay,
-          };
+      let dataToSubmit: Omit<CreateContaPayload, 'userId'>;
+
+      if (formData.type === 'LOAN') {
+        // Para empréstimos, incluir valor da parcela
+        const installmentValueInCents = installmentValue
+          ? parseInt(installmentValue.replace(/\D/g, ''))
+          : 0;
+
+        dataToSubmit = {
+          name: formData.name,
+          type: formData.type,
+          totalAmount: formData.totalAmount,
+          installments: formData.installments,
+          installmentAmount: installmentValueInCents,
+          startDate: formData.startDate,
+          dueDay: formData.dueDay,
+        };
+      } else if (hasInstallments) {
+        // Para outros tipos com parcelas
+        dataToSubmit = formData;
+      } else {
+        // Para contas sem parcelas
+        dataToSubmit = {
+          name: formData.name,
+          type: formData.type,
+          totalAmount: formData.totalAmount,
+          startDate: formData.startDate,
+          dueDay: formData.dueDay,
+        };
+      }
 
       await onSubmit(dataToSubmit);
     } catch (error) {
@@ -141,6 +192,7 @@ export function ContaForm({
           checked={hasInstallments}
           onChange={setHasInstallments}
           label={tCommon('hasInstallments')}
+          disabled={formData.type === 'LOAN'}
         />
       </div>
 
@@ -170,7 +222,7 @@ export function ContaForm({
           <BaseSelect
             value={formData.type}
             onChange={(value) =>
-              handleInputChange('type', value as CreateContaPayload['type'])
+              handleTypeChange(value as CreateContaPayload['type'])
             }
             options={tipoContaOptions}
             error={errors.type}
@@ -195,6 +247,21 @@ export function ContaForm({
             <p className="text-red-500 text-sm mt-1">{errors.totalAmount}</p>
           )}
         </div>
+
+        {formData.type === 'LOAN' && (
+          <div>
+            <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+              Valor da Parcela <span className="text-red-500">*</span>
+            </BaseLabel>
+            <BaseInput
+              type="text"
+              value={installmentValue}
+              onChange={(e) => handleInstallmentValueChange(e.target.value)}
+              placeholder="R$ 0,00"
+              className="w-full h-12 text-base"
+            />
+          </div>
+        )}
 
         {hasInstallments && (
           <div>

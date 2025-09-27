@@ -221,6 +221,59 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
         </div>
       </div>
 
+      {/* Grid de informações de juros - só para empréstimos */}
+      {conta.type === 'LOAN' &&
+        (conta.totalWithInterest ||
+          conta.interestRate ||
+          conta.monthlyInterestRate ||
+          conta.amountPaid) && (
+          <div className="mb-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-blue-900 mb-3">
+                Informações do Empréstimo
+              </h4>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="text-center">
+                    <p className="text-gray-600">Valor Total com Juros</p>
+                    <p className="font-semibold text-green-600">
+                      {conta.totalWithInterest
+                        ? formatCurrencyFromCents(conta.totalWithInterest)
+                        : 'R$ 0,00'}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-gray-600">Valor dos Juros</p>
+                    <p className="font-semibold text-red-600">
+                      {conta.interestRate
+                        ? formatCurrencyFromCents(conta.interestRate)
+                        : 'R$ 0,00'}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="text-center">
+                    <p className="text-gray-600">Valor Pago</p>
+                    <p className="font-semibold text-emerald-600">
+                      {conta.amountPaid
+                        ? formatCurrencyFromCents(conta.amountPaid)
+                        : 'R$ 0,00'}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-gray-600">Taxa Mensal</p>
+                    <p className="font-semibold text-blue-600">
+                      {conta.monthlyInterestRate
+                        ? `${conta.monthlyInterestRate.toFixed(2)}%`
+                        : '0,00%'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       {hasInstallments && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">

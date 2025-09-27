@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Transacao } from '@/types';
 import {
@@ -6,7 +6,7 @@ import {
   getCategoryLabel,
   TransactionCategory,
 } from '@/utils';
-import { BasePagination } from '@/components/atoms';
+import { BasePagination, BaseConfirmModal } from '@/components/atoms';
 
 interface TransactionTableProps {
   transacoes: Transacao[];
@@ -33,6 +33,38 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
   onPageChange,
 }) => {
   const t = useTranslations('Transacoes');
+
+  // Estados para modal de confirmação
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] =
+    useState<Transacao | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Funções para modal de confirmação
+  const handleDeleteClick = (transacao: Transacao) => {
+    setTransactionToDelete(transacao);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!transactionToDelete || !onDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await onDelete(transactionToDelete.id);
+      setShowDeleteModal(false);
+      setTransactionToDelete(null);
+    } catch (error) {
+      console.error('Erro ao excluir transação:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setTransactionToDelete(null);
+  };
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('pt-BR');
@@ -416,7 +448,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
-                    onClick={() => onDelete?.(transacao.id)}
+                    onClick={() => handleDeleteClick(transacao)}
                     className="text-red-600 hover:text-red-800 transition-colors duration-200"
                     title="Excluir transação"
                   >
@@ -453,6 +485,19 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
           />
         </div>
       )}
+
+      {/* Modal de Confirmação de Exclusão */}
+      <BaseConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Excluir Transação"
+        message={`Tem certeza que deseja excluir a transação "${transactionToDelete?.description}"? Esta ação não pode ser desfeita.`}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        type="danger"
+        loading={isDeleting}
+      />
     </div>
   );
 };
