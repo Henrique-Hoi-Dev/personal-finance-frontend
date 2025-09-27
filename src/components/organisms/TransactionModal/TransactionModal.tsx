@@ -2,12 +2,10 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 import { BaseModal } from '@/components/atoms';
 import { TransactionForm, TransactionFormData } from '@/components/molecules';
-import { Conta } from '@/types';
 
 interface TransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  contas: Conta[];
   onSubmit: (data: TransactionFormData) => void;
   loading?: boolean;
 }
@@ -15,7 +13,6 @@ interface TransactionModalProps {
 export const TransactionModal: React.FC<TransactionModalProps> = ({
   isOpen,
   onClose,
-  contas,
   onSubmit,
   loading = false,
 }) => {
@@ -37,7 +34,6 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       size="2xl"
     >
       <TransactionForm
-        contas={contas}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         loading={loading}

@@ -15,6 +15,7 @@ export const PreferencesCard: React.FC<PreferencesCardProps> = ({
   loading = false,
 }) => {
   const t = useTranslations('Profile');
+  const tCommon = useTranslations('Common');
   const { changeLanguage } = useLanguage();
   const [preferences, setPreferences] = useState({
     currency: user.defaultCurrency || 'BRL',
@@ -95,9 +96,9 @@ export const PreferencesCard: React.FC<PreferencesCardProps> = ({
               }
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white"
             >
-              <option value="BRL">Real Brasileiro (R$)</option>
-              <option value="USD">Dólar Americano ($)</option>
-              <option value="EUR">Euro (€)</option>
+              <option value="BRL">{tCommon('currencyOptions.BRL')}</option>
+              <option value="USD">{tCommon('currencyOptions.USD')}</option>
+              <option value="EUR">{tCommon('currencyOptions.EUR')}</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg
@@ -133,8 +134,8 @@ export const PreferencesCard: React.FC<PreferencesCardProps> = ({
               }
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white"
             >
-              <option value="pt">Português (Brasil)</option>
-              <option value="en">English (US)</option>
+              <option value="pt">{tCommon('languageOptions.pt')}</option>
+              <option value="en">{tCommon('languageOptions.en')}</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg

@@ -51,6 +51,8 @@ export interface Balance {
   income: number;
   expense: number;
   balance: number;
+  fixedAccountsTotal: number;
+  loanAccountsTotal: number;
 }
 
 export interface Category {

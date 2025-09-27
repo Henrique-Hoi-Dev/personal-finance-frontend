@@ -16,6 +16,7 @@ import { formatCurrencyFromCents } from '@/utils';
 
 export const Dashboard: React.FC = () => {
   const t = useTranslations('Dashboard');
+  const tCommon = useTranslations('Common');
   const [balance, setBalance] = useState<Balance | null>(null);
   const [transactions, setTransactions] = useState<Transacao[]>([]);
   const [categories, setCategories] = useState<ExpenseByCategory[]>([]);
@@ -117,7 +118,9 @@ export const Dashboard: React.FC = () => {
     },
     {
       title: t('fixedAccounts'),
-      value: 'R$ 0,00', // TODO: Conectar com dados do backend
+      value: balance
+        ? formatCurrencyFromCents(balance.fixedAccountsTotal)
+        : 'R$ 0,00',
       color: 'blue' as const,
       icon: (
         <svg
@@ -137,7 +140,9 @@ export const Dashboard: React.FC = () => {
     },
     {
       title: t('loans'),
-      value: 'R$ 0,00', // TODO: Conectar com dados do backend
+      value: balance
+        ? formatCurrencyFromCents(balance.loanAccountsTotal)
+        : 'R$ 0,00',
       color: 'purple' as const,
       icon: (
         <svg
@@ -239,7 +244,7 @@ export const Dashboard: React.FC = () => {
               ))
             ) : (
               <div className="text-center py-4 text-gray-500">
-                Nenhum gasto por categoria encontrado
+                {tCommon('noExpensesByCategory')}
               </div>
             )}
           </div>

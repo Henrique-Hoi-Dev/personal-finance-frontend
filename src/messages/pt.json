@@ -195,7 +195,38 @@
     "preferencesUpdated": "Preferências atualizadas!"
   },
   "Common": {
-    "required": "*"
+    "required": "*",
+    "loading": "Carregando...",
+    "saveChanges": "Salvar Alterações",
+    "logout": "Sair",
+    "changePhoto": "Alterar Foto",
+    "fullName": "Nome Completo",
+    "email": "Email",
+    "noExpensesByCategory": "Nenhum gasto por categoria encontrado",
+    "hasInstallments": "Esta conta tem parcelas",
+    "currencyOptions": {
+      "BRL": "Real Brasileiro (R$)",
+      "USD": "Dólar Americano ($)",
+      "EUR": "Euro (€)"
+    },
+    "languageOptions": {
+      "pt": "Português (Brasil)",
+      "en": "English (US)"
+    },
+    "validation": {
+      "nameRequired": "Nome é obrigatório",
+      "totalAmountRequired": "Valor total deve ser maior que zero",
+      "installmentsRequired": "Número de parcelas deve ser pelo menos 1",
+      "startDateRequired": "Data de início é obrigatória",
+      "dueDayRequired": "Dia de vencimento deve ser entre 1 e 31"
+    },
+    "messages": {
+      "logoutError": "Erro ao fazer logout",
+      "changesSaved": "Alterações salvas com sucesso!",
+      "errorSaving": "Erro ao salvar alterações",
+      "photoSelected": "Foto selecionada com sucesso!",
+      "managePersonalInfo": "Gerencie suas informações pessoais e preferências"
+    }
   },
   "NotFound": {
     "title": "Página não encontrada",

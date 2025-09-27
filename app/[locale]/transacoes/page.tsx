@@ -10,7 +10,6 @@ import {
 } from '@/components/molecules';
 import { TransactionModal } from '@/components/organisms';
 import { useTransacoesStore } from '@/store/transacoes.store';
-import { useContasStore } from '@/store/contas.store';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Transacao } from '@/types';
 import { TransactionFormData } from '@/components/molecules';
@@ -18,7 +17,6 @@ import { TransactionFormData } from '@/components/molecules';
 export default function TransacoesPage() {
   const { transacoes, loading, fetchTransacoes, pagination, addTransacao } =
     useTransacoesStore();
-  const { contas, fetchContas } = useContasStore();
   const t = useTranslations('Transacoes');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransacao, setEditingTransacao] = useState<Transacao | null>(
@@ -54,13 +52,6 @@ export default function TransacoesPage() {
     pagination.itemsPerPage,
   ]);
 
-  // Carrega contas apenas quando o modal é aberto
-  useEffect(() => {
-    if (isModalOpen) {
-      fetchContas();
-    }
-  }, [isModalOpen, fetchContas]);
-
   const handleCreateTransacao = () => {
     setEditingTransacao(null);
     setIsModalOpen(true);
@@ -88,9 +79,6 @@ export default function TransacoesPage() {
           category: data.category,
         };
 
-        if (data.accountId) {
-          payload.accountId = data.accountId;
-        }
         await addTransacao(payload, data.type);
       }
       await fetchTransacoes({
@@ -194,7 +182,6 @@ export default function TransacoesPage() {
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             onSubmit={handleSubmitTransacao}
-            contas={contas}
           />
         </div>
       </DashboardLayout>

@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 
 export default function PerfilPage() {
   const t = useTranslations('Profile');
+  const tCommon = useTranslations('Common');
   const router = useRouter();
   const { user, logout, loading, updatePreferences } = useAuthStore();
   const [isSaving, setIsSaving] = useState(false);
@@ -28,16 +29,16 @@ export default function PerfilPage() {
       await logout();
       router.push('/pt/login');
     } catch (error) {
-      toast.error('Erro ao fazer logout');
+      toast.error(tCommon('messages.logoutError'));
     }
   };
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
     try {
-      toast.success('Alterações salvas com sucesso!');
+      toast.success(tCommon('messages.changesSaved'));
     } catch (error) {
-      toast.error('Erro ao salvar alterações');
+      toast.error(tCommon('messages.errorSaving'));
     } finally {
       setIsSaving(false);
     }
@@ -65,7 +66,7 @@ export default function PerfilPage() {
 
   const handlePhotoChange = (file: File) => {
     console.log('Arquivo selecionado:', file);
-    toast.success('Foto selecionada com sucesso!');
+    toast.success(tCommon('messages.photoSelected'));
   };
 
   if (loading) {
@@ -89,7 +90,7 @@ export default function PerfilPage() {
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
               <p className="mt-2 text-gray-600">
-                Gerencie suas informações pessoais e preferências
+                {tCommon('messages.managePersonalInfo')}
               </p>
             </div>
 
@@ -141,7 +142,7 @@ export default function PerfilPage() {
                       d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
                     />
                   </svg>
-                  <span>Salvar Alterações</span>
+                  <span>{tCommon('saveChanges')}</span>
                 </BaseButton>
 
                 <BaseButton
@@ -163,7 +164,7 @@ export default function PerfilPage() {
                       d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                     />
                   </svg>
-                  <span>Sair</span>
+                  <span>{tCommon('logout')}</span>
                 </BaseButton>
               </div>
             </div>

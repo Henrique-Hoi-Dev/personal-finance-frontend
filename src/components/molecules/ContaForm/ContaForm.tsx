@@ -26,6 +26,7 @@ export function ContaForm({
   loading = false,
 }: ContaFormProps) {
   const t = useTranslations('Contas');
+  const tCommon = useTranslations('Common');
   const [formData, setFormData] = useState<Omit<CreateContaPayload, 'userId'>>({
     name: '',
     type: 'FIXED',
@@ -74,23 +75,23 @@ export function ContaForm({
     > = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Nome é obrigatório';
+      newErrors.name = tCommon('validation.nameRequired');
     }
 
     if (formData.totalAmount <= 0) {
-      newErrors.totalAmount = 'Valor total deve ser maior que zero';
+      newErrors.totalAmount = tCommon('validation.totalAmountRequired');
     }
 
     if (hasInstallments && (formData.installments || 0) < 1) {
-      newErrors.installments = 'Número de parcelas deve ser pelo menos 1';
+      newErrors.installments = tCommon('validation.installmentsRequired');
     }
 
     if (!formData.startDate) {
-      newErrors.startDate = 'Data de início é obrigatória';
+      newErrors.startDate = tCommon('validation.startDateRequired');
     }
 
     if (formData.dueDay < 1 || formData.dueDay > 31) {
-      newErrors.dueDay = 'Dia de vencimento deve ser entre 1 e 31';
+      newErrors.dueDay = tCommon('validation.dueDayRequired');
     }
 
     setErrors(newErrors);
@@ -139,7 +140,7 @@ export function ContaForm({
         <BaseToggleSwitch
           checked={hasInstallments}
           onChange={setHasInstallments}
-          label="Esta conta tem parcelas"
+          label={tCommon('hasInstallments')}
         />
       </div>
 

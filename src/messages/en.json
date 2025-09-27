@@ -195,7 +195,38 @@
     "preferencesUpdated": "Preferences updated!"
   },
   "Common": {
-    "required": "*"
+    "required": "*",
+    "loading": "Loading...",
+    "saveChanges": "Save Changes",
+    "logout": "Logout",
+    "changePhoto": "Change Photo",
+    "fullName": "Full Name",
+    "email": "Email",
+    "noExpensesByCategory": "No expenses by category found",
+    "hasInstallments": "This account has installments",
+    "currencyOptions": {
+      "BRL": "Brazilian Real (R$)",
+      "USD": "US Dollar ($)",
+      "EUR": "Euro (€)"
+    },
+    "languageOptions": {
+      "pt": "Portuguese (Brazil)",
+      "en": "English (US)"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "totalAmountRequired": "Total amount must be greater than zero",
+      "installmentsRequired": "Number of installments must be at least 1",
+      "startDateRequired": "Start date is required",
+      "dueDayRequired": "Due day must be between 1 and 31"
+    },
+    "messages": {
+      "logoutError": "Error logging out",
+      "changesSaved": "Changes saved successfully!",
+      "errorSaving": "Error saving changes",
+      "photoSelected": "Photo selected successfully!",
+      "managePersonalInfo": "Manage your personal information and preferences"
+    }
   },
   "NotFound": {
     "title": "Page not found",

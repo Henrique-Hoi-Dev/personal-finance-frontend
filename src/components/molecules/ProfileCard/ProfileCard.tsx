@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { UserProfile } from '@/types/auth';
 import { BaseLabel } from '@/components/atoms';
+import { useTranslations } from 'next-intl';
 
 interface ProfileCardProps {
   user: UserProfile;
@@ -11,6 +12,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   user,
   onPhotoChange,
 }) => {
+  const tCommon = useTranslations('Common');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,21 +79,21 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
               d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
-          <span>Alterar Foto</span>
+          <span>{tCommon('changePhoto')}</span>
         </button>
       </div>
 
       {/* User Info Form */}
       <div className="space-y-4">
         <div>
-          <BaseLabel>Nome Completo</BaseLabel>
+          <BaseLabel>{tCommon('fullName')}</BaseLabel>
           <div className="mt-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-900">
             {user?.name || '-'}
           </div>
         </div>
 
         <div>
-          <BaseLabel>Email</BaseLabel>
+          <BaseLabel>{tCommon('email')}</BaseLabel>
           <div className="mt-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-900">
             {user?.email || '-'}
           </div>

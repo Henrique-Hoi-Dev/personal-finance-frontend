@@ -6,13 +6,11 @@ import {
   BaseLabel,
   BaseSelect,
 } from '@/components/atoms';
-import { Conta } from '@/types';
 import { formatCurrency } from '@/utils';
 import { useCategoriesStore } from '@/store/categories.store';
 import { useEndpointOptions, useEnumOptions } from '@/hooks';
 
 interface TransactionFormProps {
-  contas: Conta[];
   onSubmit: (data: TransactionFormData) => void;
   onCancel: () => void;
   loading?: boolean;
@@ -22,13 +20,11 @@ export interface TransactionFormData {
   value: number;
   description: string;
   category: string;
-  accountId: string | null;
   date: string;
   type: 'INCOME' | 'EXPENSE';
 }
 
 export const TransactionForm: React.FC<TransactionFormProps> = ({
-  contas,
   onSubmit,
   onCancel,
   loading = false,
@@ -40,7 +36,6 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     value: 0,
     description: '',
     category: '',
-    accountId: null,
     date: new Date().toISOString().split('T')[0],
     type: 'EXPENSE', // Default to expense
   });
@@ -68,8 +63,6 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     'ptBr',
     t('selectCategory')
   );
-
-  const contaOptions = useEndpointOptions(contas, 'id', 'name', t('noAccount'));
 
   const handleInputChange = (
     field: keyof TransactionFormData,
@@ -146,19 +139,6 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         required
       />
 
-      {/* Valor */}
-      <div>
-        <BaseLabel htmlFor="value">{t('value')} *</BaseLabel>
-        <BaseInput
-          id="value"
-          type="text"
-          value={displayValue}
-          onChange={(e) => handleCurrencyChange(e.target.value)}
-          placeholder="R$ 0,00"
-          error={errors.value}
-        />
-      </div>
-
       {/* Descrição */}
       <div>
         <BaseLabel htmlFor="description">{t('description')} *</BaseLabel>
@@ -178,14 +158,6 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         onChange={(value) => handleInputChange('category', value)}
         options={categoriaOptions}
         label={t('category')}
-      />
-
-      {/* Conta */}
-      <BaseSelect
-        value={formData.accountId || ''}
-        onChange={(value) => handleInputChange('accountId', value)}
-        options={contaOptions}
-        label={t('account')}
       />
 
       {/* Data */}
@@ -215,6 +187,19 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
             </svg>
           </div>
         </div>
+      </div>
+
+      {/* Valor */}
+      <div>
+        <BaseLabel htmlFor="value">{t('value')} *</BaseLabel>
+        <BaseInput
+          id="value"
+          type="text"
+          value={displayValue}
+          onChange={(e) => handleCurrencyChange(e.target.value)}
+          placeholder="R$ 0,00"
+          error={errors.value}
+        />
       </div>
 
       {/* Actions */}
