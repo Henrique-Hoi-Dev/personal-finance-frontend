@@ -55,27 +55,30 @@ export const Dashboard: React.FC = () => {
     );
   }
 
+  // Saldo principal (linha única)
+  const mainBalance = {
+    title: t('currentBalance'),
+    value: balance ? formatCurrencyFromCents(balance.balance) : 'R$ 0,00',
+    color: 'green' as const,
+    icon: (
+      <svg
+        className="w-8 h-8 text-green-600"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+        />
+      </svg>
+    ),
+  };
+
+  // 6 big numbers em grid
   const summaryData = [
-    {
-      title: t('currentBalance'),
-      value: balance ? formatCurrencyFromCents(balance.balance) : 'R$ 0,00',
-      color: 'green' as const,
-      icon: (
-        <svg
-          className="w-6 h-6 text-green-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-          />
-        </svg>
-      ),
-    },
     {
       title: t('income'),
       value: balance ? formatCurrencyFromCents(balance.income) : 'R$ 0,00',
@@ -112,6 +115,50 @@ export const Dashboard: React.FC = () => {
             strokeLinejoin="round"
             strokeWidth={2}
             d="M17 13l-5 5m0 0l-5-5m5 5V6"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: t('linkedExpenses'),
+      value: balance
+        ? formatCurrencyFromCents(balance.linkedExpenses)
+        : 'R$ 0,00',
+      color: 'orange' as const,
+      icon: (
+        <svg
+          className="w-6 h-6 text-orange-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: t('standaloneExpenses'),
+      value: balance
+        ? formatCurrencyFromCents(balance.standaloneExpenses)
+        : 'R$ 0,00',
+      color: 'pink' as const,
+      icon: (
+        <svg
+          className="w-6 h-6 text-pink-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
           />
         </svg>
       ),
@@ -178,8 +225,19 @@ export const Dashboard: React.FC = () => {
         <p className="mt-1 text-sm text-gray-600">{t('subtitle')}</p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Saldo Principal - Linha Única */}
+      <div className="mb-8 ">
+        <SummaryCard
+          title={mainBalance.title}
+          value={mainBalance.value}
+          icon={mainBalance.icon}
+          color={mainBalance.color}
+          className="max-w-md mx-auto"
+        />
+      </div>
+
+      {/* 6 Big Numbers - Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {summaryData.map((item, index) => (
           <SummaryCard
             key={index}

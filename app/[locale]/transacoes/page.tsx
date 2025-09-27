@@ -15,8 +15,14 @@ import { Transacao } from '@/types';
 import { TransactionFormData } from '@/components/molecules';
 
 export default function TransacoesPage() {
-  const { transacoes, loading, fetchTransacoes, pagination, addTransacao } =
-    useTransacoesStore();
+  const {
+    transacoes,
+    loading,
+    fetchTransacoes,
+    pagination,
+    addTransacao,
+    removeTransacao,
+  } = useTransacoesStore();
   const t = useTranslations('Transacoes');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransacao, setEditingTransacao] = useState<Transacao | null>(
@@ -97,7 +103,7 @@ export default function TransacoesPage() {
 
   const handleDeleteTransacao = async (id: string) => {
     try {
-      // await deleteTransacao(id);
+      await removeTransacao(id);
       await fetchTransacoes({
         ...filters,
         type: filters.type || undefined,
@@ -137,7 +143,12 @@ export default function TransacoesPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+            <div className="p-6">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                {t('title')}
+              </h1>
+              <p className="text-gray-600 text-sm">{t('subtitle')}</p>
+            </div>
             <TransactionActions onAddTransaction={handleCreateTransacao} />
           </div>
 

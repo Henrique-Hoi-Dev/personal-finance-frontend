@@ -40,6 +40,8 @@
     "currentBalance": "Saldo Atual",
     "income": "Entradas",
     "expenses": "Saídas",
+    "linkedExpenses": "Saídas Vinculadas",
+    "standaloneExpenses": "Saídas Avulsas",
     "fixedAccounts": "Contas Fixas",
     "noTransactions": "Nenhuma transação encontrada",
     "loans": "Financiamentos",
@@ -100,10 +102,17 @@
       "CREDIT_CARD": "Cartão de Crédito",
       "SUBSCRIPTION": "Assinatura",
       "OTHER": "Outro"
-    }
+    },
+    "filters": "Filtros",
+    "searchByName": "Buscar por nome...",
+    "paymentStatus": "Status de Pagamento",
+    "paid": "Pago",
+    "unpaid": "Não Pago",
+    "all": "Todos"
   },
   "Transacoes": {
     "title": "Transações",
+    "actions": "Ações",
     "subtitle": "Histórico de suas movimentações financeiras",
     "allTransactions": "Todas as transações",
     "expenses": "Despesas",

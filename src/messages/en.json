@@ -41,6 +41,8 @@
     "income": "Income",
     "noTransactions": "No transactions found",
     "expenses": "Expenses",
+    "linkedExpenses": "Linked Expenses",
+    "standaloneExpenses": "Standalone Expenses",
     "fixedAccounts": "Fixed Accounts",
     "loans": "Loans",
     "latestTransactions": "Latest Transactions",
@@ -100,10 +102,17 @@
       "CREDIT_CARD": "Credit Card",
       "SUBSCRIPTION": "Subscription",
       "OTHER": "Other"
-    }
+    },
+    "filters": "Filters",
+    "searchByName": "Search by name...",
+    "paymentStatus": "Payment Status",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "all": "All"
   },
   "Transacoes": {
     "title": "Transactions",
+    "actions": "Actions",
     "subtitle": "History of your financial movements",
     "allTransactions": "All transactions",
     "expenses": "Expenses",

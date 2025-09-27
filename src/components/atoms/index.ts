@@ -8,4 +8,5 @@ export { BaseConfirmModal } from './BaseConfirmModal/BaseConfirmModal';
 export { BasePagination } from './BasePagination/BasePagination';
 export { BaseCPFInput } from './BaseCPFInput/BaseCPFInput';
 export { BaseSelect } from './BaseSelect';
+export { BaseSelectWithClear } from './BaseSelectWithClear';
 export { BaseToggleSwitch } from './BaseToggleSwitch/BaseToggleSwitch';

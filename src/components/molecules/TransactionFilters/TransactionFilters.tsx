@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useCategoriesStore } from '@/store/categories.store';
-import { BaseSelect } from '@/components/atoms';
+import { BaseSelectWithClear } from '@/components/atoms';
 import { useEndpointOptions, useEnumOptions } from '@/hooks';
 
 interface TransactionFiltersProps {
@@ -52,21 +52,23 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         {t('filters')}
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
         {/* Tipo Filter */}
-        <BaseSelect
+        <BaseSelectWithClear
           value={tipo}
           onChange={(value) => onTipoChange(value as 'INCOME' | 'EXPENSE' | '')}
           options={tipoOptions}
           label={t('type')}
+          showClearButton={true}
         />
 
         {/* Categoria Filter */}
-        <BaseSelect
+        <BaseSelectWithClear
           value={categoria}
           onChange={(value) => onCategoriaChange(String(value))}
           options={categoriaOptions}
           label={t('category')}
+          showClearButton={true}
         />
 
         {/* Data Início Filter */}
@@ -78,7 +80,7 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
             type="date"
             value={dataInicio}
             onChange={(e) => onDataInicioChange(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full h-10 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
 
@@ -91,7 +93,7 @@ export const TransactionFilters: React.FC<TransactionFiltersProps> = ({
             type="date"
             value={dataFim}
             onChange={(e) => onDataFimChange(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="w-full h-10 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
       </div>

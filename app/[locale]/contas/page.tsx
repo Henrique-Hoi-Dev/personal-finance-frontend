@@ -1,9 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { DashboardLayout } from '@/components/templates';
-import { ContaCard, ContaDetails, ContaModal } from '@/components/molecules';
+import {
+  ContaCard,
+  ContaDetails,
+  ContaModal,
+  ContaFilters,
+} from '@/components/molecules';
 import { useContasStore } from '@/store/contas.store';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Conta } from '@/types';
@@ -16,7 +21,58 @@ export default function ContasPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
+  // Estados dos filtros
+  const [filters, setFilters] = useState({
+    tipo: '',
+    nome: '',
+    isPaid: '',
+  });
+
   const [localContas, setLocalContas] = useState<Conta[]>([]);
+
+  // Funções de filtro
+  const handleTipoChange = (tipo: string) => {
+    setFilters((prev) => ({ ...prev, tipo }));
+  };
+
+  const handleNomeChange = (nome: string) => {
+    setFilters((prev) => ({ ...prev, nome }));
+  };
+
+  const handleIsPaidChange = (isPaid: string) => {
+    setFilters((prev) => ({ ...prev, isPaid }));
+  };
+
+  // Aplicar filtros
+  const applyFilters = useCallback(
+    (contasList: Conta[]) => {
+      return contasList.filter((conta) => {
+        // Filtro por tipo
+        if (filters.tipo && conta.type !== filters.tipo) {
+          return false;
+        }
+
+        // Filtro por nome
+        if (
+          filters.nome &&
+          !conta.name.toLowerCase().includes(filters.nome.toLowerCase())
+        ) {
+          return false;
+        }
+
+        // Filtro por status de pagamento
+        if (filters.isPaid !== '') {
+          const isPaid = filters.isPaid === 'true';
+          if (conta.isPaid !== isPaid) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    },
+    [filters]
+  );
 
   const updateSelectedConta = (updatedConta: Conta) => {
     setSelectedConta(updatedConta);
@@ -34,9 +90,10 @@ export default function ContasPage() {
 
   useEffect(() => {
     if (contas.length > 0) {
-      setLocalContas(contas);
+      const filteredContas = applyFilters(contas);
+      setLocalContas(filteredContas);
     }
-  }, [contas]);
+  }, [contas, applyFilters]);
 
   const handleCreateConta = async (data: any) => {
     setIsCreating(true);
@@ -98,6 +155,16 @@ export default function ContasPage() {
               </button>
             </div>
           </div>
+          {/* Componente de Filtros */}
+          <ContaFilters
+            tipo={filters.tipo}
+            nome={filters.nome}
+            isPaid={filters.isPaid}
+            onTipoChange={handleTipoChange}
+            onNomeChange={handleNomeChange}
+            onIsPaidChange={handleIsPaidChange}
+          />
+
           <div className="flex h-full">
             {/* Painel Esquerdo - Lista de Contas */}
             <div className="w-1/2 flex flex-col">

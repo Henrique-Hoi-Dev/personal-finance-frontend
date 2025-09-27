@@ -50,6 +50,8 @@ export interface TransacaoFilters {
 export interface Balance {
   income: number;
   expense: number;
+  linkedExpenses: number;
+  standaloneExpenses: number;
   balance: number;
   fixedAccountsTotal: number;
   loanAccountsTotal: number;

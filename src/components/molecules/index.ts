@@ -7,6 +7,7 @@ export { ContaCard } from './ContaCard';
 export { ContaDetails } from './ContaDetails';
 export { ContaForm } from './ContaForm';
 export { ContaModal } from './ContaModal';
+export { ContaFilters } from './ContaFilters';
 export { TransactionFilters } from './TransactionFilters';
 export { TransactionActions } from './TransactionActions';
 export { TransactionTable } from './TransactionTable';
