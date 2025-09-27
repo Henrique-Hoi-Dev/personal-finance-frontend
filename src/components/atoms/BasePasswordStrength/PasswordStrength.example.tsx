@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PasswordStrength } from './PasswordStrength';
+import { BasePasswordStrength } from './BasePasswordStrength';
 
 export const PasswordStrengthExample: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -19,12 +19,12 @@ export const PasswordStrengthExample: React.FC = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Digite sua senha"
+            placeholder="Enter your password"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
-        <PasswordStrength password={password} />
+        <BasePasswordStrength password={password} />
       </div>
 
       <div className="mt-6 p-4 bg-gray-50 rounded-md">

@@ -43,6 +43,7 @@
     "linkedExpenses": "Saídas Vinculadas",
     "standaloneExpenses": "Saídas Avulsas",
     "fixedAccounts": "Contas Fixas",
+    "totalAccounts": "Total de Contas",
     "noTransactions": "Nenhuma transação encontrada",
     "loans": "Financiamentos",
     "latestTransactions": "Últimas Transações",
@@ -106,9 +107,27 @@
     "filters": "Filtros",
     "searchByName": "Buscar por nome...",
     "paymentStatus": "Status de Pagamento",
-    "paid": "Pago",
     "unpaid": "Não Pago",
-    "all": "Todos"
+    "all": "Todos",
+    "deleteInstallment": "Excluir Parcela",
+    "deleteInstallmentMessage": "Tem certeza que deseja excluir esta parcela? Esta ação não pode ser desfeita.",
+    "deleteInstallmentTooltip": "Excluir parcela",
+    "deleteAccount": "Excluir Conta",
+    "deleteAccountMessage": "Tem certeza que deseja excluir a conta \"{name}\"? Esta ação não pode ser desfeita.",
+    "deleteAccountTooltip": "Excluir conta",
+
+    "loanInformation": "Informações do Empréstimo",
+    "totalWithInterest": "Valor Total com Juros",
+    "interestAmount": "Valor dos Juros",
+    "amountPaid": "Valor Pago",
+    "monthlyInterestRate": "Taxa Mensal",
+    "installmentAmount": "Valor da Parcela",
+    "isPreview": "Valor Preview",
+    "update": "Atualizar",
+    "updating": "Atualizando...",
+    "previewStatus": "Preview",
+    "status": "Status",
+    "valorPreview": "Valor Preview"
   },
   "Transacoes": {
     "title": "Transações",
@@ -145,6 +164,9 @@
     "account": "Conta",
     "date": "Data",
     "cancel": "Cancelar",
+    "deleteTransaction": "Excluir Transação",
+    "deleteTransactionMessage": "Tem certeza que deseja excluir a transação \"{description}\"? Esta ação não pode ser desfeita.",
+    "deleteTransactionTooltip": "Excluir transação",
     "valueRequired": "Valor deve ser maior que zero",
     "descriptionRequired": "Descrição é obrigatória",
     "dateRequired": "Data é obrigatória",
@@ -206,6 +228,8 @@
   "Common": {
     "required": "*",
     "loading": "Carregando...",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
     "saveChanges": "Salvar Alterações",
     "logout": "Sair",
     "changePhoto": "Alterar Foto",
@@ -235,6 +259,10 @@
       "errorSaving": "Erro ao salvar alterações",
       "photoSelected": "Foto selecionada com sucesso!",
       "managePersonalInfo": "Gerencie suas informações pessoais e preferências"
+    },
+    "placeholders": {
+      "currency": "R$ 0,00",
+      "password": "Digite sua senha"
     }
   },
   "NotFound": {

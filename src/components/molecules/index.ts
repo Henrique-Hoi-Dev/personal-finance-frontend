@@ -6,6 +6,7 @@ export { CategoryItem } from './CategoryItem';
 export { ContaCard } from './ContaCard';
 export { ContaDetails } from './ContaDetails';
 export { ContaForm } from './ContaForm';
+export { ContaEditForm } from './ContaEditForm';
 export { ContaModal } from './ContaModal';
 export { ContaFilters } from './ContaFilters';
 export { TransactionFilters } from './TransactionFilters';

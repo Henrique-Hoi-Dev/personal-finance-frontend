@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Conta } from '@/types';
+import { useTranslations } from 'next-intl';
+import { Conta, CreateContaPayload, UpdateContaPayload } from '@/types';
 import { formatCurrencyFromCents, getAmountColor } from '@/utils';
 import { useContasStore } from '@/store/contas.store';
-import { BaseConfirmModal } from '@/components/atoms';
+import { BaseConfirmModal, BaseModal } from '@/components/atoms';
+import { ContaEditForm } from '@/components/molecules';
 import { toast } from 'sonner';
 
 interface ContaCardProps {
@@ -18,9 +20,11 @@ export const ContaCard: React.FC<ContaCardProps> = ({
   onClick,
   onDelete,
 }) => {
+  const t = useTranslations('Contas');
   const { removeConta } = useContasStore();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const getIconColor = (tipo: string) => {
     if (!tipo) return 'bg-gray-400';
 
@@ -202,6 +206,36 @@ export const ContaCard: React.FC<ContaCardProps> = ({
     setShowDeleteModal(false);
   };
 
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Previne o clique no card
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async (data: Omit<UpdateContaPayload, 'id'>) => {
+    try {
+      const updateData = {
+        id: conta.id,
+        totalAmount: data.totalAmount,
+        startDate: data.startDate,
+        dueDay: data.dueDay,
+        isPreview: data.isPreview,
+      };
+
+      // Atualizar a conta no store (que já chama o serviço)
+      const { updateConta: updateContaInStore } = useContasStore.getState();
+      await updateContaInStore(updateData);
+
+      setShowEditModal(false);
+      toast.success('Conta atualizada com sucesso');
+    } catch (error) {
+      toast.error('Erro ao atualizar conta');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditModal(false);
+  };
+
   return (
     <div
       className={`p-4 w-full rounded-xl cursor-pointer transition-all duration-200 ${
@@ -220,11 +254,20 @@ export const ContaCard: React.FC<ContaCardProps> = ({
           >
             {getIcon(conta.type)}
           </div>
-          <div>
-            <h3 className="font-bold text-gray-900 text-lg">{conta.name}</h3>
-            <p className="text-sm text-gray-500 font-medium">
-              {getTypeLabel(conta.type)}
-            </p>
+          <div className="flex-1 flex gap-4">
+            <div>
+              <h3 className="font-bold text-gray-900 text-lg">{conta.name}</h3>
+              <p className="text-sm text-gray-500 font-medium">
+                {getTypeLabel(conta.type)}
+              </p>
+            </div>
+            {conta.isPreview && (
+              <div className="mt-2">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {t('previewStatus')}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <div className="text-right flex items-center gap-3">
@@ -245,12 +288,35 @@ export const ContaCard: React.FC<ContaCardProps> = ({
             ) : null}
           </div>
 
+          {/* Botão de editar - só aparece para contas fixas com preview */}
+          {conta.type === 'FIXED' && conta.isPreview && (
+            <button
+              onClick={handleEditClick}
+              className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+              title={t('editAccount')}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+            </button>
+          )}
+
           {/* Ícone de lixeira - só aparece se a conta não estiver paga */}
           {!isAccountPaid(conta) && (
             <button
               onClick={handleDeleteClick}
               className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200"
-              title="Excluir conta"
+              title={t('deleteAccountTooltip')}
             >
               <svg
                 className="w-5 h-5"
@@ -275,13 +341,32 @@ export const ContaCard: React.FC<ContaCardProps> = ({
         isOpen={showDeleteModal}
         onClose={handleCancelDelete}
         onConfirm={handleConfirmDelete}
-        title="Excluir Conta"
-        message={`Tem certeza que deseja excluir a conta "${conta.name}"? Esta ação não pode ser desfeita.`}
-        confirmText="Excluir"
-        cancelText="Cancelar"
+        title={t('deleteAccount')}
+        message={t('deleteAccountMessage', { name: conta.name })}
+        confirmText={t('delete')}
+        cancelText={t('cancel')}
         type="danger"
         loading={isDeleting}
       />
+
+      {/* Modal de Edição */}
+      <BaseModal
+        isOpen={showEditModal}
+        onClose={handleCancelEdit}
+        title={t('editAccount')}
+        size="lg"
+      >
+        <ContaEditForm
+          onSubmit={handleEditSubmit}
+          onCancel={handleCancelEdit}
+          initialData={{
+            totalAmount: conta.totalAmount,
+            startDate: conta.startDate,
+            dueDay: conta.dueDay,
+            isPreview: conta.isPreview || false,
+          }}
+        />
+      </BaseModal>
     </div>
   );
 };

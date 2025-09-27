@@ -1,0 +1,1 @@
+export { ContaEditForm } from './ContaEditForm';

@@ -450,7 +450,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                   <button
                     onClick={() => handleDeleteClick(transacao)}
                     className="text-red-600 hover:text-red-800 transition-colors duration-200"
-                    title="Excluir transação"
+                    title={t('deleteTransactionTooltip')}
                   >
                     <svg
                       className="w-5 h-5"
@@ -491,10 +491,12 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
         isOpen={showDeleteModal}
         onClose={handleCancelDelete}
         onConfirm={handleConfirmDelete}
-        title="Excluir Transação"
-        message={`Tem certeza que deseja excluir a transação "${transactionToDelete?.description}"? Esta ação não pode ser desfeita.`}
-        confirmText="Excluir"
-        cancelText="Cancelar"
+        title={t('deleteTransaction')}
+        message={t('deleteTransactionMessage', {
+          description: transactionToDelete?.description || '',
+        })}
+        confirmText={t('delete')}
+        cancelText={t('cancel')}
         type="danger"
         loading={isDeleting}
       />

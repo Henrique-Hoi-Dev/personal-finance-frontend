@@ -207,6 +207,28 @@ export const Dashboard: React.FC = () => {
         </svg>
       ),
     },
+    {
+      title: t('totalAccounts'),
+      value: balance
+        ? formatCurrencyFromCents(balance.totalAccounts)
+        : 'R$ 0,00',
+      color: 'blue' as const,
+      icon: (
+        <svg
+          className="w-6 h-6 text-blue-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+          />
+        </svg>
+      ),
+    },
   ];
 
   // Transform categories data for CategoryItem component
@@ -281,7 +303,7 @@ export const Dashboard: React.FC = () => {
         <h2 className="text-lg font-semibold text-gray-800 mb-4">
           Contas e Financiamentos
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <SummaryCard
             title={summaryData[4].title}
             value={summaryData[4].value}
@@ -293,6 +315,12 @@ export const Dashboard: React.FC = () => {
             value={summaryData[5].value}
             icon={summaryData[5].icon}
             color={summaryData[5].color}
+          />
+          <SummaryCard
+            title={summaryData[6].title}
+            value={summaryData[6].value}
+            icon={summaryData[6].icon}
+            color={summaryData[6].color}
           />
         </div>
       </div>

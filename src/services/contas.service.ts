@@ -60,7 +60,8 @@ export async function createConta(data: CreateContaPayload): Promise<Conta> {
 }
 
 export async function updateConta(data: UpdateContaPayload): Promise<Conta> {
-  const response = await apiClient.patch<Conta>(`/accounts/${data.id}`, data);
+  const { id, ...updateData } = data;
+  const response = await apiClient.patch<Conta>(`/accounts/${id}`, updateData);
   return response.data;
 }
 

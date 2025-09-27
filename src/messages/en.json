@@ -44,6 +44,7 @@
     "linkedExpenses": "Linked Expenses",
     "standaloneExpenses": "Standalone Expenses",
     "fixedAccounts": "Fixed Accounts",
+    "totalAccounts": "Total Accounts",
     "loans": "Loans",
     "latestTransactions": "Latest Transactions",
     "seeAll": "See all",
@@ -66,7 +67,6 @@
     "active": "Active",
     "inactive": "Inactive",
     "edit": "Edit",
-    "delete": "Delete",
     "noAccounts": "No accounts found",
     "noAccountsDescription": "You don't have any accounts registered yet. Click 'Add Account' to get started.",
     "noAccountsFound": "No accounts found",
@@ -79,7 +79,6 @@
     "dueDay": "Due Day",
     "create": "Create Account",
     "creating": "Creating...",
-    "cancel": "Cancel",
     "accountBalance": "Account Balance",
     "installmentsSection": "Installments",
     "installment": "Installment",
@@ -88,8 +87,7 @@
     "paying": "Paying...",
     "payFull": "Pay All",
     "payingFull": "Paying All...",
-    "paid": "Paid",
-    "editAccount": "Edit Account",
+
     "viewStatement": "View Statement",
     "selectAccount": "Select an account",
     "selectAccountDescription": "Click on an account on the left to see details",
@@ -108,7 +106,28 @@
     "paymentStatus": "Payment Status",
     "paid": "Paid",
     "unpaid": "Unpaid",
-    "all": "All"
+    "all": "All",
+    "deleteInstallment": "Delete Installment",
+    "deleteInstallmentMessage": "Are you sure you want to delete this installment? This action cannot be undone.",
+    "deleteInstallmentTooltip": "Delete installment",
+    "deleteAccount": "Delete Account",
+    "deleteAccountMessage": "Are you sure you want to delete the account \"{name}\"? This action cannot be undone.",
+    "deleteAccountTooltip": "Delete account",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "loanInformation": "Loan Information",
+    "totalWithInterest": "Total Amount with Interest",
+    "interestAmount": "Interest Amount",
+    "amountPaid": "Amount Paid",
+    "monthlyInterestRate": "Monthly Interest Rate",
+    "installmentAmount": "Installment Amount",
+    "isPreview": "Preview Value",
+    "editAccount": "Edit Account",
+    "update": "Update",
+    "updating": "Updating...",
+    "previewStatus": "Preview",
+    "status": "Status",
+    "valorPreview": "Preview Value"
   },
   "Transacoes": {
     "title": "Transactions",
@@ -145,6 +164,9 @@
     "account": "Account",
     "date": "Date",
     "cancel": "Cancel",
+    "deleteTransaction": "Delete Transaction",
+    "deleteTransactionMessage": "Are you sure you want to delete the transaction \"{description}\"? This action cannot be undone.",
+    "deleteTransactionTooltip": "Delete transaction",
     "valueRequired": "Value must be greater than zero",
     "descriptionRequired": "Description is required",
     "dateRequired": "Date is required",
@@ -206,6 +228,8 @@
   "Common": {
     "required": "*",
     "loading": "Loading...",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
     "saveChanges": "Save Changes",
     "logout": "Logout",
     "changePhoto": "Change Photo",
@@ -235,6 +259,10 @@
       "errorSaving": "Error saving changes",
       "photoSelected": "Photo selected successfully!",
       "managePersonalInfo": "Manage your personal information and preferences"
+    },
+    "placeholders": {
+      "currency": "$ 0.00",
+      "password": "Enter your password"
     }
   },
   "NotFound": {

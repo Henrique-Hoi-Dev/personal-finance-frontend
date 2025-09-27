@@ -230,12 +230,12 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
           <div className="mb-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h4 className="text-sm font-medium text-blue-900 mb-3">
-                Informações do Empréstimo
+                {t('loanInformation')}
               </h4>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div className="text-center">
-                    <p className="text-gray-600">Valor Total com Juros</p>
+                    <p className="text-gray-600">{t('totalWithInterest')}</p>
                     <p className="font-semibold text-green-600">
                       {conta.totalWithInterest
                         ? formatCurrencyFromCents(conta.totalWithInterest)
@@ -243,7 +243,7 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
                     </p>
                   </div>
                   <div className="text-center">
-                    <p className="text-gray-600">Valor dos Juros</p>
+                    <p className="text-gray-600">{t('interestAmount')}</p>
                     <p className="font-semibold text-red-600">
                       {conta.interestRate
                         ? formatCurrencyFromCents(conta.interestRate)
@@ -253,7 +253,7 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div className="text-center">
-                    <p className="text-gray-600">Valor Pago</p>
+                    <p className="text-gray-600">{t('amountPaid')}</p>
                     <p className="font-semibold text-emerald-600">
                       {conta.amountPaid
                         ? formatCurrencyFromCents(conta.amountPaid)
@@ -261,7 +261,7 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
                     </p>
                   </div>
                   <div className="text-center">
-                    <p className="text-gray-600">Taxa Mensal</p>
+                    <p className="text-gray-600">{t('monthlyInterestRate')}</p>
                     <p className="font-semibold text-blue-600">
                       {conta.monthlyInterestRate
                         ? `${conta.monthlyInterestRate.toFixed(2)}%`
@@ -334,7 +334,7 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
                           handleDeleteInstallmentClick(installment.id)
                         }
                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                        title="Excluir parcela"
+                        title={t('deleteInstallmentTooltip')}
                       >
                         <svg
                           className="w-4 h-4"
@@ -409,6 +409,16 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
               {conta.dueDay}
             </span>
           </div>
+
+          {/* Status Preview - só aparece se isPreview for true */}
+          {conta.isPreview && (
+            <div className="flex justify-between items-center py-3 border-b border-gray-100">
+              <span className="text-sm text-gray-600">{t('status')}</span>
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {t('previewStatus')}
+              </span>
+            </div>
+          )}
           {/* Status da conta sem parcelas */}
           <div className="pt-4">
             {!conta.isPaid ? (
@@ -461,10 +471,10 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
         isOpen={showDeleteModal}
         onClose={handleCancelDeleteInstallment}
         onConfirm={handleConfirmDeleteInstallment}
-        title="Excluir Parcela"
-        message={`Tem certeza que deseja excluir esta parcela? Esta ação não pode ser desfeita.`}
-        confirmText="Excluir"
-        cancelText="Cancelar"
+        title={t('deleteInstallment')}
+        message={t('deleteInstallmentMessage')}
+        confirmText={t('delete')}
+        cancelText={t('cancel')}
         type="danger"
         loading={isDeleting}
       />

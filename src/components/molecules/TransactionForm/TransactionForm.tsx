@@ -30,6 +30,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   loading = false,
 }) => {
   const t = useTranslations('Transacoes');
+  const tCommon = useTranslations('Common');
   const { categories, fetchCategories } = useCategoriesStore();
 
   const [formData, setFormData] = useState<TransactionFormData>({
@@ -197,7 +198,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
           type="text"
           value={displayValue}
           onChange={(e) => handleCurrencyChange(e.target.value)}
-          placeholder="R$ 0,00"
+          placeholder={tCommon('placeholders.currency')}
           error={errors.value}
         />
       </div>

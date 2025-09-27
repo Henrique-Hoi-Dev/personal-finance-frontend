@@ -18,32 +18,39 @@ interface ContaFormProps {
   onSubmit: (data: Omit<CreateContaPayload, 'userId'>) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
+  initialData?: Partial<Omit<CreateContaPayload, 'userId'>>;
 }
 
 export function ContaForm({
   onSubmit,
   onCancel,
   loading = false,
+  initialData,
 }: ContaFormProps) {
   const t = useTranslations('Contas');
   const tCommon = useTranslations('Common');
   const [formData, setFormData] = useState<Omit<CreateContaPayload, 'userId'>>({
-    name: '',
-    type: 'FIXED',
-    totalAmount: 0,
-    installments: 1,
-    startDate: '',
-    dueDay: 1,
+    name: initialData?.name || '',
+    type: initialData?.type || 'FIXED',
+    totalAmount: initialData?.totalAmount || 0,
+    installments: initialData?.installments || 1,
+    startDate: initialData?.startDate || '',
+    dueDay: initialData?.dueDay || 1,
   });
 
-  const [hasInstallments, setHasInstallments] = useState(false);
+  const [hasInstallments, setHasInstallments] = useState(
+    initialData?.installments ? initialData.installments > 1 : false
+  );
   const [installmentValue, setInstallmentValue] = useState<string>('');
+  const [isPreview, setIsPreview] = useState(initialData?.isPreview || false);
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof Omit<CreateContaPayload, 'userId'>, string>>
   >({});
 
-  const [displayValue, setDisplayValue] = useState<string>('');
+  const [displayValue, setDisplayValue] = useState<string>(
+    initialData?.totalAmount ? formatCurrency(initialData.totalAmount) : ''
+  );
 
   // Opções para o select de tipo de conta
   const tipoContaOptions = useCustomOptions(
@@ -150,18 +157,23 @@ export function ContaForm({
           totalAmount: formData.totalAmount,
           installments: formData.installments,
           installmentAmount: installmentValueInCents,
+          isPreview: isPreview,
           startDate: formData.startDate,
           dueDay: formData.dueDay,
         };
       } else if (hasInstallments) {
         // Para outros tipos com parcelas
-        dataToSubmit = formData;
+        dataToSubmit = {
+          ...formData,
+          isPreview: isPreview,
+        };
       } else {
         // Para contas sem parcelas
         dataToSubmit = {
           name: formData.name,
           type: formData.type,
           totalAmount: formData.totalAmount,
+          isPreview: isPreview,
           startDate: formData.startDate,
           dueDay: formData.dueDay,
         };
@@ -186,13 +198,18 @@ export function ContaForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Toggle para parcelas no topo */}
-      <div className="flex justify-start py-4 border-b border-gray-200">
+      {/* Toggles no topo */}
+      <div className="flex flex-col gap-4 py-4 border-b border-gray-200">
         <BaseToggleSwitch
           checked={hasInstallments}
           onChange={setHasInstallments}
           label={tCommon('hasInstallments')}
           disabled={formData.type === 'LOAN'}
+        />
+        <BaseToggleSwitch
+          checked={isPreview}
+          onChange={setIsPreview}
+          label={t('isPreview')}
         />
       </div>
 
@@ -238,7 +255,7 @@ export function ContaForm({
             type="text"
             value={displayValue}
             onChange={(e) => handleCurrencyChange(e.target.value)}
-            placeholder="R$ 0,00"
+            placeholder={tCommon('placeholders.currency')}
             className={`w-full h-12 text-base ${
               errors.totalAmount ? 'border-red-500' : ''
             }`}
@@ -251,13 +268,13 @@ export function ContaForm({
         {formData.type === 'LOAN' && (
           <div>
             <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
-              Valor da Parcela <span className="text-red-500">*</span>
+              {t('installmentAmount')} <span className="text-red-500">*</span>
             </BaseLabel>
             <BaseInput
               type="text"
               value={installmentValue}
               onChange={(e) => handleInstallmentValueChange(e.target.value)}
-              placeholder="R$ 0,00"
+              placeholder={tCommon('placeholders.currency')}
               className="w-full h-12 text-base"
             />
           </div>
