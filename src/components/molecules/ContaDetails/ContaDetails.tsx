@@ -320,6 +320,11 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
                     <p className="text-sm text-gray-500">
                       {t('dueDate')}: {formatDateSafe(installment.dueDate)}
                     </p>
+                    {installment.isPaid && installment.paidAt && (
+                      <p className="text-sm text-green-600">
+                        {t('paymentDate')}: {formatDateSafe(installment.paidAt)}
+                      </p>
+                    )}
                     <p className="text-lg font-bold text-gray-900">
                       {formatCurrencyFromCents(installment.amount)}
                     </p>
