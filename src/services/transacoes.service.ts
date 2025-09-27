@@ -4,6 +4,8 @@ import {
   CreateTransacaoPayload,
   UpdateTransacaoPayload,
   TransacaoFilters,
+  TransacaoResponse,
+  DateFilters,
   Balance,
   Category,
   CreateIncomePayload,
@@ -27,15 +29,10 @@ export async function getTransacoes(
   filters?: TransacaoFilters
 ): Promise<{ data: Transacao[]; total: number; page: number; limit: number }> {
   const cleanedFilters = filters ? cleanFilters(filters) : {};
-  const response = await apiClient.get<{
-    docs: Transacao[];
-    total: number;
-    page: number;
-    limit: number;
-    offset: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-  }>('/transactions', cleanedFilters);
+  const response = await apiClient.get<TransacaoResponse>(
+    '/transactions',
+    cleanedFilters
+  );
 
   const result = {
     data: response.data.docs,
@@ -87,8 +84,15 @@ export async function getTransacoesByConta(
 }
 
 // New endpoints
-export async function getBalance(): Promise<Balance> {
-  const response = await apiClient.get<Balance>('/transactions/balance');
+export async function getBalance(filters?: DateFilters): Promise<Balance> {
+  const params = new URLSearchParams();
+  if (filters?.year) params.append('year', filters.year.toString());
+  if (filters?.month) params.append('month', filters.month.toString());
+
+  const url = `/transactions/balance${
+    params.toString() ? `?${params.toString()}` : ''
+  }`;
+  const response = await apiClient.get<Balance>(url);
   return response.data;
 }
 

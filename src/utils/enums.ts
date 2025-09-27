@@ -157,3 +157,32 @@ export const getExpenseCategories = (): TransactionCategory[] => {
 export const getIncomeCategories = (): TransactionCategory[] => {
   return getCategoriesByType(TransactionType.INCOME);
 };
+
+// Month options for date filters
+export const monthOptions = [
+  { value: '1', label: 'Janeiro' },
+  { value: '2', label: 'Fevereiro' },
+  { value: '3', label: 'Março' },
+  { value: '4', label: 'Abril' },
+  { value: '5', label: 'Maio' },
+  { value: '6', label: 'Junho' },
+  { value: '7', label: 'Julho' },
+  { value: '8', label: 'Agosto' },
+  { value: '9', label: 'Setembro' },
+  { value: '10', label: 'Outubro' },
+  { value: '11', label: 'Novembro' },
+  { value: '12', label: 'Dezembro' },
+];
+
+// Year options for date filters
+export const generateYearOptions = (): Array<{
+  value: string;
+  label: string;
+}> => {
+  const years = [];
+  const currentYear = new Date().getFullYear();
+  for (let i = currentYear - 5; i <= currentYear + 2; i++) {
+    years.push({ value: i.toString(), label: i.toString() });
+  }
+  return years;
+};

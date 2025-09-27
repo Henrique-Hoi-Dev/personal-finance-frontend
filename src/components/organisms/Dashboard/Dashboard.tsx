@@ -11,8 +11,9 @@ import {
   getExpensesByCategory,
 } from '@/services/transacoes.service';
 import { Balance, Transacao, ExpenseByCategory } from '@/types/transacoes';
-import { BaseLoading } from '@/components/atoms';
+import { BaseLoading, BaseSelectWithClear } from '@/components/atoms';
 import { formatCurrencyFromCents } from '@/utils';
+import { monthOptions, generateYearOptions } from '@/utils/enums';
 
 export const Dashboard: React.FC = () => {
   const t = useTranslations('Dashboard');
@@ -22,6 +23,30 @@ export const Dashboard: React.FC = () => {
   const [categories, setCategories] = useState<ExpenseByCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const currentDate = new Date();
+  const [selectedYear, setSelectedYear] = useState<number>(
+    currentDate.getFullYear()
+  );
+  const [selectedMonth, setSelectedMonth] = useState<number>(
+    currentDate.getMonth() + 1
+  );
+
+  const handleYearChange = (value: string | number) => {
+    if (value === '' || value === null || value === undefined) {
+      setSelectedYear(currentDate.getFullYear());
+    } else {
+      setSelectedYear(parseInt(value.toString()));
+    }
+  };
+
+  const handleMonthChange = (value: string | number) => {
+    if (value === '' || value === null || value === undefined) {
+      setSelectedMonth(currentDate.getMonth() + 1);
+    } else {
+      setSelectedMonth(parseInt(value.toString()));
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -29,7 +54,7 @@ export const Dashboard: React.FC = () => {
 
         const [balanceData, transactionsData, categoriesData] =
           await Promise.all([
-            getBalance(),
+            getBalance({ year: selectedYear, month: selectedMonth }),
             getTransacoes({ limit: 5, page: 0 }),
             getExpensesByCategory(),
           ]);
@@ -45,7 +70,7 @@ export const Dashboard: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedYear, selectedMonth]);
 
   if (loading) {
     return (
@@ -55,7 +80,6 @@ export const Dashboard: React.FC = () => {
     );
   }
 
-  // Saldo principal (linha única)
   const mainBalance = {
     title: t('currentBalance'),
     value: balance ? formatCurrencyFromCents(balance.balance) : 'R$ 0,00',
@@ -231,7 +255,6 @@ export const Dashboard: React.FC = () => {
     },
   ];
 
-  // Transform categories data for CategoryItem component
   const categoriesData = categories.map((category) => ({
     name: category.name,
     amount: formatCurrencyFromCents(category.value),
@@ -245,6 +268,38 @@ export const Dashboard: React.FC = () => {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
         <p className="mt-1 text-sm text-gray-600">{t('subtitle')}</p>
+      </div>
+
+      {/* Filtros de Data */}
+      <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('year')}
+            </label>
+            <BaseSelectWithClear
+              value={selectedYear.toString()}
+              onChange={handleYearChange}
+              options={generateYearOptions()}
+              placeholder={t('selectYear')}
+              className="w-full"
+              showClearButton={true}
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('month')}
+            </label>
+            <BaseSelectWithClear
+              value={selectedMonth.toString()}
+              onChange={handleMonthChange}
+              options={monthOptions}
+              placeholder={t('selectMonth')}
+              className="w-full"
+              showClearButton={true}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Saldo Principal - Linha Única */}

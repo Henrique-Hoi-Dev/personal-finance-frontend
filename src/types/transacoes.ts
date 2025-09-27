@@ -47,6 +47,21 @@ export interface TransacaoFilters {
   limit?: number;
 }
 
+export interface TransacaoResponse {
+  docs: Transacao[];
+  total: number;
+  page: number;
+  limit: number;
+  offset: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface DateFilters {
+  year?: number;
+  month?: number;
+}
+
 export interface Balance {
   income: number;
   expense: number;

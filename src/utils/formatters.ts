@@ -119,15 +119,22 @@ export const formatDateSafe = (dateString: string): string => {
   if (dateString.includes('/')) {
     return dateString;
   }
-  
-  // Para datas ISO ou YYYY-MM-DD, cria a data localmente
-  const date = new Date(dateString + 'T00:00:00');
-  
+
+  // Para datas ISO completas (com horário), usa diretamente
+  let date: Date;
+  if (dateString.includes('T')) {
+    // Data ISO completa (ex: 2025-08-10T21:13:10.360Z)
+    date = new Date(dateString);
+  } else {
+    // Data apenas com dia (ex: 2025-08-10), adiciona horário local
+    date = new Date(dateString + 'T00:00:00');
+  }
+
   // Verifica se a data é válida
   if (isNaN(date.getTime())) {
     return dateString; // Retorna a string original se inválida
   }
-  
+
   return new Intl.DateTimeFormat('pt-BR').format(date);
 };
 
