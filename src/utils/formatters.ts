@@ -110,6 +110,28 @@ export const formatDate = (date: Date | string): string => {
 };
 
 /**
+ * Formata uma data evitando problemas de timezone
+ * @param dateString - String da data no formato ISO ou YYYY-MM-DD
+ * @returns Data formatada no padrão brasileiro (dd/mm/aaaa)
+ */
+export const formatDateSafe = (dateString: string): string => {
+  // Se a data já está no formato dd/mm/yyyy, retorna como está
+  if (dateString.includes('/')) {
+    return dateString;
+  }
+  
+  // Para datas ISO ou YYYY-MM-DD, cria a data localmente
+  const date = new Date(dateString + 'T00:00:00');
+  
+  // Verifica se a data é válida
+  if (isNaN(date.getTime())) {
+    return dateString; // Retorna a string original se inválida
+  }
+  
+  return new Intl.DateTimeFormat('pt-BR').format(date);
+};
+
+/**
  * Formata um valor monetário simples (R$ 1.234,56)
  * @param amount - Valor numérico
  * @returns Valor formatado como moeda brasileira

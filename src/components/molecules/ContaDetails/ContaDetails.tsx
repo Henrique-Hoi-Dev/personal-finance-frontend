@@ -10,6 +10,7 @@ import { BaseConfirmModal } from '@/components/atoms';
 import { toast } from 'sonner';
 import {
   formatCurrencyFromCents,
+  formatDateSafe,
   getAmountColor,
   getAccountTypeLabel,
 } from '@/utils';
@@ -317,10 +318,7 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
                       {t('installment')} {installment.number}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {t('dueDate')}:{' '}
-                      {new Date(installment.dueDate).toLocaleDateString(
-                        'pt-BR'
-                      )}
+                      {t('dueDate')}: {formatDateSafe(installment.dueDate)}
                     </p>
                     <p className="text-lg font-bold text-gray-900">
                       {formatCurrencyFromCents(installment.amount)}
@@ -399,7 +397,7 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
               {t('accountStartDate')}
             </span>
             <span className="text-sm font-medium text-gray-900">
-              {new Date(conta.startDate).toLocaleDateString('pt-BR')}
+              {formatDateSafe(conta.startDate)}
             </span>
           </div>
 
