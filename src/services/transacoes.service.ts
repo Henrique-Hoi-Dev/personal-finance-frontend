@@ -121,9 +121,16 @@ export async function createExpense(
   return response.data;
 }
 
-export async function getExpensesByCategory(): Promise<ExpensesByCategoryResponse> {
-  const response = await apiClient.get<ExpensesByCategoryResponse>(
-    '/transactions/expenses-by-category'
-  );
+export async function getExpensesByCategory(
+  filters?: DateFilters
+): Promise<ExpensesByCategoryResponse> {
+  const params = new URLSearchParams();
+  if (filters?.year) params.append('year', filters.year.toString());
+  if (filters?.month) params.append('month', filters.month.toString());
+
+  const url = `/transactions/expenses-by-category${
+    params.toString() ? `?${params.toString()}` : ''
+  }`;
+  const response = await apiClient.get<ExpensesByCategoryResponse>(url);
   return response.data;
 }

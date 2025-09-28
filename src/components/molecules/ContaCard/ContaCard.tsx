@@ -288,8 +288,7 @@ export const ContaCard: React.FC<ContaCardProps> = ({
             ) : null}
           </div>
 
-          {/* Botão de editar - só aparece para contas fixas com preview */}
-          {conta.type === 'FIXED' && conta.isPreview && (
+          {!isAccountPaid(conta) && conta.isPreview && (
             <button
               onClick={handleEditClick}
               className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors duration-200"

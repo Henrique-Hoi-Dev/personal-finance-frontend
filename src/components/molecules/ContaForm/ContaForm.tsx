@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   BaseInput,
@@ -43,6 +43,48 @@ export function ContaForm({
   );
   const [installmentValue, setInstallmentValue] = useState<string>('');
   const [isPreview, setIsPreview] = useState(initialData?.isPreview || false);
+
+  // Função para verificar se preview deve estar desabilitado
+  const isPreviewDisabled = () => {
+    return formData.type === 'LOAN' || formData.type === 'FIXED';
+  };
+
+  // Função para verificar se parcelamento deve estar forçado
+  const isInstallmentsForced = () => {
+    return formData.type === 'FIXED';
+  };
+
+  // Função para verificar se parcelamento deve estar desabilitado
+  const isInstallmentsDisabled = () => {
+    const disabled = formData.type === 'FIXED_PREVIEW';
+    return disabled;
+  };
+
+  // Função para verificar se parcelamento deve estar bloqueado (não pode desativar)
+  const isInstallmentsBlocked = () => {
+    // Para LOAN e FIXED, quando ativo, não pode desativar
+    return (
+      (formData.type === 'LOAN' || formData.type === 'FIXED') && hasInstallments
+    );
+  };
+
+  // Aplicar regras automaticamente quando o tipo mudar
+  useEffect(() => {
+    // Se for FIXED, forçar parcelamento e desabilitar preview
+    if (formData.type === 'FIXED') {
+      setHasInstallments(true);
+      setIsPreview(false);
+    }
+    // Se for LOAN, desabilitar preview e parcelamento
+    else if (formData.type === 'LOAN') {
+      setIsPreview(false);
+    }
+    // Se for FIXED_PREVIEW, habilitar preview e desabilitar parcelamento
+    else if (formData.type === 'FIXED_PREVIEW') {
+      setIsPreview(true);
+      setHasInstallments(false);
+    }
+  }, [formData.type]);
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof Omit<CreateContaPayload, 'userId'>, string>>
@@ -119,6 +161,11 @@ export function ContaForm({
       newErrors.totalAmount = tCommon('validation.totalAmountRequired');
     }
 
+    // Para contas FIXED (não FIXED_PREVIEW), sempre deve ter parcelas
+    if (formData.type === 'FIXED' && (formData.installments || 0) < 1) {
+      newErrors.installments = tCommon('validation.installmentsRequired');
+    }
+
     if (hasInstallments && (formData.installments || 0) < 1) {
       newErrors.installments = tCommon('validation.installmentsRequired');
     }
@@ -146,7 +193,7 @@ export function ContaForm({
       let dataToSubmit: Omit<CreateContaPayload, 'userId'>;
 
       if (formData.type === 'LOAN') {
-        // Para empréstimos, incluir valor da parcela
+        // Para empréstimos, incluir valor da parcela e sempre desabilitar preview
         const installmentValueInCents = installmentValue
           ? parseInt(installmentValue.replace(/\D/g, ''))
           : 0;
@@ -157,7 +204,29 @@ export function ContaForm({
           totalAmount: formData.totalAmount,
           installments: formData.installments,
           installmentAmount: installmentValueInCents,
-          isPreview: isPreview,
+          isPreview: false, // Sempre false para LOAN
+          startDate: formData.startDate,
+          dueDay: formData.dueDay,
+        };
+      } else if (formData.type === 'FIXED') {
+        // Para contas FIXED, sempre parcelado e sem preview
+        dataToSubmit = {
+          name: formData.name,
+          type: formData.type,
+          totalAmount: formData.totalAmount,
+          installments: formData.installments,
+          isPreview: false, // Sempre false para FIXED
+          startDate: formData.startDate,
+          dueDay: formData.dueDay,
+        };
+      } else if (formData.type === 'FIXED_PREVIEW') {
+        // Para contas FIXED_PREVIEW, parcelamento opcional e sempre com preview
+        dataToSubmit = {
+          name: formData.name,
+          type: formData.type,
+          totalAmount: formData.totalAmount,
+          installments: hasInstallments ? formData.installments : undefined,
+          isPreview: true, // Sempre true para FIXED_PREVIEW
           startDate: formData.startDate,
           dueDay: formData.dueDay,
         };
@@ -204,12 +273,13 @@ export function ContaForm({
           checked={hasInstallments}
           onChange={setHasInstallments}
           label={tCommon('hasInstallments')}
-          disabled={formData.type === 'LOAN'}
+          disabled={isInstallmentsDisabled() || isInstallmentsBlocked()}
         />
         <BaseToggleSwitch
           checked={isPreview}
           onChange={setIsPreview}
           label={t('isPreview')}
+          disabled={isPreviewDisabled()}
         />
       </div>
 

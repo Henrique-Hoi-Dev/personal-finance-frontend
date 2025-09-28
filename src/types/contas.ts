@@ -10,7 +10,13 @@ export interface Installment {
 export interface Conta {
   id: string;
   name: string;
-  type: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
+  type:
+    | 'FIXED'
+    | 'FIXED_PREVIEW'
+    | 'LOAN'
+    | 'CREDIT_CARD'
+    | 'SUBSCRIPTION'
+    | 'OTHER';
   totalAmount: number;
   installments?: number;
   installmentAmount?: number;
@@ -31,7 +37,13 @@ export interface Conta {
 export interface CreateContaPayload {
   userId: string;
   name: string;
-  type: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
+  type:
+    | 'FIXED'
+    | 'FIXED_PREVIEW'
+    | 'LOAN'
+    | 'CREDIT_CARD'
+    | 'SUBSCRIPTION'
+    | 'OTHER';
   totalAmount: number;
   installments?: number;
   installmentAmount?: number;
@@ -43,7 +55,13 @@ export interface CreateContaPayload {
 export interface UpdateContaPayload {
   id: string;
   name?: string;
-  type?: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
+  type?:
+    | 'FIXED'
+    | 'FIXED_PREVIEW'
+    | 'LOAN'
+    | 'CREDIT_CARD'
+    | 'SUBSCRIPTION'
+    | 'OTHER';
   totalAmount?: number;
   installments?: number;
   isPreview?: boolean;

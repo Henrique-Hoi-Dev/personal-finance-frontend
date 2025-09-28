@@ -56,7 +56,7 @@ export const Dashboard: React.FC = () => {
           await Promise.all([
             getBalance({ year: selectedYear, month: selectedMonth }),
             getTransacoes({ limit: 5, page: 0 }),
-            getExpensesByCategory(),
+            getExpensesByCategory({ year: selectedYear, month: selectedMonth }),
           ]);
 
         setBalance(balanceData);
