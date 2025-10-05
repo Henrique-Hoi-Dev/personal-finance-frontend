@@ -24,6 +24,7 @@ export interface CreateTransacaoPayload {
   description: string;
   value: number;
   category: string;
+  date: string;
   accountId: string | null;
 }
 

@@ -2,105 +2,65 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter, useParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/templates';
 import {
-  ContaCard,
-  ContaDetails,
   ContaModal,
-  ContaFilters,
+  MonthlyComparisonTable,
+  MonthlyFinancialSummary,
 } from '@/components/molecules';
 import { useContasStore } from '@/store/contas.store';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { Conta } from '@/types';
+import {
+  getMonthlyComparison,
+  getDashboardAll,
+} from '@/services/contas.service';
+import { MonthlyComparisonData as ApiMonthlyComparisonData } from '@/types/contas';
+import { MonthlyComparisonData } from '@/types/monthly-financial';
+import { formatDateSafe } from '@/utils';
 
 export default function ContasPage() {
-  const { contas, loading, fetchContas, addConta, removeConta } =
-    useContasStore();
+  const router = useRouter();
+  const params = useParams();
+  const { addConta } = useContasStore();
   const t = useTranslations('Contas');
-  const [selectedConta, setSelectedConta] = useState<Conta | null>(null);
+
+  // Pegar o locale atual
+  const locale = params.locale as string;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
-  // Estados dos filtros
-  const [filters, setFilters] = useState({
-    tipo: '',
-    nome: '',
-    isPaid: '',
+  // Estados para comparação mensal
+  const [monthlyComparison, setMonthlyComparison] = useState<
+    MonthlyComparisonData[]
+  >([]);
+  const [monthlyComparisonLoading, setMonthlyComparisonLoading] =
+    useState(false);
+
+  // Estados para resumo financeiro
+  const [financialSummary, setFinancialSummary] = useState({
+    totalBalance: 0,
+    monthlyIncome: 0,
+    monthlyExpenses: 0,
+    monthlySurplus: 0,
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
   });
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
-  const [localContas, setLocalContas] = useState<Conta[]>([]);
-
-  // Funções de filtro
-  const handleTipoChange = (tipo: string) => {
-    setFilters((prev) => ({ ...prev, tipo }));
-  };
-
-  const handleNomeChange = (nome: string) => {
-    setFilters((prev) => ({ ...prev, nome }));
-  };
-
-  const handleIsPaidChange = (isPaid: string) => {
-    setFilters((prev) => ({ ...prev, isPaid }));
-  };
-
-  // Aplicar filtros
-  const applyFilters = useCallback(
-    (contasList: Conta[]) => {
-      return contasList.filter((conta) => {
-        // Filtro por tipo
-        if (filters.tipo && conta.type !== filters.tipo) {
-          return false;
-        }
-
-        // Filtro por nome
-        if (
-          filters.nome &&
-          !conta.name.toLowerCase().includes(filters.nome.toLowerCase())
-        ) {
-          return false;
-        }
-
-        // Filtro por status de pagamento
-        if (filters.isPaid !== '') {
-          const isPaid = filters.isPaid === 'true';
-          if (conta.isPaid !== isPaid) {
-            return false;
-          }
-        }
-
-        return true;
-      });
-    },
-    [filters]
-  );
-
-  const updateSelectedConta = (updatedConta: Conta) => {
-    setSelectedConta(updatedConta);
-
-    setLocalContas((prevContas) =>
-      prevContas.map((conta) =>
-        conta.id === updatedConta.id ? updatedConta : conta
-      )
-    );
-  };
-
-  useEffect(() => {
-    fetchContas();
-  }, [fetchContas]);
-
-  useEffect(() => {
-    if (contas.length > 0) {
-      const filteredContas = applyFilters(contas);
-      setLocalContas(filteredContas);
-    }
-  }, [contas, applyFilters]);
+  // Estados de paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const limit = 5;
 
   const handleCreateConta = async (data: any) => {
     setIsCreating(true);
     try {
       await addConta(data);
       setIsModalOpen(false);
-      await fetchContas();
+      await fetchDashboardData();
+      await fetchMonthlyComparison();
     } catch (error) {
       console.error('Erro ao criar conta:', error);
     } finally {
@@ -108,116 +68,166 @@ export default function ContasPage() {
     }
   };
 
-  const handleDeleteConta = async () => {
-    if (!selectedConta) return;
+  const handleViewDetails = (month: string, year: number) => {
+    const monthNames = {
+      janeiro: 1,
+      fevereiro: 2,
+      março: 3,
+      abril: 4,
+      maio: 5,
+      junho: 6,
+      julho: 7,
+      agosto: 8,
+      setembro: 9,
+      outubro: 10,
+      novembro: 11,
+      dezembro: 12,
+    };
 
-    try {
-      await removeConta(selectedConta.id);
+    const monthLower = month.toLowerCase();
+    const monthNumber = monthNames[monthLower as keyof typeof monthNames];
 
-      await fetchContas();
-
-      setSelectedConta(null);
-    } catch (error) {
-      console.error('Erro ao excluir conta:', error);
+    if (monthNumber) {
+      router.push(
+        `/${locale}/contas/detalhes?month=${monthNumber}&year=${year}`
+      );
+    } else {
+      console.error('Mês não encontrado:', month);
     }
   };
+
+  // Função para transformar dados da API para o formato do componente
+  const transformMonthlyComparisonData = (data: ApiMonthlyComparisonData[]) => {
+    return data.map((item) => ({
+      month: new Date(
+        item.referenceYear,
+        item.referenceMonth - 1
+      ).toLocaleDateString('pt-BR', {
+        month: 'long',
+      }),
+      year: item.referenceYear,
+      income: item.totalIncome,
+      expenses: item.totalExpenses,
+      surplus: item.totalIncome - item.totalExpenses,
+      billsToPay: item.billsToPay,
+      installments: item.billsCount,
+      status: item.status,
+      isCurrent:
+        item.referenceMonth === new Date().getMonth() + 1 &&
+        item.referenceYear === new Date().getFullYear(),
+    }));
+  };
+
+  // Função para buscar dados do dashboard (big numbers)
+  const fetchDashboardData = useCallback(async () => {
+    setSummaryLoading(true);
+    try {
+      const response = await getDashboardAll();
+      setFinancialSummary({
+        totalBalance: response.totalBalance || 0,
+        monthlyIncome: response.totalIncome || 0,
+        monthlyExpenses: response.totalExpenses || 0,
+        monthlySurplus:
+          (response.totalIncome || 0) - (response.totalExpenses || 0),
+        month: response.month || new Date().getMonth() + 1,
+        year: response.year || new Date().getFullYear(),
+      });
+    } catch (error) {
+      console.error('Erro ao buscar dados do dashboard:', error);
+    } finally {
+      setSummaryLoading(false);
+    }
+  }, []);
+
+  // Função para buscar comparação mensal
+  const fetchMonthlyComparison = useCallback(
+    async (page: number = currentPage) => {
+      setMonthlyComparisonLoading(true);
+      try {
+        const response = await getMonthlyComparison({
+          limit,
+          page: page - 1, // API usa 0-based pagination
+        });
+        const transformedData = transformMonthlyComparisonData(response.docs);
+        setMonthlyComparison(transformedData);
+        setTotalPages(Math.ceil(response.total / limit));
+        setTotalItems(response.total);
+      } catch (error) {
+        console.error('Erro ao buscar comparação mensal:', error);
+      } finally {
+        setMonthlyComparisonLoading(false);
+      }
+    },
+    [currentPage, limit]
+  );
+
+  // Função de paginação
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchMonthlyComparison(page);
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+    fetchMonthlyComparison();
+  }, [fetchDashboardData, fetchMonthlyComparison]);
 
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="h-full bg-gray-50">
-          <div className="flex justify-between">
-            <div className="p-6">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {t('title')}
-              </h1>
-              <p className="text-gray-600 text-sm">{t('description')}</p>
-            </div>
-            <div className="p-6">
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+        <div className="min-h-screen bg-gray-50">
+          {/* Header */}
+          <div className="px-6 py-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {t('title')}
+                </h1>
+                <p className="text-gray-600 text-sm mt-1">{t('description')}</p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                {t('addAccount')}
-              </button>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  {t('addAccount')}
+                </button>
+              </div>
             </div>
           </div>
-          {/* Componente de Filtros */}
-          <ContaFilters
-            tipo={filters.tipo}
-            nome={filters.nome}
-            isPaid={filters.isPaid}
-            onTipoChange={handleTipoChange}
-            onNomeChange={handleNomeChange}
-            onIsPaidChange={handleIsPaidChange}
-          />
 
-          <div className="flex h-full">
-            {/* Painel Esquerdo - Lista de Contas */}
-            <div className="w-1/2 flex flex-col">
-              <div className="mt-4">
-                <h2 className="pl-6 text-lg font-semibold text-gray-900">
-                  {t('yourAccounts')}
-                </h2>
-              </div>
-              {/* Lista de Contas */}
-              <div className="flex-1 w-full p-6 space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
-                {loading ? (
-                  <div className="flex items-center justify-center h-32">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                    <span className="ml-2 text-gray-600">{t('loading')}</span>
-                  </div>
-                ) : localContas.length > 0 ? (
-                  localContas.map((conta) => (
-                    <ContaCard
-                      key={conta.id}
-                      conta={conta}
-                      isSelected={selectedConta?.id === conta.id}
-                      onClick={() => setSelectedConta(conta)}
-                      onDelete={handleDeleteConta}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="text-gray-500 text-lg mb-4">
-                      {t('noAccounts')}
-                    </div>
-                    <p className="text-gray-400">
-                      {t('noAccountsDescription')}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+          {/* Dashboard de Comparação Mensal */}
+          <div className="p-6 space-y-6">
+            {/* Resumo Financeiro Mensal */}
+            <MonthlyFinancialSummary
+              data={financialSummary}
+              loading={summaryLoading}
+            />
 
-            {/* Painel Direito - Detalhes da Conta */}
-            <div className="w-1/2 flex flex-col">
-              <div className="mt-4">
-                <h2 className="pl-6 text-lg font-semibold text-gray-900">
-                  {t('accountDetails') + ' ' + (selectedConta?.name ?? '')}
-                </h2>
-              </div>
-              <div className="flex-1 p-6">
-                <ContaDetails
-                  conta={selectedConta}
-                  onClose={() => setSelectedConta(null)}
-                  onUpdateConta={updateSelectedConta}
-                />
-              </div>
-            </div>
+            {/* Tabela Comparativa Mensal */}
+            <MonthlyComparisonTable
+              data={monthlyComparison}
+              loading={monthlyComparisonLoading}
+              onViewDetails={handleViewDetails}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={limit}
+              onPageChange={handlePageChange}
+            />
           </div>
 
           <ContaModal

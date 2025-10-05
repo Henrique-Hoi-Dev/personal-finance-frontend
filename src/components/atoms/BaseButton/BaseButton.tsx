@@ -29,8 +29,8 @@ export const BaseButton: React.FC<ButtonProps> = ({
 
   const sizeClasses = {
     sm: 'py-2 px-3 text-sm',
-    md: 'py-3 px-4 text-base',
-    lg: 'py-5 px-6 text-lg',
+    md: 'py-3 px-4 text-base h-12',
+    lg: 'py-5 px-6 text-lg h-12',
   };
 
   const variantClasses = {

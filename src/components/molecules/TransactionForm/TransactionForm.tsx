@@ -38,7 +38,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
     description: '',
     category: '',
     date: new Date().toISOString().split('T')[0],
-    type: 'EXPENSE', // Default to expense
+    type: 'EXPENSE',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

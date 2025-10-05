@@ -83,6 +83,7 @@ export default function TransacoesPage() {
           description: data.description,
           value: data.value,
           category: data.category,
+          date: data.date,
         };
 
         await addTransacao(payload, data.type);

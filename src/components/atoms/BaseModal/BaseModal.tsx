@@ -7,6 +7,8 @@ interface BaseModalProps {
   children: React.ReactNode;
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  closeOnBackdropClick?: boolean;
+  closeOnEsc?: boolean;
 }
 
 export const BaseModal: React.FC<BaseModalProps> = ({
@@ -16,6 +18,8 @@ export const BaseModal: React.FC<BaseModalProps> = ({
   children,
   className = '',
   size = 'md',
+  closeOnBackdropClick = false,
+  closeOnEsc = false,
 }) => {
   const handleClose = useCallback(() => {
     onClose();
@@ -29,7 +33,9 @@ export const BaseModal: React.FC<BaseModalProps> = ({
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
+      if (closeOnEsc) {
+        document.addEventListener('keydown', handleEscape);
+      }
       document.body.style.overflow = 'hidden';
     }
 
@@ -37,7 +43,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, handleClose]);
+  }, [isOpen, handleClose, closeOnEsc]);
 
   if (!isOpen) return null;
 
@@ -54,7 +60,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-        onClick={handleClose}
+        onClick={closeOnBackdropClick ? handleClose : undefined}
       />
 
       {/* Modal */}

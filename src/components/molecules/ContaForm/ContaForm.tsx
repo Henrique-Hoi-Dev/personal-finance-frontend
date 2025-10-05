@@ -36,6 +36,8 @@ export function ContaForm({
     installments: initialData?.installments || 1,
     startDate: initialData?.startDate || '',
     dueDay: initialData?.dueDay || 1,
+    referenceMonth: initialData?.referenceMonth || new Date().getMonth() + 1,
+    referenceYear: initialData?.referenceYear || new Date().getFullYear(),
   });
 
   const [hasInstallments, setHasInstallments] = useState(
@@ -207,6 +209,8 @@ export function ContaForm({
           isPreview: false, // Sempre false para LOAN
           startDate: formData.startDate,
           dueDay: formData.dueDay,
+          referenceMonth: formData.referenceMonth,
+          referenceYear: formData.referenceYear,
         };
       } else if (formData.type === 'FIXED') {
         // Para contas FIXED, sempre parcelado e sem preview
@@ -218,6 +222,8 @@ export function ContaForm({
           isPreview: false, // Sempre false para FIXED
           startDate: formData.startDate,
           dueDay: formData.dueDay,
+          referenceMonth: formData.referenceMonth,
+          referenceYear: formData.referenceYear,
         };
       } else if (formData.type === 'FIXED_PREVIEW') {
         // Para contas FIXED_PREVIEW, parcelamento opcional e sempre com preview
@@ -229,6 +235,8 @@ export function ContaForm({
           isPreview: true, // Sempre true para FIXED_PREVIEW
           startDate: formData.startDate,
           dueDay: formData.dueDay,
+          referenceMonth: formData.referenceMonth,
+          referenceYear: formData.referenceYear,
         };
       } else if (hasInstallments) {
         // Para outros tipos com parcelas
@@ -245,6 +253,8 @@ export function ContaForm({
           isPreview: isPreview,
           startDate: formData.startDate,
           dueDay: formData.dueDay,
+          referenceMonth: formData.referenceMonth,
+          referenceYear: formData.referenceYear,
         };
       }
 
@@ -388,6 +398,61 @@ export function ContaForm({
           {errors.startDate && (
             <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>
           )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+              Referência Mes e <span className="text-red-500">*</span>
+            </BaseLabel>
+            <BaseInput
+              type="number"
+              value={formData.referenceMonth?.toString() || ''}
+              onChange={(e) =>
+                handleInputChange(
+                  'referenceMonth',
+                  parseInt(e.target.value) || 1
+                )
+              }
+              placeholder="1"
+              min="1"
+              max="12"
+              className={`w-full h-12 text-base ${
+                errors.referenceMonth ? 'border-red-500' : ''
+              }`}
+            />
+            {errors.referenceMonth && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.referenceMonth}
+              </p>
+            )}
+          </div>
+          <div>
+            <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+              Ano <span className="text-red-500">*</span>
+            </BaseLabel>
+            <BaseInput
+              type="number"
+              value={formData.referenceYear?.toString() || ''}
+              onChange={(e) =>
+                handleInputChange(
+                  'referenceYear',
+                  parseInt(e.target.value) || new Date().getFullYear()
+                )
+              }
+              placeholder={new Date().getFullYear().toString()}
+              min="2020"
+              max="2030"
+              className={`w-full h-12 text-base ${
+                errors.referenceYear ? 'border-red-500' : ''
+              }`}
+            />
+            {errors.referenceYear && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.referenceYear}
+              </p>
+            )}
+          </div>
         </div>
 
         <div>

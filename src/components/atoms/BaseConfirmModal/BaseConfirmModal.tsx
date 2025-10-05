@@ -14,6 +14,8 @@ interface BaseConfirmModalProps {
   type?: ConfirmModalType;
   loading?: boolean;
   className?: string;
+  closeOnBackdropClick?: boolean;
+  closeOnEsc?: boolean;
 }
 
 export const BaseConfirmModal: React.FC<BaseConfirmModalProps> = ({
@@ -27,17 +29,21 @@ export const BaseConfirmModal: React.FC<BaseConfirmModalProps> = ({
   type = 'danger',
   loading = false,
   className = '',
+  closeOnBackdropClick = false,
+  closeOnEsc = false,
 }) => {
   const t = useTranslations('Common');
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !loading) {
+      if (e.key === 'Escape' && !loading && closeOnEsc) {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
+      if (closeOnEsc) {
+        document.addEventListener('keydown', handleEscape);
+      }
       document.body.style.overflow = 'hidden';
     }
 
@@ -45,7 +51,7 @@ export const BaseConfirmModal: React.FC<BaseConfirmModalProps> = ({
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose, loading]);
+  }, [isOpen, onClose, loading, closeOnEsc]);
 
   if (!isOpen) return null;
 
@@ -162,7 +168,9 @@ export const BaseConfirmModal: React.FC<BaseConfirmModalProps> = ({
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-        onClick={loading ? undefined : onClose}
+        onClick={
+          loading ? undefined : closeOnBackdropClick ? onClose : undefined
+        }
       />
 
       {/* Modal */}

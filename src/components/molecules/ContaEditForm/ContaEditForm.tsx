@@ -14,6 +14,7 @@ interface ContaEditFormProps {
   onCancel: () => void;
   loading?: boolean;
   initialData: {
+    name: string;
     totalAmount: number;
     startDate: string;
     dueDay: number;
@@ -31,6 +32,7 @@ export function ContaEditForm({
   const tCommon = useTranslations('Common');
 
   const [formData, setFormData] = useState({
+    name: initialData.name,
     totalAmount: initialData.totalAmount,
     startDate: initialData.startDate,
     dueDay: initialData.dueDay,
@@ -42,6 +44,7 @@ export function ContaEditForm({
   );
 
   const [errors, setErrors] = useState<{
+    name?: string;
     totalAmount?: string;
     startDate?: string;
     dueDay?: string;
@@ -75,6 +78,10 @@ export function ContaEditForm({
   const validateForm = () => {
     const newErrors: typeof errors = {};
 
+    if (!formData.name.trim()) {
+      newErrors.name = tCommon('validation.nameRequired');
+    }
+
     if (formData.totalAmount <= 0) {
       newErrors.totalAmount = tCommon('validation.totalAmountRequired');
     }
@@ -100,6 +107,7 @@ export function ContaEditForm({
 
     try {
       await onSubmit({
+        name: formData.name,
         totalAmount: formData.totalAmount,
         startDate: formData.startDate,
         dueDay: formData.dueDay,
@@ -122,6 +130,24 @@ export function ContaEditForm({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Nome */}
+        <div>
+          <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+            {t('name')} <span className="text-red-500">*</span>
+          </BaseLabel>
+          <BaseInput
+            type="text"
+            value={formData.name}
+            onChange={(e) => handleInputChange('name', e.target.value)}
+            placeholder={t('namePlaceholder')}
+            className={`w-full h-12 text-base ${
+              errors.name ? 'border-red-500' : ''
+            }`}
+          />
+          {errors.name && (
+            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+          )}
+        </div>
         {/* Valor Total */}
         <div>
           <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
@@ -190,6 +216,7 @@ export function ContaEditForm({
           variant="secondary"
           onClick={onCancel}
           disabled={loading}
+          size="md"
         >
           {t('cancel')}
         </BaseButton>

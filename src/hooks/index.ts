@@ -6,3 +6,4 @@ export {
 } from './useSelectOptions';
 export { useLanguage } from './useLanguage';
 export { useCurrency } from './useCurrency';
+export { useMonthlyFinancialData } from './useMonthlyFinancialData';

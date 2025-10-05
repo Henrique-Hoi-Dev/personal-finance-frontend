@@ -53,10 +53,15 @@ export async function createTransacao(
   data: CreateTransacaoPayload,
   type: 'INCOME' | 'EXPENSE'
 ): Promise<Transacao> {
-  // Usa rota específica baseada no tipo
   const endpoint =
     type === 'INCOME' ? '/transactions/income' : '/transactions/expense';
-  const response = await apiClient.post<Transacao>(endpoint, data);
+  const payload = {
+    description: data.description,
+    value: data.value,
+    category: data.category,
+    date: data.date,
+  };
+  const response = await apiClient.post<Transacao>(endpoint, payload);
   return response.data;
 }
 
