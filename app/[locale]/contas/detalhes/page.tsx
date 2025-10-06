@@ -55,13 +55,27 @@ export default function ContasDetailsPage() {
     return formatDateSafe(account.startDate);
   };
 
+  const getDayFromDateString = (dateString: string) => {
+    // Evita problemas de fuso horário extraindo o dia diretamente da string
+    const [datePart] = dateString.split('T');
+    const parts = datePart.split('-');
+    if (parts.length === 3) {
+      const day = parseInt(parts[2], 10);
+      if (!Number.isNaN(day)) return day;
+    }
+    // Fallback usando formatDateSafe (dd/mm/aaaa)
+    const formatted = formatDateSafe(dateString);
+    const day = parseInt(formatted.split('/')[0], 10);
+    return Number.isNaN(day) ? 0 : day;
+  };
+
   const getAccountDueDay = (account: Conta) => {
     if (
       account.installments &&
       account.installments > 0 &&
       account.installment
     ) {
-      return new Date(account.installment.dueDate).getDate();
+      return getDayFromDateString(account.installment.dueDate);
     }
     return account.dueDay;
   };
@@ -524,7 +538,8 @@ export default function ContasDetailsPage() {
                               {t('dueDate')}: Dia {getAccountDueDay(account)}
                             </span>
                             <span>
-                              {t('startDate')}: {getAccountDate(account)}
+                              {t('startDate')}:{' '}
+                              {formatDateSafe(account.startDate)}
                             </span>
                           </div>
                         </div>
@@ -642,7 +657,7 @@ export default function ContasDetailsPage() {
                                     {t('dueDay')}
                                   </div>
                                   <div className="text-gray-600">
-                                    Dia {account.dueDay}
+                                    Dia {getAccountDueDay(account)}
                                   </div>
                                 </div>
                                 <div>

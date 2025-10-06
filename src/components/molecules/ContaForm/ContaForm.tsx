@@ -8,6 +8,7 @@ import {
   BaseButton,
   BaseToggleSwitch,
   BaseSelect,
+  BaseModal,
 } from '@/components/atoms';
 import { CreateContaPayload } from '@/types/contas';
 import { formatCurrency } from '@/utils';
@@ -47,6 +48,11 @@ export function ContaForm({
   );
   const [installmentValue, setInstallmentValue] = useState<string>('');
   const [isPreview, setIsPreview] = useState(initialData?.isPreview || false);
+
+  // Helper de cálculo por parcela (UX apenas)
+  const [showCalcModal, setShowCalcModal] = useState(false);
+  const [calcSyncEnabled, setCalcSyncEnabled] = useState(true);
+  const [calcInstallmentValue, setCalcInstallmentValue] = useState<string>('');
 
   // Função para verificar se preview deve estar desabilitado
   const isPreviewDisabled = () => {
@@ -121,6 +127,11 @@ export function ContaForm({
 
     setDisplayValue(formatCurrency(valueInReais));
     setFormData((prev) => ({ ...prev, totalAmount: valueInCents }));
+
+    // Se usuário editar manualmente o total, desligar a sincronização do helper
+    if (calcSyncEnabled) {
+      setCalcSyncEnabled(false);
+    }
   };
 
   const handleInstallmentValueChange = (inputValue: string) => {
@@ -135,6 +146,30 @@ export function ContaForm({
     const valueInReais = valueInCents / 100;
 
     setInstallmentValue(formatCurrency(valueInReais));
+  };
+
+  // Helper: mudança do valor por parcela (currency)
+  const handleCalcInstallmentValueChange = (inputValue: string) => {
+    const numbersOnly = inputValue.replace(/\D/g, '');
+    if (numbersOnly === '') {
+      setCalcInstallmentValue('');
+      if (calcSyncEnabled) {
+        setFormData((prev) => ({ ...prev, totalAmount: 0 }));
+      }
+      return;
+    }
+    const valueInCents = parseInt(numbersOnly);
+    const valueInReais = valueInCents / 100;
+    setCalcInstallmentValue(formatCurrency(valueInReais));
+
+    if (calcSyncEnabled) {
+      const installmentsCount = formData.installments || 1;
+      setFormData((prev) => ({
+        ...prev,
+        totalAmount: valueInCents * installmentsCount,
+      }));
+      setDisplayValue(formatCurrency(valueInReais * installmentsCount));
+    }
   };
 
   const handleTypeChange = (newType: CreateContaPayload['type']) => {
@@ -330,9 +365,22 @@ export function ContaForm({
         </div>
 
         <div>
-          <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
-            {t('totalAmount')} <span className="text-red-500">*</span>
-          </BaseLabel>
+          <div className="flex items-center justify-between">
+            <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+              {t('totalAmount')} <span className="text-red-500">*</span>
+            </BaseLabel>
+            {hasInstallments &&
+              (formData.type === 'FIXED' ||
+                formData.type === 'FIXED_PREVIEW') && (
+                <button
+                  type="button"
+                  onClick={() => setShowCalcModal(true)}
+                  className="text-xs text-blue-600 hover:text-blue-700"
+                >
+                  {t('calcByInstallment')}
+                </button>
+              )}
+          </div>
           <BaseInput
             type="text"
             value={displayValue}
@@ -345,6 +393,99 @@ export function ContaForm({
           {errors.totalAmount && (
             <p className="text-red-500 text-sm mt-1">{errors.totalAmount}</p>
           )}
+
+          <BaseModal
+            isOpen={showCalcModal}
+            onClose={() => setShowCalcModal(false)}
+            title={t('calcByInstallment')}
+            size="lg"
+          >
+            <div className="p-2 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <BaseLabel className="block text-xs font-medium text-gray-700 mb-1">
+                    {t('installmentAmount')}
+                  </BaseLabel>
+                  <BaseInput
+                    type="text"
+                    value={calcInstallmentValue}
+                    onChange={(e) =>
+                      handleCalcInstallmentValueChange(e.target.value)
+                    }
+                    placeholder={tCommon('placeholders.currency')}
+                    className="w-full h-10 text-sm"
+                  />
+                </div>
+                <div>
+                  <BaseLabel className="block text-xs font-medium text-gray-700 mb-1">
+                    {t('installments')}
+                  </BaseLabel>
+                  <BaseInput
+                    type="number"
+                    value={(formData.installments || 1).toString()}
+                    onChange={(e) => {
+                      const count = parseInt(e.target.value) || 1;
+                      handleInputChange('installments', count);
+                      if (calcSyncEnabled) {
+                        const cents =
+                          parseInt(
+                            (calcInstallmentValue || '').replace(/\D/g, '')
+                          ) || 0;
+                        setFormData((prev) => ({
+                          ...prev,
+                          totalAmount: cents * count,
+                        }));
+                        setDisplayValue(formatCurrency((cents / 100) * count));
+                      }
+                    }}
+                    min="1"
+                    className="w-full h-10 text-sm"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <label className="inline-flex items-center space-x-2 text-xs text-gray-700">
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      checked={calcSyncEnabled}
+                      onChange={(e) => setCalcSyncEnabled(e.target.checked)}
+                    />
+                    <span>{t('keepSynced')}</span>
+                  </label>
+                </div>
+              </div>
+              <div className="text-sm text-gray-700">
+                {t('calculatedTotal')}:{' '}
+                <strong>{displayValue || formatCurrency(0)}</strong>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <BaseButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowCalcModal(false)}
+                >
+                  {t('cancel')}
+                </BaseButton>
+                <BaseButton
+                  type="button"
+                  variant="primary"
+                  onClick={() => {
+                    const cents =
+                      parseInt(
+                        (calcInstallmentValue || '').replace(/\D/g, '')
+                      ) || 0;
+                    const count = formData.installments || 1;
+                    const total = cents * count;
+                    setFormData((prev) => ({ ...prev, totalAmount: total }));
+                    setDisplayValue(formatCurrency(total / 100));
+                    setShowCalcModal(false);
+                  }}
+                >
+                  {t('useThisTotal')}
+                </BaseButton>
+              </div>
+            </div>
+          </BaseModal>
         </div>
 
         {formData.type === 'LOAN' && (
