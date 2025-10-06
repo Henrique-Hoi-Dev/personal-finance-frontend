@@ -42,21 +42,17 @@ export default function TransacoesPage() {
     endDate: '',
   });
 
+  // Sempre que filtros mudarem, resetar para página 1 (0-based -> 0)
   useEffect(() => {
     fetchTransacoes({
       ...filters,
       type: filters.type || undefined,
       startDate: filters.startDate || undefined,
       endDate: filters.endDate || undefined,
-      page: pagination.currentPage,
+      page: 0,
       limit: pagination.itemsPerPage,
     });
-  }, [
-    fetchTransacoes,
-    filters,
-    pagination.currentPage,
-    pagination.itemsPerPage,
-  ]);
+  }, [fetchTransacoes, filters, pagination.itemsPerPage]);
 
   const handleCreateTransacao = () => {
     setEditingTransacao(null);

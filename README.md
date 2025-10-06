@@ -91,34 +91,53 @@ Aplicativo de finanças pessoais construído com Next.js, TypeScript e TailwindC
 - **contas.service.ts**: Serviços de contas
 - **transacoes.service.ts**: Serviços de transações
 
-## 🔐 Funcionalidades
+## 🔐 Funcionalidades (Atualizadas)
 
 ### Autenticação
 
 - Login com CPF e senha
-- Gerenciamento de token JWT
-- Redirecionamento automático
-- Persistência de sessão
+- Gestão de token JWT com persistência de sessão
+- Rotas protegidas com `ProtectedRoute`
 
 ### Dashboard
 
-- Visão geral das finanças
-- Cards de resumo (saldo, receitas, despesas)
-- Navegação entre páginas
+- Visão geral das finanças (saldo, receitas, despesas e superávit do mês)
+- Tabela comparativa mensal com estados financeiros traduzidos (Excellent/Good/Warning/Critical)
+- Indicador do mês atual e acesso rápido aos detalhes do mês
 
 ### Contas
 
-- Listagem de contas bancárias
-- Criação, edição e exclusão
-- Diferentes tipos (corrente, poupança, investimento, cartão)
-- Status ativo/inativo
+- Listagem filtrável por nome, tipo e status de pagamento
+- Dropdown expansível por conta com animação suave mostrando:
+  - Informações completas em grid responsivo com rótulos fortes
+  - Exibição do status (Pago/Pendente) e tag de "Preview" para `FIXED_PREVIEW`
+  - Ações contextuais apenas quando disponíveis: Ver Parcelas, Pagar, Editar, Excluir
+- Criação de conta com modal; em Detalhes, o mês/ano são preenchidos automaticamente
+- Edição de conta incluindo o nome, com confirmação e feedback
+- Exclusão de conta com modal de confirmação
+- Pagamento de conta com modal de confirmação
+- Parcelas:
+  - Modal de lista com scroll e carregamento assíncrono de todas as parcelas da conta
+  - Botões para pagar e excluir cada parcela (excluir com confirmação e botão menos propenso a clique acidental)
+  - Correção de fuso/timezone na exibição de datas usando `formatDateSafe`
+  - "Dia de vencimento" consistente (extraído do ISO para evitar off-by-one)
+- Helper de cálculo para contas fixas com parcelas:
+  - Modal "Calcular por parcela" (valor da parcela x quantidade)
+  - Opção de manter sincronizado e aplicar total calculado ao formulário
+- Comportamento de modais reforçado: não fecham por clique no backdrop nem ESC por padrão; z-index ajustado para empilhamento correto
 
 ### Transações
 
-- Histórico de movimentações
-- Filtros por tipo, categoria e data
-- Criação, edição e exclusão
-- Categorização automática
+- Histórico com tabela, paginação e exclusão com confirmação
+- Filtros por tipo, categoria e intervalo de datas
+- Envio de data correto ao backend e mapeamento dos payloads
+- Ao alterar qualquer filtro, a paginação é resetada para a página 1 (0-based → 0) automaticamente
+
+### Internacionalização (i18n)
+
+- `next-intl` com mensagens em `pt.json` e `en.json`
+- Traduções aplicadas em tabelas, estados, ações e modais
+- Novas chaves adicionadas: rótulos de status financeiro, textos de ações, confirmações e helper de cálculo
 
 ## 🎨 Design
 
@@ -212,3 +231,11 @@ O projeto está preparado para integrar com um backend que implemente:
 - **Validação de dados**
 
 Consulte os tipos em `src/types/` para entender a estrutura esperada das APIs.
+
+## 🧪 Qualidade e UX
+
+- ESLint + Prettier
+- Tailwind para UI consistente e responsiva
+- Feedback ao usuário com toasts em ações críticas (pagar, excluir, editar)
+- Animações suaves nos dropdowns e carregadores nos modais
+- Cabeçalhos e datas consistentes via utilitários de formatação
