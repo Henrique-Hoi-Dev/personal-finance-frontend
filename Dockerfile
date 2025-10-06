@@ -57,7 +57,7 @@ EXPOSE 3005
 # Definir variáveis de ambiente
 ENV NODE_ENV=development
 ENV PORT=3005
-ENV NEXT_PUBLIC_API_URL=http://localhost:8081
+ENV NEXT_PUBLIC_API_URL=https://api.henriquehoinacki.dev
 ENV NEXT_PUBLIC_APP_NAME=FinanceApp
 ENV NEXT_PUBLIC_APP_VERSION=1.0.0
 
