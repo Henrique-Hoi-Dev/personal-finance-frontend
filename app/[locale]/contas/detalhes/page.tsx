@@ -5,7 +5,11 @@ import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/templates';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { ContaFilters, ContaEditForm } from '@/components/molecules';
+import {
+  ContaFilters,
+  ContaEditForm,
+  ContaModal,
+} from '@/components/molecules';
 import { BaseModal, BaseConfirmModal } from '@/components/atoms';
 import {
   getContas,
@@ -87,8 +91,14 @@ export default function ContasDetailsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingInstallment, setIsDeletingInstallment] = useState(false);
+  const [showPayModal, setShowPayModal] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
   const [installments, setInstallments] = useState<any[]>([]);
   const [loadingInstallments, setLoadingInstallments] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [showPayInstallmentModal, setShowPayInstallmentModal] = useState(false);
+  const [isPayingInstallment, setIsPayingInstallment] = useState(false);
 
   const fetchAccounts = useCallback(async () => {
     if (!month || !year) {
@@ -162,20 +172,31 @@ export default function ContasDetailsPage() {
     setShowDeleteModal(true);
   };
 
-  const handlePayAccount = async (account: Conta) => {
+  const handleRequestPayAccount = (account: Conta) => {
+    setSelectedAccount(account);
+    setShowPayModal(true);
+  };
+
+  const handleConfirmPayAccount = async () => {
+    if (!selectedAccount) return;
+    setIsPaying(true);
     try {
-      if (account.installment) {
+      if (selectedAccount.installment) {
         await payInstallment(
-          account.installment.id,
-          account.installment.amount
+          selectedAccount.installment.id,
+          selectedAccount.installment.amount
         );
       } else {
-        await payFullAccount(account.id, account.totalAmount);
+        await payFullAccount(selectedAccount.id, selectedAccount.totalAmount);
       }
-
       await fetchAccounts();
+      setShowPayModal(false);
+      setSelectedAccount(null);
+      toast.success(t('paid'));
     } catch (error) {
       toast.error('Erro ao pagar conta');
+    } finally {
+      setIsPaying(false);
     }
   };
 
@@ -209,12 +230,18 @@ export default function ContasDetailsPage() {
     setInstallments([]);
   };
 
-  const handlePayInstallment = async (installment: any) => {
+  const handleRequestPayInstallment = (installment: any) => {
+    setSelectedInstallment(installment);
+    setShowPayInstallmentModal(true);
+  };
+
+  const handleConfirmPayInstallment = async () => {
+    if (!selectedInstallment) return;
+    setIsPayingInstallment(true);
     try {
-      await payInstallment(installment.id, installment.amount);
+      await payInstallment(selectedInstallment.id, selectedInstallment.amount);
       toast.success('Parcela paga com sucesso!');
 
-      // Recarregar a lista de parcelas
       if (selectedAccount) {
         const contaCompleta = await getContaById(selectedAccount.id);
         if (
@@ -225,10 +252,13 @@ export default function ContasDetailsPage() {
         }
       }
 
-      // Recarregar a lista principal
       await fetchAccounts();
+      setShowPayInstallmentModal(false);
+      setSelectedInstallment(null);
     } catch (error) {
       toast.error('Erro ao pagar parcela');
+    } finally {
+      setIsPayingInstallment(false);
     }
   };
 
@@ -362,40 +392,64 @@ export default function ContasDetailsPage() {
         <div className="min-h-screen bg-gray-50">
           {/* Header */}
           <div className="px-6 py-4">
-            <div className="flex flex-col gap-4">
-              <button
-                onClick={handleBack}
-                className="flex items-center text-gray-600 hover:text-gray-900"
-              >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col gap-4">
+                <button
+                  onClick={handleBack}
+                  className="flex items-center text-gray-600 hover:text-gray-900"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-                {t('backToAccounts')}
-              </button>
-              <div className="flex items-center space-x-4">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    {t('accountDetails')} - {monthName}
-                  </h1>
-                  <p className="text-gray-600">
-                    {t('accountDetailsDescription')}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {accounts.length}{' '}
-                    {accounts.length === 1 ? t('account') : t('accounts')}{' '}
-                    {t('found')}
-                  </p>
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  {t('backToAccounts')}
+                </button>
+
+                <div className="flex items-center space-x-4">
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      {t('accountDetails')} - {monthName}
+                    </h1>
+                    <p className="text-gray-600">
+                      {t('accountDetailsDescription')}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {accounts.length}{' '}
+                      {accounts.length === 1 ? t('account') : t('accounts')}{' '}
+                      {t('found')}
+                    </p>
+                  </div>
                 </div>
+              </div>
+              <div className="ml-auto">
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  {t('addAccount')}
+                </button>
               </div>
             </div>
           </div>
@@ -523,72 +577,93 @@ export default function ContasDetailsPage() {
                               <h4 className="font-medium text-gray-900">
                                 {t('completeInformation')}
                               </h4>
-                              <div className="space-y-1 text-sm text-gray-600">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                 <div>
-                                  <span className="font-medium">
-                                    {t('name')}:
-                                  </span>{' '}
-                                  {account.name}
+                                  <div className="text-gray-800 font-semibold">
+                                    {t('name')}
+                                  </div>
+                                  <div className="text-gray-600">
+                                    {account.name}
+                                  </div>
                                 </div>
                                 <div>
-                                  <span className="font-medium">
-                                    {t('accountType')}:
-                                  </span>{' '}
-                                  {getAccountTypeLabel(account.type)}
+                                  <div className="text-gray-800 font-semibold">
+                                    {t('accountType')}
+                                  </div>
+                                  <div className="text-gray-600">
+                                    {getAccountTypeLabel(account.type)}
+                                  </div>
                                 </div>
                                 <div>
-                                  <span className="font-medium">
-                                    {t('totalAmount')}:
-                                  </span>{' '}
-                                  {formatCurrencyFromCents(account.totalAmount)}
+                                  <div className="text-gray-800 font-semibold">
+                                    {t('totalAmount')}
+                                  </div>
+                                  <div className="text-gray-600">
+                                    {formatCurrencyFromCents(
+                                      account.totalAmount
+                                    )}
+                                  </div>
                                 </div>
                                 {account.installments && (
                                   <div>
-                                    <span className="font-medium">
-                                      {t('installments')}:
-                                    </span>{' '}
-                                    {account.installments}
+                                    <div className="text-gray-800 font-semibold">
+                                      {t('installments')}
+                                    </div>
+                                    <div className="text-gray-600">
+                                      {account.installments}
+                                    </div>
                                   </div>
                                 )}
-                                {account.installmentAmount && (
+                                {(account.installmentAmount ||
+                                  account.installment?.amount) && (
                                   <div>
-                                    <span className="font-medium">
-                                      {t('installmentAmount')}:
-                                    </span>{' '}
-                                    {formatCurrencyFromCents(
-                                      account.installmentAmount
-                                    )}
+                                    <div className="text-gray-800 font-semibold">
+                                      {t('installmentAmount')}
+                                    </div>
+                                    <div className="text-gray-600">
+                                      {formatCurrencyFromCents(
+                                        (account.installmentAmount ??
+                                          account.installment?.amount) ||
+                                          0
+                                      )}
+                                    </div>
                                   </div>
                                 )}
                                 <div>
-                                  <span className="font-medium">
-                                    {t('startDate')}:
-                                  </span>{' '}
-                                  {formatDateSafe(account.startDate)}
+                                  <div className="text-gray-800 font-semibold">
+                                    {t('startDate')}
+                                  </div>
+                                  <div className="text-gray-600">
+                                    {formatDateSafe(account.startDate)}
+                                  </div>
                                 </div>
                                 <div>
-                                  <span className="font-medium">
-                                    {t('dueDay')}:
-                                  </span>{' '}
-                                  Dia {account.dueDay}
+                                  <div className="text-gray-800 font-semibold">
+                                    {t('dueDay')}
+                                  </div>
+                                  <div className="text-gray-600">
+                                    Dia {account.dueDay}
+                                  </div>
                                 </div>
                                 <div>
-                                  <span className="font-medium">
-                                    {t('status')}:
-                                  </span>{' '}
-                                  <span
-                                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                      account.installment?.isPaid ||
+                                  <div className="text-gray-800 font-semibold">
+                                    {t('status')}
+                                  </div>
+                                  <div>
+                                    <span
+                                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                        account.installment?.isPaid ||
+                                        account.isPaid
+                                          ? 'bg-green-100 text-green-800'
+                                          : 'bg-yellow-100 text-yellow-800'
+                                      }`}
+                                    >
+                                      {account.installment?.isPaid ||
                                       account.isPaid
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-yellow-100 text-yellow-800'
-                                    }`}
-                                  >
-                                    {account.installment?.isPaid ||
-                                    account.isPaid
-                                      ? t('paid')
-                                      : t('pending')}
-                                  </span>
+                                        ? t('paid')
+                                        : t('pending')}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -635,7 +710,7 @@ export default function ContasDetailsPage() {
                                     <>
                                       <button
                                         onClick={() =>
-                                          handlePayAccount(account)
+                                          handleRequestPayAccount(account)
                                         }
                                         className="flex items-center px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
                                       >
@@ -736,6 +811,33 @@ export default function ContasDetailsPage() {
             />
           )}
         </BaseModal>
+
+        {/* Modal de Criar Conta (usa mês/ano do contexto) */}
+        <ContaModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={async (data) => {
+            setIsCreating(true);
+            try {
+              const { useContasStore } = await import('@/store/contas.store');
+              const addConta = useContasStore.getState().addConta;
+              await addConta({
+                ...data,
+                referenceMonth: parseInt(
+                  month || `${new Date().getMonth() + 1}`
+                ),
+                referenceYear: parseInt(year || `${new Date().getFullYear()}`),
+              } as any);
+              await fetchAccounts();
+              setShowCreateModal(false);
+            } finally {
+              setIsCreating(false);
+            }
+          }}
+          loading={isCreating}
+          referenceMonth={month ? parseInt(month) : undefined}
+          referenceYear={year ? parseInt(year) : undefined}
+        />
 
         {/* Modal de Confirmação de Exclusão */}
         <BaseConfirmModal
@@ -846,7 +948,7 @@ export default function ContasDetailsPage() {
                             {!installment.isPaid && (
                               <button
                                 onClick={() =>
-                                  handlePayInstallment(installment)
+                                  handleRequestPayInstallment(installment)
                                 }
                                 className="flex items-center px-2 py-1 text-xs font-medium text-green-600 bg-green-50 rounded hover:bg-green-100 transition-colors"
                               >
@@ -896,6 +998,58 @@ export default function ContasDetailsPage() {
             </div>
           )}
         </BaseModal>
+
+        {/* Modal de Confirmação de Pagamento da Conta */}
+        <BaseConfirmModal
+          isOpen={showPayModal}
+          onClose={() => {
+            setShowPayModal(false);
+            setSelectedAccount(null);
+          }}
+          onConfirm={handleConfirmPayAccount}
+          title={t('confirm')}
+          message={
+            selectedAccount
+              ? `${t('confirm')} ${t('pay')} "${selectedAccount.name}"?`
+              : t('confirm')
+          }
+          confirmText={t('pay')}
+          cancelText={t('cancel')}
+          type="success"
+          loading={isPaying}
+          closeOnBackdropClick={false}
+          closeOnEsc={false}
+        />
+
+        {/* Modal de Confirmação de Pagamento da Parcela */}
+        <div
+          className={
+            showPayInstallmentModal ? 'fixed inset-0 z-[60]' : 'hidden'
+          }
+        >
+          <BaseConfirmModal
+            isOpen={showPayInstallmentModal}
+            onClose={() => {
+              setShowPayInstallmentModal(false);
+              setSelectedInstallment(null);
+            }}
+            onConfirm={handleConfirmPayInstallment}
+            title={t('confirm')}
+            message={
+              selectedInstallment
+                ? `${t('confirm')} ${t('pay')} ${t('installment')} ${
+                    selectedInstallment.number
+                  }?`
+                : t('confirm')
+            }
+            confirmText={t('pay')}
+            cancelText={t('cancel')}
+            type="success"
+            loading={isPayingInstallment}
+            closeOnBackdropClick={false}
+            closeOnEsc={false}
+          />
+        </div>
       </DashboardLayout>
     </ProtectedRoute>
   );
