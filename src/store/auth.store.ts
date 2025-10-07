@@ -70,7 +70,7 @@ export const useAuthStore = create<AuthStore>()(
             loading: false,
           });
 
-          // Redireciona para o idioma preferido do usuário após login
+          // Redireciona para o dashboard no idioma preferido do usuário após login
           if (userProfile.preferredLanguage && typeof window !== 'undefined') {
             const preferredLocale = mapPreferredLanguageToLocale(
               userProfile.preferredLanguage as PreferredLanguage
@@ -78,13 +78,20 @@ export const useAuthStore = create<AuthStore>()(
             const currentPath = window.location.pathname;
             const currentLocale = currentPath.split('/')[1];
 
-            // Se o idioma atual for diferente do preferido, redireciona
-            if (currentLocale !== preferredLocale) {
-              const newPath = currentPath.replace(
-                `/${currentLocale}`,
-                `/${preferredLocale}`
-              );
-              window.location.href = newPath;
+            // Sempre redireciona para o dashboard no idioma preferido
+            const dashboardPath = `/${preferredLocale}/dashboard`;
+
+            // Se não estiver no dashboard correto, redireciona
+            if (
+              !currentPath.includes('/dashboard') ||
+              currentLocale !== preferredLocale
+            ) {
+              window.location.href = dashboardPath;
+            }
+          } else {
+            // Fallback: se não houver idioma preferido, vai para pt/dashboard
+            if (typeof window !== 'undefined') {
+              window.location.href = '/pt/dashboard';
             }
           }
         } catch (error: any) {
@@ -111,6 +118,20 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: true,
             loading: false,
           });
+
+          // Redireciona para o dashboard no idioma preferido do usuário após registro
+          if (userProfile.preferredLanguage && typeof window !== 'undefined') {
+            const preferredLocale = mapPreferredLanguageToLocale(
+              userProfile.preferredLanguage as PreferredLanguage
+            );
+            const dashboardPath = `/${preferredLocale}/dashboard`;
+            window.location.href = dashboardPath;
+          } else {
+            // Fallback: se não houver idioma preferido, vai para pt/dashboard
+            if (typeof window !== 'undefined') {
+              window.location.href = '/pt/dashboard';
+            }
+          }
         } catch (error: any) {
           set({
             error: error.message || 'Erro ao criar conta',
@@ -242,9 +263,7 @@ export const useAuthStore = create<AuthStore>()(
           const avatarUrl = await getCurrentUserAvatar();
           // Atualiza apenas a URL do avatar, mantendo os outros dados do usuário
           set((state) => ({
-            user: state.user
-              ? { ...state.user, avatarUrl }
-              : null,
+            user: state.user ? { ...state.user, avatarUrl } : null,
             loading: false,
           }));
         } catch (error: any) {

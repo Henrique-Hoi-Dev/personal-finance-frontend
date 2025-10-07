@@ -59,8 +59,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     } else {
       try {
         await login(dataToSend);
-        // Redireciona após login bem-sucedido
-        router.push('/pt/dashboard');
+        // O redirecionamento é feito automaticamente pelo auth.store
+        // baseado no idioma preferido do usuário
       } catch (error) {
         toast.error(t('error_login'));
       }
