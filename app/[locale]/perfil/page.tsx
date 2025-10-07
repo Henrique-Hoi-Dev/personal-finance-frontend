@@ -35,7 +35,7 @@ export default function PerfilPage() {
     changePassword,
     loadAvatar,
   } = useAuthStore();
-  const { changeLanguage } = useLanguage();
+  const { changeLanguage, mapPreferredLanguageToLocale } = useLanguage();
   const [isSaving, setIsSaving] = useState(false);
   const [personalInfo, setPersonalInfo] = useState<{
     name: string;
@@ -108,7 +108,10 @@ export default function PerfilPage() {
           user &&
           toSend.preferred_language !== (user as UserProfile).preferredLanguage
         ) {
-          const newLocale = toSend.preferred_language === 'pt-BR' ? 'pt' : 'en';
+          // Usa o mapeamento correto do hook useLanguage
+          const newLocale = mapPreferredLanguageToLocale(
+            toSend.preferred_language
+          );
           await changeLanguage(newLocale);
           return;
         }

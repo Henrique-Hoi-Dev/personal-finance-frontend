@@ -238,10 +238,12 @@ export const useAuthStore = create<AuthStore>()(
         set({ loading: true, error: null });
         try {
           const updatedUser = await updateUserAvatar(file);
+          // Carrega o avatar atualizado do servidor para garantir que temos a URL correta
+          const avatarUrl = await getCurrentUserAvatar();
           // Atualiza apenas a URL do avatar, mantendo os outros dados do usuário
           set((state) => ({
             user: state.user
-              ? { ...state.user, avatarUrl: updatedUser.avatarUrl }
+              ? { ...state.user, avatarUrl }
               : null,
             loading: false,
           }));

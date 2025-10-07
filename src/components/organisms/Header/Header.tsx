@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,6 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
   const pathname = usePathname();
   const { currentLanguage } = useLanguage();
   const t = useTranslations('Header');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -21,6 +22,14 @@ export const Header: React.FC<HeaderProps> = ({ className = '' }) => {
 
   const isActive = (path: string) => {
     return pathname.includes(path);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
