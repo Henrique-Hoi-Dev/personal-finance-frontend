@@ -96,6 +96,7 @@
     "installments": "Cuotas",
     "startDate": "Fecha de Inicio",
     "dueDay": "Día de Vencimiento",
+    "accountReference": "Referencia de la cuenta (Mes y Año)",
     "create": "Crear Cuenta",
     "creating": "Creando...",
     "account": "cuenta",

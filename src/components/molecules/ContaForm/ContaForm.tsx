@@ -544,58 +544,60 @@ export function ContaForm({
         </div>
 
         {!hideReferenceFields && (
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
-                Referência Mes e <span className="text-red-500">*</span>
-              </BaseLabel>
-              <BaseInput
-                type="number"
-                value={formData.referenceMonth?.toString() || ''}
-                onChange={(e) =>
-                  handleInputChange(
-                    'referenceMonth',
-                    parseInt(e.target.value) || 1
-                  )
-                }
-                placeholder="1"
-                min="1"
-                max="12"
-                className={`w-full h-12 text-base ${
-                  errors.referenceMonth ? 'border-red-500' : ''
-                }`}
-              />
-              {errors.referenceMonth && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.referenceMonth}
-                </p>
-              )}
-            </div>
-            <div>
-              <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="flex flex-col">
+            <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+              {t('accountReference')} <span className="text-red-500">*</span>
+            </BaseLabel>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <BaseInput
+                  type="number"
+                  value={formData.referenceMonth?.toString() || ''}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'referenceMonth',
+                      parseInt(e.target.value) || 1
+                    )
+                  }
+                  placeholder="1"
+                  min="1"
+                  max="12"
+                  className={`w-full h-12 text-base ${
+                    errors.referenceMonth ? 'border-red-500' : ''
+                  }`}
+                />
+                {errors.referenceMonth && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.referenceMonth}
+                  </p>
+                )}
+              </div>
+              <div>
+                {/* <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
                 Ano <span className="text-red-500">*</span>
-              </BaseLabel>
-              <BaseInput
-                type="number"
-                value={formData.referenceYear?.toString() || ''}
-                onChange={(e) =>
-                  handleInputChange(
-                    'referenceYear',
-                    parseInt(e.target.value) || new Date().getFullYear()
-                  )
-                }
-                placeholder={new Date().getFullYear().toString()}
-                min="2020"
-                max="2030"
-                className={`w-full h-12 text-base ${
-                  errors.referenceYear ? 'border-red-500' : ''
-                }`}
-              />
-              {errors.referenceYear && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.referenceYear}
-                </p>
-              )}
+              </BaseLabel> */}
+                <BaseInput
+                  type="number"
+                  value={formData.referenceYear?.toString() || ''}
+                  onChange={(e) =>
+                    handleInputChange(
+                      'referenceYear',
+                      parseInt(e.target.value) || new Date().getFullYear()
+                    )
+                  }
+                  placeholder={new Date().getFullYear().toString()}
+                  min="2020"
+                  max="2030"
+                  className={`w-full h-12 text-base ${
+                    errors.referenceYear ? 'border-red-500' : ''
+                  }`}
+                />
+                {errors.referenceYear && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.referenceYear}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         )}

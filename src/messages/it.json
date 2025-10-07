@@ -96,6 +96,7 @@
     "installments": "Rate",
     "startDate": "Data Inizio",
     "dueDay": "Giorno Scadenza",
+    "accountReference": "Riferimento del conto (Mese e Anno)",
     "create": "Crea Conto",
     "creating": "Creazione...",
     "account": "conto",

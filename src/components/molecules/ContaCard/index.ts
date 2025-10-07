@@ -1,1 +1,0 @@
-export { ContaCard } from './ContaCard';

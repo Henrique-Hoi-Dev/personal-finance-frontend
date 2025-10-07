@@ -97,6 +97,7 @@
     "installments": "分期付款",
     "startDate": "开始日期",
     "dueDay": "到期日",
+    "accountReference": "账户参考（月份和年份）",
     "create": "创建账户",
     "creating": "创建中...",
     "account": "账户",

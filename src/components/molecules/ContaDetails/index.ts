@@ -1,1 +1,0 @@
-export { ContaDetails } from './ContaDetails';

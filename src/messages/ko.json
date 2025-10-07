@@ -96,6 +96,7 @@
     "installments": "할부",
     "startDate": "시작일",
     "dueDay": "만료일",
+    "accountReference": "계좌 참조 (월 및 연도)",
     "create": "계좌 만들기",
     "creating": "만드는 중...",
     "account": "계좌",

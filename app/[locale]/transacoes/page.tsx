@@ -139,15 +139,17 @@ export default function TransacoesPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <div className="space-y-6">
-          <div className="p-6 space-y-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {t('title')}
-              </h1>
-              <p className="text-gray-600 text-sm">{t('subtitle')}</p>
-            </div>
-            <div className="flex justify-start">
-              <TransactionActions onAddTransaction={handleCreateTransacao} />
+          <div className="px-4 sm:px-6 py-4">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex-1">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  {t('title')}
+                </h1>
+                <p className="text-gray-600 text-sm mt-1">{t('subtitle')}</p>
+              </div>
+              <div className="flex justify-stretch lg:justify-end">
+                <TransactionActions onAddTransaction={handleCreateTransacao} />
+              </div>
             </div>
           </div>
 

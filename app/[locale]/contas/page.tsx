@@ -177,21 +177,21 @@ export default function ContasPage() {
       <DashboardLayout>
         <div className="min-h-screen bg-gray-50">
           {/* Header */}
-          <div className="px-6 py-4">
-            <div className="space-y-4">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+          <div className="px-4 sm:px-6 py-4">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex-1">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
                   {t('title')}
                 </h1>
                 <p className="text-gray-600 text-sm mt-1">{t('description')}</p>
               </div>
-              <div className="flex justify-start">
+              <div className="flex justify-stretch lg:justify-end">
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 text-sm sm:text-base"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 text-sm w-full sm:w-auto justify-center sm:justify-start"
                 >
                   <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -204,7 +204,7 @@ export default function ContasPage() {
                     />
                   </svg>
                   <span className="hidden sm:inline">{t('addAccount')}</span>
-                  <span className="sm:hidden">Adicionar</span>
+                  <span className="sm:hidden">{t('addAccount')}</span>
                 </button>
               </div>
             </div>

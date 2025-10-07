@@ -96,6 +96,7 @@
     "installments": "Parcelas",
     "startDate": "Data de Início",
     "dueDay": "Dia de Vencimento",
+    "accountReference": "Referência da conta (Mês e Ano)",
     "create": "Criar Conta",
     "account": "conta",
     "accounts": "contas",

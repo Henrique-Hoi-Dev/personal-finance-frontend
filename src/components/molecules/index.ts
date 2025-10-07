@@ -3,8 +3,6 @@ export { PasswordField } from './PasswordField/PasswordField';
 export { SummaryCard } from './SummaryCard';
 export { TransactionItem } from './TransactionItem';
 export { CategoryItem } from './CategoryItem';
-export { ContaCard } from './ContaCard';
-export { ContaDetails } from './ContaDetails';
 export { ContaForm } from './ContaForm';
 export { ContaEditForm } from './ContaEditForm';
 export { ContaModal } from './ContaModal';

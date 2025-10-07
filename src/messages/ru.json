@@ -96,6 +96,7 @@
     "installments": "Платежи",
     "startDate": "Дата начала",
     "dueDay": "День платежа",
+    "accountReference": "Ссылка на счет (Месяц и Год)",
     "create": "Создать счет",
     "creating": "Создание...",
     "account": "счет",

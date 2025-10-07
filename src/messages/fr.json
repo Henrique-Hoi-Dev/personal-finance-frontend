@@ -97,6 +97,7 @@
     "installments": "Échéances",
     "startDate": "Date de Début",
     "dueDay": "Jour d'Échéance",
+    "accountReference": "Référence du compte (Mois et Année)",
     "create": "Créer un Compte",
     "creating": "Création...",
     "account": "compte",

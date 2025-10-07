@@ -96,6 +96,7 @@
     "installments": "Raten",
     "startDate": "Startdatum",
     "dueDay": "Fälligkeitstag",
+    "accountReference": "Kontoreferenz (Monat und Jahr)",
     "create": "Konto erstellen",
     "creating": "Erstellen...",
     "account": "Konto",

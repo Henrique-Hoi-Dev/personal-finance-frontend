@@ -96,6 +96,7 @@
     "installments": "分割払い",
     "startDate": "開始日",
     "dueDay": "支払日",
+    "accountReference": "口座参照（月と年）",
     "create": "口座を作成",
     "creating": "作成中...",
     "account": "口座",
