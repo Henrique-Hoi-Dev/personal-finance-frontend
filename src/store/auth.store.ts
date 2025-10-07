@@ -4,37 +4,45 @@ import {
   login,
   logout,
   getCurrentUser,
+  getCurrentUserAvatar,
   register,
   updateUserPreferences,
+  updateUserProfile,
+  changePassword,
+  updateUserAvatar,
 } from '@/services/auth.service';
 import {
   LoginPayload,
   SignupPayload,
-  UserProfile,
+  AuthState,
+  AuthActions,
   UpdatePreferencesPayload,
+  UpdateProfilePayload,
+  PreferredLanguage,
 } from '@/types/auth';
 import { apiClient } from '@/services/apiClient';
-
-interface AuthState {
-  user: UserProfile | null;
-  token: string | null;
-  loading: boolean;
-  error: string | null;
-  isAuthenticated: boolean;
-}
-
-interface AuthActions {
-  login: (data: LoginPayload) => Promise<void>;
-  register: (data: SignupPayload) => Promise<void>;
-  logout: () => Promise<void>;
-  clearError: () => void;
-  setToken: (token: string) => void;
-  loadUserProfile: () => Promise<void>;
-  forceLogout: () => void;
-  updatePreferences: (data: UpdatePreferencesPayload) => Promise<void>;
-}
+import { Locale } from '@/i18n';
 
 type AuthStore = AuthState & AuthActions;
+
+// Mapeia PreferredLanguage para Locale
+const mapPreferredLanguageToLocale = (
+  preferredLanguage: PreferredLanguage
+): Locale => {
+  const mapping: Record<PreferredLanguage, Locale> = {
+    [PreferredLanguage.PT_BR]: 'pt',
+    [PreferredLanguage.EN_US]: 'en',
+    [PreferredLanguage.ES_ES]: 'es',
+    [PreferredLanguage.FR_FR]: 'fr',
+    [PreferredLanguage.DE_DE]: 'de',
+    [PreferredLanguage.IT_IT]: 'it',
+    [PreferredLanguage.JA_JP]: 'ja',
+    [PreferredLanguage.KO_KR]: 'ko',
+    [PreferredLanguage.ZH_CN]: 'zh',
+    [PreferredLanguage.RU_RU]: 'ru',
+  };
+  return mapping[preferredLanguage] || 'pt';
+};
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -61,6 +69,24 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: true,
             loading: false,
           });
+
+          // Redireciona para o idioma preferido do usuário após login
+          if (userProfile.preferredLanguage && typeof window !== 'undefined') {
+            const preferredLocale = mapPreferredLanguageToLocale(
+              userProfile.preferredLanguage as PreferredLanguage
+            );
+            const currentPath = window.location.pathname;
+            const currentLocale = currentPath.split('/')[1];
+
+            // Se o idioma atual for diferente do preferido, redireciona
+            if (currentLocale !== preferredLocale) {
+              const newPath = currentPath.replace(
+                `/${currentLocale}`,
+                `/${preferredLocale}`
+              );
+              window.location.href = newPath;
+            }
+          }
         } catch (error: any) {
           set({
             error: error.message || 'Erro ao fazer login',
@@ -168,6 +194,77 @@ export const useAuthStore = create<AuthStore>()(
         } catch (error: any) {
           set({
             error: error.message || 'Erro ao atualizar preferências',
+            loading: false,
+          });
+          throw error;
+        }
+      },
+
+      updateProfile: async (data: UpdateProfilePayload) => {
+        set({ loading: true, error: null });
+        try {
+          const updatedUser = await updateUserProfile(data);
+          set({
+            user: updatedUser,
+            loading: false,
+          });
+        } catch (error: any) {
+          set({
+            error: error.message || 'Erro ao atualizar perfil',
+            loading: false,
+          });
+          throw error;
+        }
+      },
+
+      changePassword: async (data: {
+        currentPassword: string;
+        newPassword: string;
+      }) => {
+        set({ loading: true, error: null });
+        try {
+          await changePassword(data);
+          set({ loading: false });
+        } catch (error: any) {
+          set({
+            error: error.message || 'Erro ao atualizar senha',
+            loading: false,
+          });
+          throw error;
+        }
+      },
+
+      updateAvatar: async (file: File) => {
+        set({ loading: true, error: null });
+        try {
+          const updatedUser = await updateUserAvatar(file);
+          // Atualiza apenas a URL do avatar, mantendo os outros dados do usuário
+          set((state) => ({
+            user: state.user
+              ? { ...state.user, avatarUrl: updatedUser.avatarUrl }
+              : null,
+            loading: false,
+          }));
+        } catch (error: any) {
+          set({
+            error: error.message || 'Erro ao atualizar avatar',
+            loading: false,
+          });
+          throw error;
+        }
+      },
+
+      loadAvatar: async () => {
+        set({ loading: true, error: null });
+        try {
+          const avatarUrl = await getCurrentUserAvatar();
+          set((state) => ({
+            user: state.user ? { ...state.user, avatarUrl } : null,
+            loading: false,
+          }));
+        } catch (error: any) {
+          set({
+            error: error.message || 'Erro ao carregar avatar',
             loading: false,
           });
           throw error;

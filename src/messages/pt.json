@@ -261,6 +261,7 @@
     "photoChangeNotImplemented": "Alteração de foto ainda não implementada",
     "personalInfoUpdated": "Informações pessoais atualizadas!",
     "passwordUpdated": "Senha atualizada com sucesso!",
+    "avatarUpdated": "Avatar atualizado com sucesso!",
     "preferencesUpdated": "Preferências atualizadas!"
   },
   "Common": {
@@ -278,11 +279,30 @@
     "currencyOptions": {
       "BRL": "Real Brasileiro (R$)",
       "USD": "Dólar Americano ($)",
-      "EUR": "Euro (€)"
+      "EUR": "Euro (€)",
+      "GBP": "Libra Esterlina (£)",
+      "CAD": "Dólar Canadense (C$)",
+      "AUD": "Dólar Australiano (A$)",
+      "JPY": "Iene Japonês (¥)",
+      "CHF": "Franco Suíço (CHF)",
+      "CNY": "Yuan Chinês (¥)",
+      "ARS": "Peso Argentino ($)",
+      "CLP": "Peso Chileno ($)",
+      "COP": "Peso Colombiano ($)",
+      "MXN": "Peso Mexicano ($)",
+      "PEN": "Sol Peruano (S/)"
     },
     "languageOptions": {
-      "pt": "Português (Brasil)",
-      "en": "English (US)"
+      "pt-BR": "Português (Brasil)",
+      "en-US": "Inglês (EUA)",
+      "es-ES": "Espanhol (Espanha)",
+      "fr-FR": "Francês (França)",
+      "de-DE": "Alemão (Alemanha)",
+      "it-IT": "Italiano (Itália)",
+      "ja-JP": "Japonês (Japão)",
+      "ko-KR": "Coreano (Coreia)",
+      "zh-CN": "Chinês (China)",
+      "ru-RU": "Russo (Rússia)"
     },
     "validation": {
       "nameRequired": "Nome é obrigatório",

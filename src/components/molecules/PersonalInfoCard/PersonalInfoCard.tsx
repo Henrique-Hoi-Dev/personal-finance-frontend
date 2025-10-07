@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { BaseInput, BaseLabel } from '@/components/atoms';
 import { User } from '@/types/auth';
@@ -6,12 +6,14 @@ import { User } from '@/types/auth';
 interface PersonalInfoCardProps {
   user: User;
   onSave?: (data: { name: string; email: string }) => void;
+  onChange?: (data: { name: string; email: string }) => void;
   loading?: boolean;
 }
 
 export const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({
   user,
   onSave,
+  onChange,
   loading = false,
 }) => {
   const t = useTranslations('Profile');
@@ -20,8 +22,20 @@ export const PersonalInfoCard: React.FC<PersonalInfoCardProps> = ({
     email: user?.email || '',
   });
 
+  // Atualiza formData quando user muda
+  useEffect(() => {
+    setFormData({
+      name: user?.name || '',
+      email: user?.email || '',
+    });
+  }, [user]);
+
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value };
+      if (onChange) onChange(next);
+      return next;
+    });
   };
 
   const handleSave = () => {
