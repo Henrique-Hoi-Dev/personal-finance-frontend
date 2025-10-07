@@ -17,7 +17,7 @@ export const BasePagination: React.FC<BasePaginationProps> = ({
   onPageChange,
   className = '',
 }) => {
-  const startItem = (currentPage * itemsPerPage) + 1;
+  const startItem = currentPage * itemsPerPage + 1;
   const endItem = Math.min((currentPage + 1) * itemsPerPage, totalItems);
 
   const getVisiblePages = () => {
@@ -55,21 +55,24 @@ export const BasePagination: React.FC<BasePaginationProps> = ({
   }
 
   return (
-    <div className={`flex items-center justify-between ${className}`}>
+    <div
+      className={`flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0 ${className}`}
+    >
       {/* Informações de itens */}
-      <div className="text-sm text-gray-700">
+      <div className="text-sm text-gray-700 text-center sm:text-left">
         Mostrando {startItem} a {endItem} de {totalItems} resultados
       </div>
 
       {/* Controles de paginação */}
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center justify-center sm:justify-end space-x-1">
         {/* Botão Anterior */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 0}
-          className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Anterior
+          <span className="hidden sm:inline">Anterior</span>
+          <span className="sm:hidden">‹</span>
         </button>
 
         {/* Números das páginas */}
@@ -77,11 +80,13 @@ export const BasePagination: React.FC<BasePaginationProps> = ({
           {getVisiblePages().map((page, index) => (
             <React.Fragment key={index}>
               {page === '...' ? (
-                <span className="px-3 py-2 text-sm text-gray-500">...</span>
+                <span className="px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-500">
+                  ...
+                </span>
               ) : (
                 <button
                   onClick={() => onPageChange((page as number) - 1)}
-                  className={`px-3 py-2 text-sm font-medium rounded-md ${
+                  className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md ${
                     currentPage === (page as number) - 1
                       ? 'bg-blue-600 text-white'
                       : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
@@ -98,9 +103,10 @@ export const BasePagination: React.FC<BasePaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages - 1}
-          className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Próximo
+          <span className="hidden sm:inline">Próximo</span>
+          <span className="sm:hidden">›</span>
         </button>
       </div>
     </div>

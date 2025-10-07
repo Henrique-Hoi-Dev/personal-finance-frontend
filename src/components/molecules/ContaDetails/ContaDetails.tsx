@@ -196,6 +196,7 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
 
   const hasInstallments =
     conta.installmentList && conta.installmentList.length > 0;
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       {/* Header */}
@@ -428,7 +429,7 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
               <button
                 onClick={handlePayFullAccount}
                 disabled={payingFullAccount}
-                className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                className={`w-full px-3 sm:px-4 py-3 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
                   payingFullAccount
                     ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                     : 'bg-green-500 hover:bg-green-600 text-white'
@@ -437,10 +438,14 @@ export const ContaDetails: React.FC<ContaDetailsProps> = ({
                 {payingFullAccount ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    {t('payingFull')}
+                    <span className="hidden sm:inline">{t('payingFull')}</span>
+                    <span className="sm:hidden">...</span>
                   </div>
                 ) : (
-                  t('payFull')
+                  <>
+                    <span className="hidden sm:inline">{t('payFull')}</span>
+                    <span className="sm:hidden">Pagar</span>
+                  </>
                 )}
               </button>
             ) : (

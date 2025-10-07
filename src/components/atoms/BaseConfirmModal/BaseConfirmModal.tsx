@@ -197,12 +197,12 @@ export const BaseConfirmModal: React.FC<BaseConfirmModalProps> = ({
                 <p className="text-sm text-gray-600 mb-6">{message}</p>
 
                 {/* Actions */}
-                <div className="flex justify-end space-x-3">
+                <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
                   <button
                     type="button"
                     onClick={onClose}
                     disabled={loading}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                    className="w-full sm:w-auto px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 whitespace-nowrap"
                   >
                     {cancelText || t('cancel')}
                   </button>
@@ -210,12 +210,13 @@ export const BaseConfirmModal: React.FC<BaseConfirmModalProps> = ({
                     type="button"
                     onClick={onConfirm}
                     disabled={loading}
-                    className={`px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 ${typeStyles.confirmButton}`}
+                    className={`w-full sm:w-auto px-4 py-2 text-xs sm:text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 whitespace-nowrap ${typeStyles.confirmButton}`}
                   >
                     {loading ? (
-                      <div className="flex items-center">
+                      <div className="flex items-center justify-center">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        {t('loading')}
+                        <span className="hidden sm:inline">{t('loading')}</span>
+                        <span className="sm:hidden">...</span>
                       </div>
                     ) : (
                       confirmText || t('confirm')

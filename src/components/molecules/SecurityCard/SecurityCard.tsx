@@ -61,15 +61,15 @@ export const SecurityCard: React.FC<SecurityCardProps> = ({
       <div className="space-y-6">
         <div>
           <BaseLabel htmlFor="currentPassword">{t('password')}</BaseLabel>
-          <div className="flex items-center justify-between space-x-3 mt-1">
-            <div className="min-w-96 flex-1 max-w-52 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-600 font-mono">
+          <div className="mt-1 space-y-3">
+            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-gray-600 font-mono">
               ••••••••
             </div>
             <BaseButton
               type="button"
               variant="secondary"
               onClick={() => setShowChangePassword(!showChangePassword)}
-              className="w-60 h-8"
+              className="w-full sm:w-auto h-8 text-xs sm:text-sm"
             >
               {t('changePassword')}
             </BaseButton>
@@ -119,14 +119,14 @@ export const SecurityCard: React.FC<SecurityCardProps> = ({
               />
             </div>
 
-            <div className="flex space-x-3">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
               <BaseButton
                 type="button"
                 variant="primary"
                 onClick={handleSavePassword}
                 loading={loading}
-                fullWidth={false}
-                className="h-8"
+                fullWidth={true}
+                className="h-8 text-xs sm:text-sm"
               >
                 {t('savePassword')}
               </BaseButton>
@@ -134,8 +134,8 @@ export const SecurityCard: React.FC<SecurityCardProps> = ({
                 type="button"
                 variant="secondary"
                 onClick={() => setShowChangePassword(false)}
-                fullWidth={false}
-                className="h-8"
+                fullWidth={true}
+                className="h-8 text-xs sm:text-sm"
               >
                 {t('cancel')}
               </BaseButton>

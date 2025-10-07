@@ -178,20 +178,20 @@ export default function ContasPage() {
         <div className="min-h-screen bg-gray-50">
           {/* Header */}
           <div className="px-6 py-4">
-            <div className="flex justify-between items-center">
+            <div className="space-y-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
                   {t('title')}
                 </h1>
                 <p className="text-gray-600 text-sm mt-1">{t('description')}</p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex justify-start">
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 text-sm sm:text-base"
                 >
                   <svg
-                    className="w-5 h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -203,7 +203,8 @@ export default function ContasPage() {
                       d="M12 4v16m8-8H4"
                     />
                   </svg>
-                  {t('addAccount')}
+                  <span className="hidden sm:inline">{t('addAccount')}</span>
+                  <span className="sm:hidden">Adicionar</span>
                 </button>
               </div>
             </div>

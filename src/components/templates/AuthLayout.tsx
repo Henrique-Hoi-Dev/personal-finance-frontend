@@ -33,14 +33,16 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-xl">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <h1
-            className="text-6xl font-bold text-gray-900 mb-4"
+            className="text-4xl sm:text-6xl font-bold text-gray-900 mb-4"
             style={{ fontFamily: 'var(--font-dancing-script)' }}
           >
             {t('title')}
           </h1>
-          <p className="text-lg text-gray-600">{getDefaultSubtitle()}</p>
+          <p className="text-base sm:text-lg text-gray-600">
+            {getDefaultSubtitle()}
+          </p>
         </div>
 
         <div className="w-full">{children}</div>

@@ -25,12 +25,12 @@ export const BaseButton: React.FC<ButtonProps> = ({
   fullWidth = true,
 }) => {
   const baseClasses =
-    'flex justify-center items-center border border-transparent rounded-md shadow-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200';
+    'flex justify-center items-center border border-transparent rounded-md shadow-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis';
 
   const sizeClasses = {
-    sm: 'py-2 px-3 text-sm',
-    md: 'py-3 px-4 text-base h-12',
-    lg: 'py-5 px-6 text-lg h-12',
+    sm: 'py-2 px-3 text-xs sm:text-sm',
+    md: 'py-3 px-4 text-sm sm:text-base h-12',
+    lg: 'py-4 sm:py-5 px-4 sm:px-6 text-sm sm:text-lg h-12',
   };
 
   const variantClasses = {

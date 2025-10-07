@@ -18,9 +18,11 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
       {(title || subtitle) && (
         <div className="bg-white shadow">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="py-6">
+            <div className="py-4 sm:py-6">
               {title && (
-                <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  {title}
+                </h1>
               )}
               {subtitle && (
                 <p className="mt-1 text-sm text-gray-600">{subtitle}</p>
