@@ -1,11 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
-import { UpdatePreferencesPayload } from '@/types/auth';
+import {
+  UpdateProfilePayload,
+  PreferredLanguage,
+  CurrencyCode,
+} from '@/types/auth';
 import { UserProfile } from '@/types/auth';
+import { useLanguage } from '@/hooks/useLanguage';
 import { BaseButton, BaseLoading } from '@/components/atoms';
 import {
   ProfileCard,
@@ -21,8 +26,54 @@ export default function PerfilPage() {
   const t = useTranslations('Profile');
   const tCommon = useTranslations('Common');
   const router = useRouter();
-  const { user, logout, loading, updatePreferences } = useAuthStore();
+  const {
+    user,
+    logout,
+    loading,
+    updateProfile,
+    updateAvatar,
+    changePassword,
+    loadAvatar,
+  } = useAuthStore();
+  const { changeLanguage } = useLanguage();
   const [isSaving, setIsSaving] = useState(false);
+  const [personalInfo, setPersonalInfo] = useState<{
+    name: string;
+    email: string;
+    default_currency: CurrencyCode;
+    preferred_language: PreferredLanguage;
+  } | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+
+  // Inicializa personalInfo com os valores atuais do usuário
+  useEffect(() => {
+    if (user) {
+      setPersonalInfo({
+        name: (user as UserProfile).name,
+        email: (user as UserProfile).email,
+        default_currency: (user as UserProfile).defaultCurrency as CurrencyCode,
+        preferred_language: (user as UserProfile)
+          .preferredLanguage as PreferredLanguage,
+      });
+    }
+  }, [user]);
+
+  // Carrega o avatar quando a página carrega
+  useEffect(() => {
+    if (user && !avatarLoading) {
+      setAvatarLoading(true);
+      loadAvatar()
+        .catch(() => {
+          // Ignora erro se não conseguir carregar avatar
+        })
+        .finally(() => {
+          setAvatarLoading(false);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // Só depende do ID do usuário
 
   const handleLogout = async () => {
     try {
@@ -36,7 +87,43 @@ export default function PerfilPage() {
   const handleSaveChanges = async () => {
     setIsSaving(true);
     try {
-      toast.success(tCommon('messages.changesSaved'));
+      // 1) Atualiza perfil (name/email/currency/language)
+      const toSend =
+        personalInfo ||
+        (user
+          ? {
+              name: (user as UserProfile).name,
+              email: (user as UserProfile).email,
+              default_currency: (user as UserProfile)
+                .defaultCurrency as CurrencyCode,
+              preferred_language: (user as UserProfile)
+                .preferredLanguage as PreferredLanguage,
+            }
+          : null);
+      if (toSend) {
+        await updateProfile(toSend);
+
+        // 3) Verifica se o idioma mudou e atualiza a URL
+        if (
+          user &&
+          toSend.preferred_language !== (user as UserProfile).preferredLanguage
+        ) {
+          const newLocale = toSend.preferred_language === 'pt-BR' ? 'pt' : 'en';
+          await changeLanguage(newLocale);
+          return;
+        }
+      }
+
+      // 2) Atualiza avatar separadamente, se selecionado
+      if (avatarFile) {
+        await updateAvatar(avatarFile);
+        if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+        setAvatarPreviewUrl(null);
+        setAvatarFile(null);
+        toast.success(t('avatarUpdated'));
+      } else {
+        toast.success(tCommon('messages.changesSaved'));
+      }
     } catch (error) {
       toast.error(tCommon('messages.errorSaving'));
     } finally {
@@ -44,29 +131,11 @@ export default function PerfilPage() {
     }
   };
 
-  const handleSavePreferences = async (data: {
-    currency: string;
-    language: string;
-  }) => {
-    setIsSaving(true);
-    try {
-      const preferences: UpdatePreferencesPayload = {
-        defaultCurrency: data.currency,
-        // Language is handled separately by the PreferencesCard component
-      };
-
-      await updatePreferences(preferences);
-      toast.success(t('preferencesUpdated'));
-    } catch (error) {
-      toast.error(t('errorSaving'));
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handlePhotoChange = (file: File) => {
-    console.log('Arquivo selecionado:', file);
-    toast.success(tCommon('messages.photoSelected'));
+    if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+    const url = URL.createObjectURL(file);
+    setAvatarPreviewUrl(url);
+    setAvatarFile(file);
   };
 
   if (loading) {
@@ -102,18 +171,59 @@ export default function PerfilPage() {
                   <ProfileCard
                     user={user as UserProfile}
                     onPhotoChange={handlePhotoChange}
+                    previewUrl={avatarPreviewUrl || undefined}
                   />
                 )}
               </div>
 
               {/* Right Column - Settings Cards */}
               <div className="lg:col-span-2 space-y-6">
-                {user && <PersonalInfoCard user={user as UserProfile} />}
-                <SecurityCard />
+                {user && (
+                  <PersonalInfoCard
+                    user={user as UserProfile}
+                    onChange={(data) =>
+                      setPersonalInfo((prev) => ({
+                        name: data.name,
+                        email: data.email,
+                        default_currency:
+                          prev?.default_currency ??
+                          ((user as UserProfile)
+                            .defaultCurrency as CurrencyCode),
+                        preferred_language:
+                          prev?.preferred_language ??
+                          (((user as UserProfile).preferredLanguage === 'pt-BR'
+                            ? 'pt-BR'
+                            : 'en-US') as PreferredLanguage),
+                      }))
+                    }
+                    loading={isSaving}
+                  />
+                )}
+                <SecurityCard
+                  onPasswordChange={async (currentPassword, newPassword) => {
+                    setIsSaving(true);
+                    try {
+                      await changePassword({ currentPassword, newPassword });
+                      toast.success(t('passwordUpdated'));
+                    } catch (err) {
+                      toast.error(t('errorSaving'));
+                    } finally {
+                      setIsSaving(false);
+                    }
+                  }}
+                  loading={isSaving}
+                />
                 {user && (
                   <PreferencesCard
                     user={user as UserProfile}
-                    onSave={handleSavePreferences}
+                    onChange={(data) =>
+                      setPersonalInfo((prev) => ({
+                        name: prev?.name ?? (user as UserProfile).name,
+                        email: prev?.email ?? (user as UserProfile).email,
+                        default_currency: data.currency,
+                        preferred_language: data.language,
+                      }))
+                    }
                     loading={isSaving}
                   />
                 )}

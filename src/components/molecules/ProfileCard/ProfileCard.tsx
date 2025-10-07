@@ -6,11 +6,13 @@ import { useTranslations } from 'next-intl';
 interface ProfileCardProps {
   user: UserProfile;
   onPhotoChange?: (file: File) => void;
+  previewUrl?: string;
 }
 
 export const ProfileCard: React.FC<ProfileCardProps> = ({
   user,
   onPhotoChange,
+  previewUrl,
 }) => {
   const tCommon = useTranslations('Common');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,19 +33,28 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
       {/* Profile Picture */}
       <div className="flex flex-col items-center mb-6">
         <div className="relative w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-6 overflow-hidden">
-          <svg
-            className="w-16 h-16 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          {previewUrl || user.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={previewUrl || (user.avatarUrl as string)}
+              alt="avatar"
+              className="w-full h-full object-cover"
             />
-          </svg>
+          ) : (
+            <svg
+              className="w-16 h-16 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+          )}
         </div>
 
         {/* Hidden File Input */}

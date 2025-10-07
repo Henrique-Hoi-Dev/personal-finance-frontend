@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { UserProfile } from '@/types/auth';
+import { UserProfile, PreferredLanguage, CurrencyCode } from '@/types/auth';
 import { useLanguage } from '@/hooks/useLanguage';
+import { Locale } from '@/i18n';
+//
 
 interface PreferencesCardProps {
   user: UserProfile;
-  onSave?: (data: { currency: string; language: string }) => void;
+  onChange?: (data: {
+    currency: CurrencyCode;
+    language: PreferredLanguage;
+  }) => void;
   loading?: boolean;
 }
 
 export const PreferencesCard: React.FC<PreferencesCardProps> = ({
   user,
-  onSave,
+  onChange,
   loading = false,
 }) => {
   const t = useTranslations('Profile');
@@ -19,36 +24,64 @@ export const PreferencesCard: React.FC<PreferencesCardProps> = ({
   const { changeLanguage } = useLanguage();
   const [preferences, setPreferences] = useState({
     currency: user.defaultCurrency || 'BRL',
-    language: user.preferredLanguage || 'pt',
+    language: user.preferredLanguage || PreferredLanguage.PT_BR,
   });
+
+  // Atualiza preferences quando user muda
+  useEffect(() => {
+    setPreferences({
+      currency: user.defaultCurrency || 'BRL',
+      language: user.preferredLanguage || PreferredLanguage.PT_BR,
+    });
+  }, [user]);
+
+  const availableCurrencies = Object.values(CurrencyCode);
+  const availableLanguages = Object.values(PreferredLanguage);
+
+  const getCurrencyLabel = (code: CurrencyCode) => {
+    try {
+      return tCommon(`currencyOptions.${code}`);
+    } catch {
+      return code;
+    }
+  };
+
+  const getLanguageLabel = (code: PreferredLanguage) => {
+    try {
+      return tCommon(`languageOptions.${code}`);
+    } catch {
+      return code;
+    }
+  };
 
   // Update preferences when user data changes
   useEffect(() => {
     setPreferences({
       currency: user.defaultCurrency || 'BRL',
-      language: user.preferredLanguage || 'pt',
+      language: (user.preferredLanguage === 'pt-BR' ||
+      user.preferredLanguage === 'pt'
+        ? 'pt-BR'
+        : 'en-US') as PreferredLanguage,
     });
   }, [user.defaultCurrency, user.preferredLanguage]);
 
   const handlePreferenceChange = (field: string, value: string) => {
-    setPreferences((prev) => ({ ...prev, [field]: value }));
+    setPreferences((prev) => ({
+      ...(prev as { currency: CurrencyCode; language: PreferredLanguage }),
+      [field]: value,
+    }));
   };
 
-  const handleSave = async () => {
-    try {
-      // If language changed, update it immediately
-      if (preferences.language !== user.preferredLanguage) {
-        await changeLanguage(preferences.language as 'pt' | 'en');
-      }
-
-      // Call the onSave callback for other preferences
-      if (onSave) {
-        onSave(preferences);
-      }
-    } catch (error) {
-      console.error('Error saving preferences:', error);
+  useEffect(() => {
+    if (onChange) {
+      onChange({
+        currency: preferences.currency as CurrencyCode,
+        language: preferences.language as PreferredLanguage,
+      });
     }
-  };
+    // intentionally not depending on onChange to avoid effect loop from new function identity each render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferences.currency, preferences.language]);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -96,9 +129,11 @@ export const PreferencesCard: React.FC<PreferencesCardProps> = ({
               }
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white"
             >
-              <option value="BRL">{tCommon('currencyOptions.BRL')}</option>
-              <option value="USD">{tCommon('currencyOptions.USD')}</option>
-              <option value="EUR">{tCommon('currencyOptions.EUR')}</option>
+              {availableCurrencies.map((c) => (
+                <option key={c} value={c}>
+                  {getCurrencyLabel(c)}
+                </option>
+              ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg
@@ -134,8 +169,11 @@ export const PreferencesCard: React.FC<PreferencesCardProps> = ({
               }
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white"
             >
-              <option value="pt">{tCommon('languageOptions.pt')}</option>
-              <option value="en">{tCommon('languageOptions.en')}</option>
+              {availableLanguages.map((lng) => (
+                <option key={lng} value={lng}>
+                  {getLanguageLabel(lng)}
+                </option>
+              ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <svg
