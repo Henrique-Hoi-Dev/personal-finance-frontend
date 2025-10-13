@@ -143,6 +143,7 @@
 
     "loanInformation": "Informações do Empréstimo",
     "totalWithInterest": "Valor Total com Juros",
+    "interestRate": "Valor ja pago",
     "interestAmount": "Valor dos Juros",
     "amountPaid": "Valor Pago",
     "monthlyInterestRate": "Taxa Mensal",

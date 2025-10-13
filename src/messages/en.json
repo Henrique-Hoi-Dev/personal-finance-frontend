@@ -135,6 +135,7 @@
     "cancel": "Cancel",
     "loanInformation": "Loan Information",
     "totalWithInterest": "Total Amount with Interest",
+    "interestRate": "Value already paid",
     "interestAmount": "Interest Amount",
     "amountPaid": "Amount Paid",
     "monthlyInterestRate": "Monthly Interest Rate",

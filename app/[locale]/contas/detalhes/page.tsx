@@ -833,6 +833,31 @@ export default function ContasDetailsPage() {
                                     Dia {getAccountDueDay(account)}
                                   </div>
                                 </div>
+                                {/* Campos específicos para empréstimos */}
+                                {account.type === 'LOAN' &&
+                                  account.interestRate && (
+                                    <div>
+                                      <div className="text-gray-800 font-semibold">
+                                        {t('interestRate')}
+                                      </div>
+                                      <div className="text-gray-600">
+                                        {account.interestRate}%
+                                      </div>
+                                    </div>
+                                  )}
+                                {account.type === 'LOAN' &&
+                                  account.totalWithInterest && (
+                                    <div>
+                                      <div className="text-gray-800 font-semibold">
+                                        {t('totalWithInterest')}
+                                      </div>
+                                      <div className="text-gray-600">
+                                        {formatCurrencyFromCents(
+                                          account.totalWithInterest
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
                                 <div>
                                   <div className="text-gray-800 font-semibold">
                                     {t('status')}
