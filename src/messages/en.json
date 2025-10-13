@@ -114,7 +114,6 @@
     "accountDueDay": "Due Day",
     "accountTypes": {
       "FIXED": "Fixed",
-      "FIXED_PREVIEW": "Fixed Preview",
       "LOAN": "Loan",
       "CREDIT_CARD": "Credit Card",
       "SUBSCRIPTION": "Subscription",

@@ -56,45 +56,48 @@ export function ContaForm({
 
   // Função para verificar se preview deve estar desabilitado
   const isPreviewDisabled = () => {
-    return formData.type === 'LOAN' || formData.type === 'FIXED';
+    return formData.type === 'LOAN';
   };
 
   // Função para verificar se parcelamento deve estar forçado
   const isInstallmentsForced = () => {
-    return formData.type === 'FIXED';
+    return formData.type === 'FIXED' && !isPreview;
   };
 
   // Função para verificar se parcelamento deve estar desabilitado
   const isInstallmentsDisabled = () => {
-    const disabled = formData.type === 'FIXED_PREVIEW';
-    return disabled;
+    // Quando preview estiver selecionado no tipo FIXED, não pode ter parcelas
+    return formData.type === 'FIXED' && isPreview;
   };
 
   // Função para verificar se parcelamento deve estar bloqueado (não pode desativar)
   const isInstallmentsBlocked = () => {
-    // Para LOAN e FIXED, quando ativo, não pode desativar
+    // Para LOAN e FIXED (sem preview), quando ativo, não pode desativar
     return (
-      (formData.type === 'LOAN' || formData.type === 'FIXED') && hasInstallments
+      (formData.type === 'LOAN' || (formData.type === 'FIXED' && !isPreview)) &&
+      hasInstallments
     );
   };
 
   // Aplicar regras automaticamente quando o tipo mudar
   useEffect(() => {
-    // Se for FIXED, forçar parcelamento e desabilitar preview
-    if (formData.type === 'FIXED') {
-      setHasInstallments(true);
+    // Se for LOAN, desabilitar preview
+    if (formData.type === 'LOAN') {
       setIsPreview(false);
-    }
-    // Se for LOAN, desabilitar preview e parcelamento
-    else if (formData.type === 'LOAN') {
-      setIsPreview(false);
-    }
-    // Se for FIXED_PREVIEW, habilitar preview e desabilitar parcelamento
-    else if (formData.type === 'FIXED_PREVIEW') {
-      setIsPreview(true);
-      setHasInstallments(false);
     }
   }, [formData.type]);
+
+  // Aplicar regras quando preview mudar
+  useEffect(() => {
+    // Se preview estiver ativo no tipo FIXED, desabilitar parcelas
+    if (formData.type === 'FIXED' && isPreview) {
+      setHasInstallments(false);
+    }
+    // Se preview estiver desativo no tipo FIXED, forçar parcelas
+    else if (formData.type === 'FIXED' && !isPreview) {
+      setHasInstallments(true);
+    }
+  }, [isPreview, formData.type]);
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof Omit<CreateContaPayload, 'userId'>, string>>
@@ -200,8 +203,12 @@ export function ContaForm({
       newErrors.totalAmount = tCommon('validation.totalAmountRequired');
     }
 
-    // Para contas FIXED (não FIXED_PREVIEW), sempre deve ter parcelas
-    if (formData.type === 'FIXED' && (formData.installments || 0) < 1) {
+    // Para contas FIXED sem preview, sempre deve ter parcelas
+    if (
+      formData.type === 'FIXED' &&
+      !isPreview &&
+      (formData.installments || 0) < 1
+    ) {
       newErrors.installments = tCommon('validation.installmentsRequired');
     }
 
@@ -250,26 +257,13 @@ export function ContaForm({
           referenceYear: formData.referenceYear,
         };
       } else if (formData.type === 'FIXED') {
-        // Para contas FIXED, sempre parcelado e sem preview
-        dataToSubmit = {
-          name: formData.name,
-          type: formData.type,
-          totalAmount: formData.totalAmount,
-          installments: formData.installments,
-          isPreview: false, // Sempre false para FIXED
-          startDate: formData.startDate,
-          dueDay: formData.dueDay,
-          referenceMonth: formData.referenceMonth,
-          referenceYear: formData.referenceYear,
-        };
-      } else if (formData.type === 'FIXED_PREVIEW') {
-        // Para contas FIXED_PREVIEW, parcelamento opcional e sempre com preview
+        // Para contas FIXED, usar o valor do isPreview
         dataToSubmit = {
           name: formData.name,
           type: formData.type,
           totalAmount: formData.totalAmount,
           installments: hasInstallments ? formData.installments : undefined,
-          isPreview: true, // Sempre true para FIXED_PREVIEW
+          isPreview: isPreview,
           startDate: formData.startDate,
           dueDay: formData.dueDay,
           referenceMonth: formData.referenceMonth,
@@ -369,17 +363,15 @@ export function ContaForm({
             <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
               {t('totalAmount')} <span className="text-red-500">*</span>
             </BaseLabel>
-            {hasInstallments &&
-              (formData.type === 'FIXED' ||
-                formData.type === 'FIXED_PREVIEW') && (
-                <button
-                  type="button"
-                  onClick={() => setShowCalcModal(true)}
-                  className="text-xs text-blue-600 hover:text-blue-700"
-                >
-                  {t('calcByInstallment')}
-                </button>
-              )}
+            {hasInstallments && formData.type === 'FIXED' && (
+              <button
+                type="button"
+                onClick={() => setShowCalcModal(true)}
+                className="text-xs text-blue-600 hover:text-blue-700"
+              >
+                {t('calcByInstallment')}
+              </button>
+            )}
           </div>
           <BaseInput
             type="text"

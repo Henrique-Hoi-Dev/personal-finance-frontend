@@ -36,7 +36,8 @@ export const ContaFilters: React.FC<ContaFiltersProps> = ({
       CREDIT_CARD: t('accountTypes.CREDIT_CARD'),
       SUBSCRIPTION: t('accountTypes.SUBSCRIPTION'),
       OTHER: t('accountTypes.OTHER'),
-    }
+    },
+    t('all') // Adiciona "Todos" como primeira opção
   );
 
   const statusOptions = useEnumOptions(

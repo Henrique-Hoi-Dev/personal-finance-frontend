@@ -42,7 +42,8 @@ export const MonthlyFinancialFilters: React.FC<
       CREDIT_CARD: tContas('accountTypes.CREDIT_CARD'),
       SUBSCRIPTION: tContas('accountTypes.SUBSCRIPTION'),
       OTHER: tContas('accountTypes.OTHER'),
-    }
+    },
+    tContas('all') // Adiciona "Todos" como primeira opção
   );
 
   const statusOptions = useEnumOptions(

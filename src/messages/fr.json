@@ -124,7 +124,6 @@
     "accountDueDay": "Jour d'Échéance",
     "accountTypes": {
       "FIXED": "Fixe",
-      "FIXED_PREVIEW": "Fixe (Aperçu)",
       "LOAN": "Prêt",
       "CREDIT_CARD": "Carte de Crédit",
       "SUBSCRIPTION": "Abonnement",

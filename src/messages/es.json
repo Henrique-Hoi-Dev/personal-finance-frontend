@@ -123,7 +123,6 @@
     "accountDueDay": "Día de Vencimiento",
     "accountTypes": {
       "FIXED": "Fija",
-      "FIXED_PREVIEW": "Fija (Vista Previa)",
       "LOAN": "Préstamo",
       "CREDIT_CARD": "Tarjeta de Crédito",
       "SUBSCRIPTION": "Suscripción",

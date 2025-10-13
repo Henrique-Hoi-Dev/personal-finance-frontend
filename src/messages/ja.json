@@ -123,7 +123,6 @@
     "accountDueDay": "支払日",
     "accountTypes": {
       "FIXED": "固定",
-      "FIXED_PREVIEW": "固定（プレビュー）",
       "LOAN": "ローン",
       "CREDIT_CARD": "クレジットカード",
       "SUBSCRIPTION": "サブスクリプション",

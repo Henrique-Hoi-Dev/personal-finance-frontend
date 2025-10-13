@@ -110,7 +110,7 @@ Aplicativo de finanças pessoais construído com Next.js, TypeScript e TailwindC
 - Listagem filtrável por nome, tipo e status de pagamento
 - Dropdown expansível por conta com animação suave mostrando:
   - Informações completas em grid responsivo com rótulos fortes
-  - Exibição do status (Pago/Pendente) e tag de "Preview" para `FIXED_PREVIEW`
+  - Exibição do status (Pago/Pendente) e tag de "Preview" para contas com `isPreview=true`
   - Ações contextuais apenas quando disponíveis: Ver Parcelas, Pagar, Editar, Excluir
 - Criação de conta com modal; em Detalhes, o mês/ano são preenchidos automaticamente
 - Edição de conta incluindo o nome, com confirmação e feedback

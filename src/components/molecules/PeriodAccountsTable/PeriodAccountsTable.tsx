@@ -19,7 +19,6 @@ export const PeriodAccountsTable: React.FC<PeriodAccountsTableProps> = ({
   const getTypeLabel = (type: string) => {
     const typeLabels = {
       FIXED: t('accountTypes.FIXED'),
-      FIXED_PREVIEW: t('accountTypes.FIXED_PREVIEW'),
       LOAN: t('accountTypes.LOAN'),
       CREDIT_CARD: t('accountTypes.CREDIT_CARD'),
       SUBSCRIPTION: t('accountTypes.SUBSCRIPTION'),

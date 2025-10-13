@@ -123,7 +123,6 @@
     "accountDueDay": "День платежа",
     "accountTypes": {
       "FIXED": "Фиксированный",
-      "FIXED_PREVIEW": "Фиксированный (Предварительный просмотр)",
       "LOAN": "Кредит",
       "CREDIT_CARD": "Кредитная карта",
       "SUBSCRIPTION": "Подписка",

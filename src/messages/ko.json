@@ -123,7 +123,6 @@
     "accountDueDay": "만료일",
     "accountTypes": {
       "FIXED": "고정",
-      "FIXED_PREVIEW": "고정 (미리보기)",
       "LOAN": "대출",
       "CREDIT_CARD": "신용카드",
       "SUBSCRIPTION": "구독",

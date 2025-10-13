@@ -35,7 +35,6 @@ export default function ContasDetailsPage() {
   const getAccountTypeLabel = (type: string) => {
     const typeLabels: { [key: string]: string } = {
       FIXED: t('accountTypes.FIXED'),
-      FIXED_PREVIEW: t('accountTypes.FIXED_PREVIEW'),
       LOAN: t('accountTypes.LOAN'),
       CREDIT_CARD: t('accountTypes.CREDIT_CARD'),
       SUBSCRIPTION: t('accountTypes.SUBSCRIPTION'),

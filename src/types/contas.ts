@@ -12,7 +12,6 @@ export interface Conta {
   name: string;
   type:
     | 'FIXED'
-    | 'FIXED_PREVIEW'
     | 'LOAN'
     | 'CREDIT_CARD'
     | 'SUBSCRIPTION'
@@ -52,7 +51,6 @@ export interface CreateContaPayload {
   name: string;
   type:
     | 'FIXED'
-    | 'FIXED_PREVIEW'
     | 'LOAN'
     | 'CREDIT_CARD'
     | 'SUBSCRIPTION'
@@ -72,7 +70,6 @@ export interface UpdateContaPayload {
   name?: string;
   type?:
     | 'FIXED'
-    | 'FIXED_PREVIEW'
     | 'LOAN'
     | 'CREDIT_CARD'
     | 'SUBSCRIPTION'
@@ -167,7 +164,6 @@ export interface PeriodAccount {
   name: string;
   type:
     | 'FIXED'
-    | 'FIXED_PREVIEW'
     | 'LOAN'
     | 'CREDIT_CARD'
     | 'SUBSCRIPTION'

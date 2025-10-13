@@ -124,7 +124,6 @@
     "accountDueDay": "Dia de Vencimento",
     "accountTypes": {
       "FIXED": "Fixa",
-      "FIXED_PREVIEW": "Fixa Preview",
       "LOAN": "Empréstimo",
       "CREDIT_CARD": "Cartão de Crédito",
       "SUBSCRIPTION": "Assinatura",

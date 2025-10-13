@@ -123,7 +123,6 @@
     "accountDueDay": "Giorno Scadenza",
     "accountTypes": {
       "FIXED": "Fisso",
-      "FIXED_PREVIEW": "Fisso (Anteprima)",
       "LOAN": "Prestito",
       "CREDIT_CARD": "Carta di Credito",
       "SUBSCRIPTION": "Abbonamento",

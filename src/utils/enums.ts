@@ -1,5 +1,4 @@
 export const accountTypes = [
-  { value: 'FIXED_PREVIEW', label: 'Fixa Preview' },
   { value: 'FIXED', label: 'Fixa' },
   { value: 'LOAN', label: 'Empréstimo' },
   { value: 'CREDIT_CARD', label: 'Cartão de Crédito' },
