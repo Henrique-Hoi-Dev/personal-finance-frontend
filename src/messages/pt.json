@@ -276,6 +276,9 @@
     "fullName": "Nome Completo",
     "email": "Email",
     "noExpensesByCategory": "Nenhum gasto por categoria encontrado",
+    "success": "Sucesso",
+    "ok": "OK",
+    "operationCompleted": "Operação concluída com sucesso!",
     "hasInstallments": "Esta conta tem parcelas",
     "currencyOptions": {
       "BRL": "Real Brasileiro (R$)",
@@ -371,5 +374,60 @@
     "good": "Bom",
     "warning": "Atenção",
     "critical": "Crítico"
+  },
+  "Tutorial": {
+    "step1": {
+      "content": "Bem-vindo! Aqui você gerencia todas as suas contas e parcelas, organizadas mês a mês."
+    },
+    "step2": {
+      "content": "Esses cartões mostram seu saldo atual, entradas, saídas e quanto sobrou no mês."
+    },
+    "step3": {
+      "content": "Cada linha representa um mês com base nas contas e parcelas registradas. Veja entradas, saídas e status financeiro."
+    },
+    "step4": {
+      "content": "Clique aqui para adicionar uma nova conta. Você poderá escolher o tipo: Fixa, Empréstimo, Assinatura ou Cartão de Crédito."
+    },
+    "step5": {
+      "content": "Aqui você cria uma conta. Tudo que definir será lançado no mês de referência — e, se houver parcelas, cada parcela irá para o mês correspondente."
+    },
+    "step6": {
+      "content": "Ative se a conta será parcelada. Com parcelas ligadas, você define a quantidade e o sistema distribui pelos meses."
+    },
+    "step7": {
+      "content": "Use Preview para contas de valor variável (água, luz, gás). É uma simulação para planejamento e **não pode** ser combinada com parcelas."
+    },
+    "step8": {
+      "content": "**Fixa**: longo prazo; pode usar calculadora mensal × meses; com Preview não parcela.\n**Empréstimo**: informe total e parcela (com juros); parcelas geradas automaticamente.\n**Assinatura / Cartão**: flexíveis; podem ter parcelas ou serem lançamentos únicos."
+    },
+    "step9": {
+      "content": "Dê um nome claro (ex.: 'Aluguel ap. 301' ou 'Internet Fibra 500M'). Isso melhora seus relatórios."
+    },
+    "step10": {
+      "content": "Defina o total desta conta. Use **Calcular por parcela** para multiplicar valor de parcela × quantidade (útil para Empréstimo ou Fixa parcelada)."
+    },
+    "step11": {
+      "content": "Informe quantas parcelas. O sistema gera as referências mensais automaticamente a partir da Data de Início."
+    },
+    "step12": {
+      "content": "A Data de Início define o começo do cronograma da conta. É a partir desta data que o sistema calcula quando cada parcela será devida."
+    },
+    "step13": {
+      "content": "A referência (Mês e Ano) define em qual mês a conta será registrada.\nEsse é o **ponto de ancoragem do sistema financeiro** — é com base nele que a conta aparece no mês certo da listagem e nos relatórios.\nSe a conta tiver parcelas, o sistema cria automaticamente as próximas referências com base neste mês e na Data de Início.\n💡 Exemplo: se a conta começar em **Outubro de 2025** e tiver 3 parcelas, as referências serão Outubro, Novembro e Dezembro de 2025."
+    },
+    "step14": {
+      "content": "Escolha o dia do mês. Dica: alinhe com seu dia de pagamento para melhorar o fluxo de caixa."
+    },
+    "step15": {
+      "content": "Revise os dados e salve. Você pode cancelar se mudar de ideia."
+    },
+    "step16": {
+      "content": "Tudo certo! Agora você já entende como funciona o painel de contas e como criar novas contas. Pode começar a usar o sistema!"
+    },
+    "back": "Voltar",
+    "close": "Fechar",
+    "finish": "Finalizar",
+    "next": "Próximo",
+    "skip": "Pular"
   }
 }

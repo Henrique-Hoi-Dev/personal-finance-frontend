@@ -31,7 +31,11 @@ class ApiClient {
   setToken(token: string | null) {
     this.token = token;
     if (token && typeof window !== 'undefined') {
-      this.startTokenExpirationCheck();
+      // Aguarda um pouco antes de iniciar a verificação de expiração
+      // para evitar problemas com tokens recém-criados
+      setTimeout(() => {
+        this.startTokenExpirationCheck();
+      }, 1000);
     }
   }
 
@@ -54,7 +58,11 @@ class ApiClient {
         store.forceLogout();
       });
 
-      toast.error('Sessão expirada. Faça login novamente.');
+      // Só mostra toast se não estiver na página de cadastro
+      const currentPath = window.location.pathname;
+      if (!currentPath.includes('/signup')) {
+        toast.error('Sessão expirada. Faça login novamente.');
+      }
 
       // Redireciona para login
       window.location.href = '/pt/login';
@@ -66,7 +74,13 @@ class ApiClient {
     options: RequestInit & { responseType?: 'json' | 'blob' } = {}
   ): Promise<ApiResponse<T>> {
     // Verifica se o token está expirado antes de fazer a requisição
-    if (this.token && isTokenExpired(this.token)) {
+    // Mas não verifica em endpoints de autenticação (login/register)
+    if (
+      this.token &&
+      !endpoint.includes('/users/login') &&
+      !endpoint.includes('/users/register') &&
+      isTokenExpired(this.token)
+    ) {
       this.handleTokenExpiration();
       throw new ApiError('Token expirado', 401);
     }
@@ -93,7 +107,8 @@ class ApiClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        if (response.status === 401) {
+        // Só redireciona para login se for erro 401 e não for endpoint de registro
+        if (response.status === 401 && !endpoint.includes('/users/register')) {
           this.handleTokenExpiration();
         }
 

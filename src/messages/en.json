@@ -359,5 +359,60 @@
     "good": "Good",
     "warning": "Warning",
     "critical": "Critical"
+  },
+  "Tutorial": {
+    "step1": {
+      "content": "Welcome! Here you manage all your accounts and installments, organized month by month."
+    },
+    "step2": {
+      "content": "These cards show your current balance, income, expenses and how much you have left in the month."
+    },
+    "step3": {
+      "content": "Each row represents a month based on registered accounts and installments. See income, expenses and financial status."
+    },
+    "step4": {
+      "content": "Click here to add a new account. You can choose the type: Fixed, Loan, Subscription or Credit Card."
+    },
+    "step5": {
+      "content": "Here you create an account. Everything you define will be posted in the reference month — and if there are installments, each installment will go to the corresponding month."
+    },
+    "step6": {
+      "content": "Enable if the account will be paid in installments. With installments enabled, you define the quantity and the system distributes across the months."
+    },
+    "step7": {
+      "content": "Use Preview for variable value accounts (water, electricity, gas). It's a simulation for planning and **cannot** be combined with installments."
+    },
+    "step8": {
+      "content": "**Fixed**: long term; can use monthly calculator × months; with Preview doesn't install.\n**Loan**: enter total and installment (with interest); installments generated automatically.\n**Subscription / Credit Card**: flexible; can have installments or be single transactions."
+    },
+    "step9": {
+      "content": "Give a clear name (e.g., 'Rent apt. 301' or 'Internet Fiber 500M'). This improves your reports."
+    },
+    "step10": {
+      "content": "Define the total of this account. Use **Calculate by installment** to multiply installment value × quantity (useful for Loan or Fixed with installments)."
+    },
+    "step11": {
+      "content": "Enter how many installments. The system generates monthly references automatically from the Start Date."
+    },
+    "step12": {
+      "content": "The Start Date defines the beginning of the account schedule. It's from this date that the system calculates when each installment will be due."
+    },
+    "step13": {
+      "content": "The reference (Month and Year) defines in which month the account will be registered.\nThis is the **anchor point of the financial system** — it's based on this that the account appears in the correct month in the listing and reports.\nIf the account has installments, the system automatically creates the next references based on this month and the Start Date.\n💡 Example: if the account starts in **October 2025** and has 3 installments, the references will be October, November and December 2025."
+    },
+    "step14": {
+      "content": "Choose the day of the month. Tip: align with your payment day to improve cash flow."
+    },
+    "step15": {
+      "content": "Review the data and save. You can cancel if you change your mind."
+    },
+    "step16": {
+      "content": "All set! Now you understand how the accounts panel works and how to create new accounts. You can start using the system!"
+    },
+    "back": "Back",
+    "close": "Close",
+    "finish": "Finish",
+    "next": "Next",
+    "skip": "Skip"
   }
 }

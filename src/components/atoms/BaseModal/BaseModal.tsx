@@ -9,6 +9,7 @@ interface BaseModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   closeOnBackdropClick?: boolean;
   closeOnEsc?: boolean;
+  titleProps?: React.HTMLAttributes<HTMLHeadingElement>;
 }
 
 export const BaseModal: React.FC<BaseModalProps> = ({
@@ -20,6 +21,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
   size = 'md',
   closeOnBackdropClick = false,
   closeOnEsc = false,
+  titleProps = {},
 }) => {
   const handleClose = useCallback(() => {
     onClose();
@@ -71,7 +73,9 @@ export const BaseModal: React.FC<BaseModalProps> = ({
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <h3 className="text-lg font-semibold text-gray-900" {...titleProps}>
+              {title}
+            </h3>
             <button
               onClick={handleClose}
               className="text-gray-400 hover:text-gray-600 transition-colors duration-200"

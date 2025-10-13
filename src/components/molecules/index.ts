@@ -21,3 +21,5 @@ export { ProfileCard } from './ProfileCard';
 export { PersonalInfoCard } from './PersonalInfoCard';
 export { SecurityCard } from './SecurityCard';
 export { PreferencesCard } from './PreferencesCard';
+export { AccountsTutorial } from './AccountsTutorial';
+export { SuccessModal } from './SuccessModal';

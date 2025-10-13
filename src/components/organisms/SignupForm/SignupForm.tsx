@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PasswordField, FormField } from '@/components/molecules';
+import { PasswordField, FormField, SuccessModal } from '@/components/molecules';
 import { BaseButton, BaseCPFInput, BaseLabel } from '@/components/atoms';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
@@ -26,6 +26,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({
     cpf: '',
     password: '',
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -58,10 +59,20 @@ export const SignupForm: React.FC<SignupFormProps> = ({
     } else {
       try {
         await register(dataToSend);
-        toast.success(t('success'));
+        // Mostra modal de sucesso antes do redirecionamento
+        setShowSuccessModal(true);
       } catch (error) {
+        // Só mostra toast de erro se realmente houve erro no registro
         toast.error(t('error_signup'));
       }
+    }
+  };
+
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    // O redirecionamento já aconteceu no store, mas se não aconteceu, força aqui
+    if (typeof window !== 'undefined') {
+      window.location.href = '/pt/dashboard';
     }
   };
 
@@ -144,6 +155,15 @@ export const SignupForm: React.FC<SignupFormProps> = ({
           </a>
         </p>
       </div>
+
+      {/* Modal de Sucesso */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessModalClose}
+        title={t('success')}
+        message={t('success')}
+        onConfirm={handleSuccessModalClose}
+      />
     </div>
   );
 };

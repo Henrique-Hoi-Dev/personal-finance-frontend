@@ -311,12 +311,14 @@ export function ContaForm({
       {/* Toggles no topo */}
       <div className="flex flex-col gap-4 py-4 border-b border-gray-200">
         <BaseToggleSwitch
+          data-tour-id="toggle-parcelas"
           checked={hasInstallments}
           onChange={setHasInstallments}
           label={tCommon('hasInstallments')}
           disabled={isInstallmentsDisabled() || isInstallmentsBlocked()}
         />
         <BaseToggleSwitch
+          data-tour-id="toggle-preview"
           checked={isPreview}
           onChange={setIsPreview}
           label={t('isPreview')}
@@ -330,6 +332,7 @@ export function ContaForm({
             {t('name')} <span className="text-red-500">*</span>
           </BaseLabel>
           <BaseInput
+            data-tour-id="field-nome"
             type="text"
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
@@ -348,6 +351,7 @@ export function ContaForm({
             {t('type')} <span className="text-red-500">*</span>
           </BaseLabel>
           <BaseSelect
+            data-tour-id="field-tipo"
             value={formData.type}
             onChange={(value) =>
               handleTypeChange(value as CreateContaPayload['type'])
@@ -358,7 +362,7 @@ export function ContaForm({
           />
         </div>
 
-        <div>
+        <div data-tour-id="field-valor-total">
           <div className="flex items-center justify-between">
             <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
               {t('totalAmount')} <span className="text-red-500">*</span>
@@ -496,7 +500,7 @@ export function ContaForm({
         )}
 
         {hasInstallments && (
-          <div>
+          <div data-tour-id="field-parcelas">
             <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
               {t('installments')} <span className="text-red-500">*</span>
             </BaseLabel>
@@ -518,7 +522,7 @@ export function ContaForm({
           </div>
         )}
 
-        <div>
+        <div data-tour-id="field-data-inicio">
           <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
             {t('startDate')} <span className="text-red-500">*</span>
           </BaseLabel>
@@ -536,7 +540,7 @@ export function ContaForm({
         </div>
 
         {!hideReferenceFields && (
-          <div className="flex flex-col">
+          <div className="flex flex-col" data-tour-id="field-referencia">
             <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
               {t('accountReference')} <span className="text-red-500">*</span>
             </BaseLabel>
@@ -594,7 +598,7 @@ export function ContaForm({
           </div>
         )}
 
-        <div>
+        <div data-tour-id="field-vencimento">
           <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
             {t('dueDay')} <span className="text-red-500">*</span>
           </BaseLabel>
@@ -617,7 +621,10 @@ export function ContaForm({
         </div>
       </div>
 
-      <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+      <div
+        className="flex justify-end space-x-4 pt-6 border-t border-gray-200"
+        data-tour-id="modal-actions"
+      >
         <BaseButton
           type="button"
           variant="secondary"

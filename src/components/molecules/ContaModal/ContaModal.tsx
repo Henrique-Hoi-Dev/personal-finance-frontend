@@ -40,6 +40,11 @@ export function ContaModal({
       onClose={onClose}
       title={t('addAccount')}
       size="2xl"
+      titleProps={
+        {
+          'data-tour-id': 'modal-title',
+        } as React.HTMLAttributes<HTMLHeadingElement>
+      }
     >
       <div className="p-6">
         <ContaForm

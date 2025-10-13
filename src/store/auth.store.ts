@@ -61,7 +61,17 @@ export const useAuthStore = create<AuthStore>()(
 
           apiClient.setToken(response.accessToken);
 
-          const userProfile = await getCurrentUser();
+          // Tenta buscar o perfil do usuário, mas não falha se não conseguir
+          let userProfile = null;
+          try {
+            userProfile = await getCurrentUser();
+          } catch (profileError) {
+            console.warn(
+              'Erro ao buscar perfil do usuário após login:',
+              profileError
+            );
+            // Continua o fluxo mesmo sem o perfil
+          }
 
           set({
             user: userProfile,
@@ -71,7 +81,7 @@ export const useAuthStore = create<AuthStore>()(
           });
 
           // Redireciona para o dashboard no idioma preferido do usuário após login
-          if (userProfile.preferredLanguage && typeof window !== 'undefined') {
+          if (userProfile?.preferredLanguage && typeof window !== 'undefined') {
             const preferredLocale = mapPreferredLanguageToLocale(
               userProfile.preferredLanguage as PreferredLanguage
             );
@@ -108,30 +118,37 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const response = await register(data);
 
+          // Define o token imediatamente após o registro bem-sucedido
           apiClient.setToken(response.accessToken);
 
-          const userProfile = await getCurrentUser();
-
+          // Define o estado como autenticado imediatamente
           set({
-            user: userProfile,
+            user: null, // Será carregado depois
             token: response.accessToken,
             isAuthenticated: true,
             loading: false,
           });
 
-          // Redireciona para o dashboard no idioma preferido do usuário após registro
-          if (userProfile.preferredLanguage && typeof window !== 'undefined') {
-            const preferredLocale = mapPreferredLanguageToLocale(
-              userProfile.preferredLanguage as PreferredLanguage
-            );
-            const dashboardPath = `/${preferredLocale}/dashboard`;
-            window.location.href = dashboardPath;
-          } else {
-            // Fallback: se não houver idioma preferido, vai para pt/dashboard
-            if (typeof window !== 'undefined') {
-              window.location.href = '/pt/dashboard';
-            }
-          }
+          // Tenta buscar o perfil do usuário em background após um delay
+          // para evitar problemas com verificação de token
+          setTimeout(() => {
+            getCurrentUser()
+              .then((userProfile) => {
+                set((state) => ({
+                  ...state,
+                  user: userProfile,
+                }));
+              })
+              .catch((profileError) => {
+                console.warn(
+                  'Erro ao buscar perfil do usuário após registro:',
+                  profileError
+                );
+                // Continua o fluxo mesmo sem o perfil
+              });
+          }, 2000);
+
+          // Sucesso - não retorna nada pois o tipo é void
         } catch (error: any) {
           set({
             error: error.message || 'Erro ao criar conta',
