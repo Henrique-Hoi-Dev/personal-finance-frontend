@@ -841,7 +841,9 @@ export default function ContasDetailsPage() {
                                         {t('interestRate')}
                                       </div>
                                       <div className="text-gray-600">
-                                        {account.interestRate}%
+                                        {formatCurrencyFromCents(
+                                          account.interestRate
+                                        )}
                                       </div>
                                     </div>
                                   )}
