@@ -13,11 +13,17 @@ import {
 import { Balance, Transacao, ExpenseByCategory } from '@/types/transacoes';
 import { BaseLoading, BaseSelectWithClear } from '@/components/atoms';
 import { formatCurrencyFromCents } from '@/utils';
-import { monthOptions, generateYearOptions } from '@/utils/enums';
+import {
+  monthOptions,
+  generateYearOptions,
+  getCategoryLabel,
+} from '@/utils/enums';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export const Dashboard: React.FC = () => {
   const t = useTranslations('Dashboard');
   const tCommon = useTranslations('Common');
+  const { currentLanguage } = useLanguage();
   const [balance, setBalance] = useState<Balance | null>(null);
   const [transactions, setTransactions] = useState<Transacao[]>([]);
   const [categories, setCategories] = useState<ExpenseByCategory[]>([]);
@@ -256,7 +262,9 @@ export const Dashboard: React.FC = () => {
   ];
 
   const categoriesData = categories.map((category) => ({
-    name: category.name,
+    name:
+      getCategoryLabel(category.category, currentLanguage as 'pt' | 'en') ||
+      category.name,
     amount: formatCurrencyFromCents(category.value),
     color: category.color,
     percentage: category.percentage,

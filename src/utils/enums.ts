@@ -16,6 +16,9 @@ export enum TransactionCategory {
   HEALTH = 'HEALTH',
   ACCOUNT_PAYMENT = 'ACCOUNT_PAYMENT',
   INSTALLMENT_PAYMENT = 'INSTALLMENT_PAYMENT',
+  UTILITIES = 'UTILITIES',
+  EDUCATION = 'EDUCATION',
+  SHOPPING = 'SHOPPING',
 
   // INCOME Categories
   SALARY = 'SALARY',
@@ -83,6 +86,27 @@ export const transactionCategories = {
     type: TransactionType.EXPENSE,
     description: 'Pagamento de parcelas de compras, financiamentos, etc.',
   },
+  [TransactionCategory.UTILITIES]: {
+    name: 'UTILITIES',
+    pt: 'Utilidades',
+    en: 'Utilities',
+    type: TransactionType.EXPENSE,
+    description: 'Contas de luz, água, gás, internet, telefone, etc.',
+  },
+  [TransactionCategory.EDUCATION]: {
+    name: 'EDUCATION',
+    pt: 'Educação',
+    en: 'Education',
+    type: TransactionType.EXPENSE,
+    description: 'Cursos, livros, material escolar, mensalidades, etc.',
+  },
+  [TransactionCategory.SHOPPING]: {
+    name: 'SHOPPING',
+    pt: 'Compras',
+    en: 'Shopping',
+    type: TransactionType.EXPENSE,
+    description: 'Roupas, eletrônicos, produtos diversos, etc.',
+  },
 
   // INCOME Categories
   [TransactionCategory.SALARY]: {
@@ -120,14 +144,53 @@ export const transactionCategories = {
     type: TransactionType.INCOME,
     description: 'Outras receitas não categorizadas',
   },
+
+  // Tipos de conta - adicionados para tradução
+  FIXED: {
+    name: 'FIXED',
+    pt: 'Contas Fixas',
+    en: 'Fixed Accounts',
+    type: TransactionType.EXPENSE,
+    description: 'Contas fixas como água, luz, internet, etc.',
+  },
+  FIXED_PREVIEW: {
+    name: 'FIXED_PREVIEW',
+    pt: 'Contas Variáveis',
+    en: 'Variable Accounts',
+    type: TransactionType.EXPENSE,
+    description: 'Contas que variam mensalmente',
+  },
+  LOAN: {
+    name: 'LOAN',
+    pt: 'Empréstimos',
+    en: 'Loans',
+    type: TransactionType.EXPENSE,
+    description: 'Empréstimos e financiamentos',
+  },
+  CREDIT_CARD: {
+    name: 'CREDIT_CARD',
+    pt: 'Cartão de Crédito',
+    en: 'Credit Card',
+    type: TransactionType.EXPENSE,
+    description: 'Gastos com cartão de crédito',
+  },
+  SUBSCRIPTION: {
+    name: 'SUBSCRIPTION',
+    pt: 'Assinaturas',
+    en: 'Subscriptions',
+    type: TransactionType.EXPENSE,
+    description: 'Assinaturas de serviços',
+  },
 };
 
 // Helper functions
 export const getCategoryLabel = (
-  category: TransactionCategory,
+  category: TransactionCategory | string,
   locale: 'pt' | 'en' = 'pt'
 ): string => {
-  return transactionCategories[category]?.[locale] || category;
+  return (
+    transactionCategories[category as TransactionCategory]?.[locale] || category
+  );
 };
 
 export const getCategoryDescription = (
@@ -185,4 +248,37 @@ export const generateYearOptions = (): Array<{
     years.push({ value: i.toString(), label: i.toString() });
   }
   return years;
+};
+
+// Category color mapping - matches backend enums
+export const getCategoryColor = (category: string): string => {
+  const colors: Record<string, string> = {
+    // Categorias de transação tradicionais
+    FOOD: '#ef4444', // red
+    TRANSPORT: '#3b82f6', // blue
+    ENTERTAINMENT: '#8b5cf6', // purple
+    RENT: '#f59e0b', // orange
+    HEALTH: '#10b981', // green
+    ACCOUNT_PAYMENT: '#6b7280', // gray
+    INSTALLMENT_PAYMENT: '#6b7280', // gray
+    UTILITIES: '#f59e0b', // orange
+    EDUCATION: '#8b5cf6', // purple
+    SHOPPING: '#ec4899', // pink
+    OTHER: '#6b7280', // gray
+
+    // Tipos de conta - cores mais específicas e atrativas
+    FIXED: '#059669', // emerald-600 - contas fixas (água, luz)
+    FIXED_PREVIEW: '#0891b2', // cyan-600 - contas variáveis
+    LOAN: '#dc2626', // red-600 - empréstimos/financiamentos
+    CREDIT_CARD: '#7c3aed', // violet-600 - cartão de crédito
+    SUBSCRIPTION: '#ea580c', // orange-600 - assinaturas
+
+    // Categorias de receita
+    SALARY: '#10b981', // green
+    FREELANCE: '#3b82f6', // blue
+    INVESTMENT: '#8b5cf6', // purple
+    REFUND: '#f59e0b', // orange
+  };
+
+  return colors[category] || '#6b7280'; // default gray
 };
