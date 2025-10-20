@@ -92,6 +92,10 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
       newErrors.description = t('descriptionRequired');
     }
 
+    if (!formData.category) {
+      newErrors.category = t('categoryRequired');
+    }
+
     if (!formData.date) {
       newErrors.date = t('dateRequired');
     }
@@ -159,6 +163,8 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         onChange={(value) => handleInputChange('category', value)}
         options={categoriaOptions}
         label={t('category')}
+        required
+        error={errors.category}
       />
 
       {/* Data */}

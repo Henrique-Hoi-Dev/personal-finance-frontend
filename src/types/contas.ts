@@ -14,7 +14,13 @@ export interface Conta {
     | 'FIXED'
     | 'LOAN'
     | 'CREDIT_CARD'
+    | 'DEBIT_CARD'
     | 'SUBSCRIPTION'
+    | 'INSURANCE'
+    | 'TAX'
+    | 'PENSION'
+    | 'EDUCATION'
+    | 'HEALTH'
     | 'OTHER';
   totalAmount: number;
   installments?: number;
@@ -53,7 +59,13 @@ export interface CreateContaPayload {
     | 'FIXED'
     | 'LOAN'
     | 'CREDIT_CARD'
+    | 'DEBIT_CARD'
     | 'SUBSCRIPTION'
+    | 'INSURANCE'
+    | 'TAX'
+    | 'PENSION'
+    | 'EDUCATION'
+    | 'HEALTH'
     | 'OTHER';
   totalAmount: number;
   installments?: number;
@@ -166,7 +178,13 @@ export interface PeriodAccount {
     | 'FIXED'
     | 'LOAN'
     | 'CREDIT_CARD'
+    | 'DEBIT_CARD'
     | 'SUBSCRIPTION'
+    | 'INSURANCE'
+    | 'TAX'
+    | 'PENSION'
+    | 'EDUCATION'
+    | 'HEALTH'
     | 'OTHER';
   totalAmount: number;
   installmentAmount?: number | null;

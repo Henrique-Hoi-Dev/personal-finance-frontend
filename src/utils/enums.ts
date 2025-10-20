@@ -2,7 +2,13 @@ export const accountTypes = [
   { value: 'FIXED', label: 'Fixa' },
   { value: 'LOAN', label: 'Empréstimo' },
   { value: 'CREDIT_CARD', label: 'Cartão de Crédito' },
+  { value: 'DEBIT_CARD', label: 'Cartão de Débito' },
   { value: 'SUBSCRIPTION', label: 'Assinatura' },
+  { value: 'INSURANCE', label: 'Seguro' },
+  { value: 'TAX', label: 'Imposto' },
+  { value: 'PENSION', label: 'Previdência' },
+  { value: 'EDUCATION', label: 'Educação' },
+  { value: 'HEALTH', label: 'Saúde' },
   { value: 'OTHER', label: 'Outro' },
 ];
 
@@ -174,12 +180,54 @@ export const transactionCategories = {
     type: TransactionType.EXPENSE,
     description: 'Gastos com cartão de crédito',
   },
+  DEBIT_CARD: {
+    name: 'DEBIT_CARD',
+    pt: 'Cartão de Débito',
+    en: 'Debit Card',
+    type: TransactionType.EXPENSE,
+    description: 'Conta corrente vinculada ao cartão de débito',
+  },
   SUBSCRIPTION: {
     name: 'SUBSCRIPTION',
     pt: 'Assinaturas',
     en: 'Subscriptions',
     type: TransactionType.EXPENSE,
     description: 'Assinaturas de serviços',
+  },
+  INSURANCE: {
+    name: 'INSURANCE',
+    pt: 'Seguros',
+    en: 'Insurance',
+    type: TransactionType.EXPENSE,
+    description: 'Seguros de vida, saúde, auto, residencial',
+  },
+  TAX: {
+    name: 'TAX',
+    pt: 'Impostos',
+    en: 'Taxes',
+    type: TransactionType.EXPENSE,
+    description: 'IPTU, IPVA, IR, taxas municipais',
+  },
+  PENSION: {
+    name: 'PENSION',
+    pt: 'Previdência',
+    en: 'Pension',
+    type: TransactionType.EXPENSE,
+    description: 'INSS, previdência privada, aposentadoria',
+  },
+  ACCOUNT_EDUCATION: {
+    name: 'EDUCATION',
+    pt: 'Educação',
+    en: 'Education',
+    type: TransactionType.EXPENSE,
+    description: 'Mensalidades escolares, cursos, material didático',
+  },
+  ACCOUNT_HEALTH: {
+    name: 'HEALTH',
+    pt: 'Saúde',
+    en: 'Health',
+    type: TransactionType.EXPENSE,
+    description: 'Planos de saúde, consultas, medicamentos',
   },
 };
 
