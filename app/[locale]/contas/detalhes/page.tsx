@@ -79,6 +79,19 @@ export default function ContasDetailsPage() {
     return account.dueDay;
   };
 
+  const getAccountDisplayAmount = (account: Conta) => {
+    // Se a conta é parcelada, mostra o valor da parcela
+    if (
+      account.installments &&
+      account.installments > 0 &&
+      account.installment
+    ) {
+      return account.installment.amount;
+    }
+    // Caso contrário, mostra o valor total
+    return account.totalAmount;
+  };
+
   const month = searchParams.get('month');
   const year = searchParams.get('year');
 
@@ -545,7 +558,9 @@ export default function ContasDetailsPage() {
                         <div className="flex items-center space-x-4">
                           <div className="text-right">
                             <div className="text-lg font-semibold text-gray-900">
-                              {formatCurrencyFromCents(account.totalAmount)}
+                              {formatCurrencyFromCents(
+                                getAccountDisplayAmount(account)
+                              )}
                             </div>
                             {account.installments && (
                               <div className="text-sm text-gray-600">
@@ -621,7 +636,9 @@ export default function ContasDetailsPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="text-lg font-semibold text-gray-900">
-                              {formatCurrencyFromCents(account.totalAmount)}
+                              {formatCurrencyFromCents(
+                                getAccountDisplayAmount(account)
+                              )}
                             </div>
                             {account.installments && (
                               <div className="text-sm text-gray-600">

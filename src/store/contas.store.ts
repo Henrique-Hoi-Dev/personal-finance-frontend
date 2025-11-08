@@ -45,7 +45,7 @@ export const useContasStore = create<ContasStore>((set, get) => ({
   fetchContas: async () => {
     set({ loading: true, error: null });
     try {
-      const contas = await getContas();
+      const contas = await getContas({});
       set({ contas, loading: false });
     } catch (error: any) {
       set({ contas: [], loading: false });
