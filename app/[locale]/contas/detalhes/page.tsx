@@ -852,10 +852,23 @@ export default function ContasDetailsPage() {
                                 </div>
                                 {/* Campos específicos para empréstimos */}
                                 {account.type === 'LOAN' &&
-                                  account.interestRate && (
+                                  account.totalPaidAmount && (
                                     <div>
                                       <div className="text-gray-800 font-semibold">
                                         {t('interestRate')}
+                                      </div>
+                                      <div className="text-gray-600">
+                                        {formatCurrencyFromCents(
+                                          account.totalPaidAmount
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                {account.type === 'LOAN' &&
+                                  account.interestRate && (
+                                    <div>
+                                      <div className="text-gray-800 font-semibold">
+                                        {t('interestAmount')}
                                       </div>
                                       <div className="text-gray-600">
                                         {formatCurrencyFromCents(

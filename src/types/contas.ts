@@ -27,6 +27,7 @@ export interface Conta {
   installmentAmount?: number;
   totalWithInterest?: number;
   interestRate?: number;
+  totalPaidAmount?: number;
   monthlyInterestRate?: number;
   amountPaid?: number;
   isPreview?: boolean;
@@ -80,12 +81,7 @@ export interface CreateContaPayload {
 export interface UpdateContaPayload {
   id: string;
   name?: string;
-  type?:
-    | 'FIXED'
-    | 'LOAN'
-    | 'CREDIT_CARD'
-    | 'SUBSCRIPTION'
-    | 'OTHER';
+  type?: 'FIXED' | 'LOAN' | 'CREDIT_CARD' | 'SUBSCRIPTION' | 'OTHER';
   totalAmount?: number;
   installments?: number;
   isPreview?: boolean;
