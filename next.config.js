@@ -12,11 +12,18 @@ const nextConfig = {
     // Ignorar erros de ESLint durante o build
     ignoreDuringBuilds: true,
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, 'src'),
     };
+
+    // Garante que pluggy-connect-sdk só seja carregado no client
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push('pluggy-connect-sdk');
+    }
+
     return config;
   },
 };

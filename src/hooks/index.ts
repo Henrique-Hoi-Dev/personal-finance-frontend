@@ -7,3 +7,4 @@ export {
 export { useLanguage } from './useLanguage';
 export { useCurrency } from './useCurrency';
 export { useMonthlyFinancialData } from './useMonthlyFinancialData';
+export { usePluggy } from './usePluggy';

@@ -117,6 +117,7 @@
     "payingFull": "Pagando Tudo...",
     "paid": "Pago",
     "editAccount": "Editar Conta",
+    "editOrAddAccount": "Editar/Adicionar Conta",
     "viewStatement": "Ver Extrato",
     "selectAccount": "Selecione uma conta",
     "selectAccountDescription": "Clique em uma conta à esquerda para ver os detalhes",
@@ -171,7 +172,23 @@
     "totalInstallments": "Total de Parcelas",
     "noInstallmentsFound": "Nenhuma parcela encontrada",
     "confirmDeleteInstallment": "Tem certeza que deseja excluir esta parcela?",
-    "confirmDeleteInstallmentMessage": "Tem certeza que deseja excluir a"
+    "confirmDeleteInstallmentMessage": "Tem certeza que deseja excluir a",
+    "details": "Detalhes",
+    "installmentDetails": "Detalhes da Parcela",
+    "linkedAccounts": "Contas Vinculadas",
+    "noInstallments": "Sem parcelas",
+    "noLinkedAccounts": "Nenhuma conta vinculada",
+    "creditLimit": "Limite de Crédito",
+    "closingDate": "Dia de Fechamento",
+    "creditLimitRequired": "Limite de crédito é obrigatório",
+    "closingDateRequired": "Dia de fechamento inválido",
+    "addLinkedAccount": "Adicionar Conta",
+    "createLinkedAccount": "Criar Conta Vinculada",
+    "backToEdit": "Voltar para Edição",
+    "backToList": "Voltar para Lista",
+    "createAndLink": "Criar e Vincular",
+    "accountLinkedSuccess": "Conta criada e vinculada com sucesso!",
+    "installmentAmountRequired": "Valor da parcela é obrigatório"
   },
   "Transacoes": {
     "title": "Transações",
@@ -436,5 +453,15 @@
     "finish": "Finalizar",
     "next": "Próximo",
     "skip": "Pular"
+  },
+  "Pluggy": {
+    "connectBank": "Conectar meu banco",
+    "connectAnotherBank": "Conectar outro banco",
+    "connecting": "Conectando...",
+    "loadingSDK": "Carregando SDK do Pluggy...",
+    "errorConnecting": "Erro ao conectar com o banco",
+    "errorSaving": "Erro ao salvar conexão do banco",
+    "success": "Banco conectado com sucesso!",
+    "description": "Conecte suas contas bancárias automaticamente usando o Pluggy Connect"
   }
 }

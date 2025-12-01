@@ -174,6 +174,8 @@ export const getAccountTypeLabel = (type: string): string => {
       return 'Empréstimo';
     case 'CREDIT_CARD':
       return 'Cartão de Crédito';
+    case 'DEBIT_CARD':
+      return 'Cartão de Débito';
     case 'SUBSCRIPTION':
       return 'Assinatura';
     case 'OTHER':

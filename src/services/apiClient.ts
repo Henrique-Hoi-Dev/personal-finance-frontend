@@ -16,9 +16,7 @@ class ApiClient {
   private baseURL: string;
   private token: string | null = null;
 
-  constructor(
-    baseURL: string = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'
-  ) {
+  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || '') {
     this.baseURL = baseURL;
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');

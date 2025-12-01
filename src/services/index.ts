@@ -9,3 +9,6 @@ export * from './contas.service';
 
 // Transações Service
 export * from './transacoes.service';
+
+// Pluggy Service
+export * from './pluggy.service';

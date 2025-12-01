@@ -1,0 +1,1 @@
+export { PluggyConnectButton } from './PluggyConnectButton';

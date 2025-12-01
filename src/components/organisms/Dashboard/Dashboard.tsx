@@ -66,8 +66,8 @@ export const Dashboard: React.FC = () => {
           ]);
 
         setBalance(balanceData);
-        setTransactions(transactionsData.data);
-        setCategories(categoriesData.categories);
+        setTransactions(transactionsData?.data || []);
+        setCategories(categoriesData?.categories || []);
       } catch (error) {
         console.error('Dashboard: Erro ao carregar dados:', error);
       } finally {

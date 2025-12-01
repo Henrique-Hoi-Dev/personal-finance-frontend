@@ -37,6 +37,7 @@ export default function ContasDetailsPage() {
       FIXED: t('accountTypes.FIXED'),
       LOAN: t('accountTypes.LOAN'),
       CREDIT_CARD: t('accountTypes.CREDIT_CARD'),
+      DEBIT_CARD: t('accountTypes.DEBIT_CARD'),
       SUBSCRIPTION: t('accountTypes.SUBSCRIPTION'),
       OTHER: t('accountTypes.OTHER'),
     };
@@ -94,6 +95,7 @@ export default function ContasDetailsPage() {
 
   const month = searchParams.get('month');
   const year = searchParams.get('year');
+  const editAccountId = searchParams.get('editAccountId');
 
   const [accounts, setAccounts] = useState<Conta[]>([]);
   const [loading, setLoading] = useState(false);
@@ -125,6 +127,11 @@ export default function ContasDetailsPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [showPayInstallmentModal, setShowPayInstallmentModal] = useState(false);
   const [isPayingInstallment, setIsPayingInstallment] = useState(false);
+  const [installmentsView, setInstallmentsView] = useState<'list' | 'details'>(
+    'list'
+  );
+  const [selectedInstallmentForDetails, setSelectedInstallmentForDetails] =
+    useState<any>(null);
 
   const fetchAccounts = useCallback(async () => {
     if (!month || !year) {
@@ -154,6 +161,20 @@ export default function ContasDetailsPage() {
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts]);
+
+  // Abrir modal de edição se editAccountId estiver na URL
+  useEffect(() => {
+    if (editAccountId && accounts.length > 0 && month && year) {
+      const accountToEdit = accounts.find((acc) => acc.id === editAccountId);
+      if (accountToEdit) {
+        setSelectedAccount(accountToEdit);
+        setShowEditModal(true);
+        // Remover o parâmetro da URL
+        const newUrl = `/${locale}/contas/detalhes?month=${month}&year=${year}`;
+        router.replace(newUrl);
+      }
+    }
+  }, [editAccountId, accounts, month, year, locale, router]);
 
   const handleBack = () => {
     router.push(`/${locale}/contas`);
@@ -254,6 +275,8 @@ export default function ContasDetailsPage() {
     setShowInstallmentsModal(false);
     setSelectedAccount(null);
     setInstallments([]);
+    setInstallmentsView('list');
+    setSelectedInstallmentForDetails(null);
   };
 
   const handleRequestPayInstallment = (installment: any) => {
@@ -329,6 +352,16 @@ export default function ContasDetailsPage() {
     setShowDeleteInstallmentModal(false);
     setSelectedInstallment(null);
     setIsDeletingInstallment(false);
+  };
+
+  const handleViewInstallmentDetails = (installment: any) => {
+    setSelectedInstallmentForDetails(installment);
+    setInstallmentsView('details');
+  };
+
+  const handleBackToInstallmentsList = () => {
+    setInstallmentsView('list');
+    setSelectedInstallmentForDetails(null);
   };
 
   const handleCloseEditModal = () => {
@@ -739,7 +772,9 @@ export default function ContasDetailsPage() {
                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                                       />
                                     </svg>
-                                    {t('edit')}
+                                    {account.type === 'CREDIT_CARD'
+                                      ? t('editOrAddAccount')
+                                      : t('edit')}
                                   </button>
                                   <button
                                     onClick={() => handleDeleteAccount(account)}
@@ -851,45 +886,42 @@ export default function ContasDetailsPage() {
                                   </div>
                                 </div>
                                 {/* Campos específicos para empréstimos */}
-                                {account.type === 'LOAN' &&
-                                  account.totalPaidAmount && (
-                                    <div>
-                                      <div className="text-gray-800 font-semibold">
-                                        {t('interestRate')}
-                                      </div>
-                                      <div className="text-gray-600">
-                                        {formatCurrencyFromCents(
-                                          account.totalPaidAmount
-                                        )}
-                                      </div>
+                                {account.type === 'LOAN' && (
+                                  <div>
+                                    <div className="text-gray-800 font-semibold">
+                                      {t('interestRate')}
                                     </div>
-                                  )}
-                                {account.type === 'LOAN' &&
-                                  account.interestRate && (
-                                    <div>
-                                      <div className="text-gray-800 font-semibold">
-                                        {t('interestAmount')}
-                                      </div>
-                                      <div className="text-gray-600">
-                                        {formatCurrencyFromCents(
-                                          account.interestRate
-                                        )}
-                                      </div>
+                                    <div className="text-gray-600">
+                                      {formatCurrencyFromCents(
+                                        account.totalPaidAmount || 0
+                                      )}
                                     </div>
-                                  )}
-                                {account.type === 'LOAN' &&
-                                  account.totalWithInterest && (
-                                    <div>
-                                      <div className="text-gray-800 font-semibold">
-                                        {t('totalWithInterest')}
-                                      </div>
-                                      <div className="text-gray-600">
-                                        {formatCurrencyFromCents(
-                                          account.totalWithInterest
-                                        )}
-                                      </div>
+                                  </div>
+                                )}
+                                {account.type === 'LOAN' && (
+                                  <div>
+                                    <div className="text-gray-800 font-semibold">
+                                      {t('interestAmount')}
                                     </div>
-                                  )}
+                                    <div className="text-gray-600">
+                                      {formatCurrencyFromCents(
+                                        account.interestRate || 0
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                {account.type === 'LOAN' && (
+                                  <div>
+                                    <div className="text-gray-800 font-semibold">
+                                      {t('totalWithInterest')}
+                                    </div>
+                                    <div className="text-gray-600">
+                                      {formatCurrencyFromCents(
+                                        account.totalWithInterest || 0
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                                 <div>
                                   <div className="text-gray-800 font-semibold">
                                     {t('status')}
@@ -993,7 +1025,9 @@ export default function ContasDetailsPage() {
                                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                                           />
                                         </svg>
-                                        {t('edit')}
+                                        {account.type === 'CREDIT_CARD'
+                                          ? t('editOrAddAccount')
+                                          : t('edit')}
                                       </button>
                                       <button
                                         onClick={() =>
@@ -1036,7 +1070,11 @@ export default function ContasDetailsPage() {
         <BaseModal
           isOpen={showEditModal}
           onClose={handleCloseEditModal}
-          title={t('editAccount')}
+          title={
+            selectedAccount?.type === 'CREDIT_CARD'
+              ? t('editOrAddAccount')
+              : t('editAccount')
+          }
           size="2xl"
           closeOnBackdropClick={false}
           closeOnEsc={false}
@@ -1052,12 +1090,20 @@ export default function ContasDetailsPage() {
                 startDate: selectedAccount.startDate,
                 dueDay: selectedAccount.dueDay,
                 isPreview: selectedAccount.isPreview || false,
+                type: selectedAccount.type,
+                creditLimit: (selectedAccount as any).creditLimit,
+                closingDate: (selectedAccount as any).closingDate,
+                id: selectedAccount.id,
               }}
+              creditCardId={selectedAccount.id}
+              referenceMonth={month ? parseInt(month) : undefined}
+              referenceYear={year ? parseInt(year) : undefined}
+              onAccountLinked={fetchAccounts}
             />
           )}
         </BaseModal>
 
-        {/* Modal de Criar Conta (usa mês/ano do contexto) */}
+        {/* Modal de Criar Conta */}
         <ContaModal
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
@@ -1066,13 +1112,7 @@ export default function ContasDetailsPage() {
             try {
               const { useContasStore } = await import('@/store/contas.store');
               const addConta = useContasStore.getState().addConta;
-              await addConta({
-                ...data,
-                referenceMonth: parseInt(
-                  month || `${new Date().getMonth() + 1}`
-                ),
-                referenceYear: parseInt(year || `${new Date().getFullYear()}`),
-              } as any);
+              await addConta(data as any);
               await fetchAccounts();
               setShowCreateModal(false);
             } finally {
@@ -1080,8 +1120,6 @@ export default function ContasDetailsPage() {
             }
           }}
           loading={isCreating}
-          referenceMonth={month ? parseInt(month) : undefined}
-          referenceYear={year ? parseInt(year) : undefined}
         />
 
         {/* Modal de Confirmação de Exclusão */}
@@ -1103,217 +1141,363 @@ export default function ContasDetailsPage() {
           closeOnEsc={false}
         />
 
-        {/* Modal de Confirmação de Exclusão de Parcela */}
-        <div
-          className={
-            showDeleteInstallmentModal ? 'fixed inset-0 z-[60]' : 'hidden'
-          }
-        >
-          <BaseConfirmModal
-            isOpen={showDeleteInstallmentModal}
-            onClose={handleCloseDeleteInstallmentModal}
-            onConfirm={handleConfirmDeleteInstallment}
-            title={t('confirmDeleteInstallment')}
-            message={
-              selectedInstallment
-                ? `${t('confirmDeleteInstallmentMessage')} ${t(
-                    'installment'
-                  )} ${selectedInstallment.number}?`
-                : t('confirmDeleteInstallment')
-            }
-            confirmText={t('delete')}
-            cancelText={t('cancel')}
-            type="danger"
-            loading={isDeletingInstallment}
-            closeOnBackdropClick={false}
-            closeOnEsc={false}
-          />
-        </div>
-
         {/* Modal de Parcelas */}
         <BaseModal
           isOpen={showInstallmentsModal}
           onClose={handleCloseInstallmentsModal}
-          title={t('installmentsList')}
+          title={
+            installmentsView === 'details' && selectedInstallmentForDetails
+              ? `${t('installment')} ${
+                  selectedInstallmentForDetails.number
+                } - ${t('details')}`
+              : t('installmentsList')
+          }
           size="2xl"
           closeOnBackdropClick={false}
           closeOnEsc={false}
         >
           {selectedAccount && (
-            <div className="p-6 max-h-96 flex flex-col">
-              <div className="mb-4 flex-shrink-0">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {selectedAccount.name}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {t('totalInstallments')}: {selectedAccount.installments}
-                </p>
-              </div>
+            <div className="relative overflow-hidden">
+              {/* Container com transição */}
+              <div
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{
+                  transform: `translateX(${
+                    installmentsView === 'list' ? '0%' : '-100%'
+                  })`,
+                }}
+              >
+                {/* View de Lista de Parcelas */}
+                <div className="w-full flex-shrink-0 p-6 max-h-96 flex flex-col">
+                  <div className="mb-4 flex-shrink-0">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {selectedAccount.name}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {t('totalInstallments')}: {selectedAccount.installments}
+                    </p>
+                  </div>
 
-              <div className="flex-1 overflow-y-auto">
-                {loadingInstallments ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-2 text-gray-600">{t('loading')}</span>
-                  </div>
-                ) : installments.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-gray-400 text-4xl mb-2">📋</div>
-                    <p className="text-gray-600">{t('noInstallmentsFound')}</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pr-2">
-                    {installments.map((installment, index) => (
-                      <div
-                        key={installment.id || index}
-                        className="p-4 bg-gray-50 rounded-lg"
-                      >
-                        {/* Layout Desktop */}
-                        <div className="hidden md:flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {t('installment')} {installment.number}
+                  <div className="flex-1 overflow-y-auto">
+                    {loadingInstallments ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <span className="ml-2 text-gray-600">
+                          {t('loading')}
+                        </span>
+                      </div>
+                    ) : installments.length === 0 ? (
+                      <div className="text-center py-8">
+                        <div className="text-gray-400 text-4xl mb-2">📋</div>
+                        <p className="text-gray-600">
+                          {t('noInstallmentsFound')}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 pr-2">
+                        {installments.map((installment, index) => (
+                          <div
+                            key={installment.id || index}
+                            className="p-4 bg-gray-50 rounded-lg"
+                          >
+                            {/* Layout Desktop */}
+                            <div className="hidden md:flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {t('installment')} {installment.number}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {formatDateSafe(installment.dueDate)}
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-4">
+                                <div className="text-sm font-semibold text-gray-900">
+                                  {formatCurrencyFromCents(installment.amount)}
+                                </div>
+                                <span
+                                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                    installment.isPaid
+                                      ? 'bg-green-100 text-green-800'
+                                      : 'bg-yellow-100 text-yellow-800'
+                                  }`}
+                                >
+                                  {installment.isPaid
+                                    ? t('paid')
+                                    : t('pending')}
+                                </span>
+                                <div className="flex items-center space-x-2">
+                                  {selectedAccount?.type === 'CREDIT_CARD' &&
+                                    installment.breakdown && (
+                                      <button
+                                        onClick={() =>
+                                          handleViewInstallmentDetails(
+                                            installment
+                                          )
+                                        }
+                                        className="flex items-center px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
+                                        title={t('viewDetails')}
+                                      >
+                                        <svg
+                                          className="w-3 h-3"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                          />
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                          />
+                                        </svg>
+                                      </button>
+                                    )}
+                                  {!installment.isPaid && (
+                                    <button
+                                      onClick={() =>
+                                        handleRequestPayInstallment(installment)
+                                      }
+                                      className="flex items-center px-2 py-1 text-xs font-medium text-green-600 bg-green-50 rounded hover:bg-green-100 transition-colors"
+                                    >
+                                      <svg
+                                        className="w-3 h-3 mr-1"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                      </svg>
+                                      {t('pay')}
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-600">
-                              {formatDateSafe(installment.dueDate)}
+
+                            {/* Layout Mobile */}
+                            <div className="md:hidden">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {t('installment')} {installment.number}
+                                </div>
+                                <span
+                                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                    installment.isPaid
+                                      ? 'bg-green-100 text-green-800'
+                                      : 'bg-yellow-100 text-yellow-800'
+                                  }`}
+                                >
+                                  {installment.isPaid
+                                    ? t('paid')
+                                    : t('pending')}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="text-sm text-gray-600">
+                                  {formatDateSafe(installment.dueDate)}
+                                </div>
+                                <div className="text-sm font-semibold text-gray-900">
+                                  {formatCurrencyFromCents(installment.amount)}
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                {selectedAccount?.type === 'CREDIT_CARD' &&
+                                  installment.breakdown && (
+                                    <button
+                                      onClick={() =>
+                                        handleViewInstallmentDetails(
+                                          installment
+                                        )
+                                      }
+                                      className="flex items-center px-3 py-2 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                                      title={t('viewDetails')}
+                                    >
+                                      <svg
+                                        className="w-3 h-3 mr-1"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                        />
+                                      </svg>
+                                      {t('viewDetails')}
+                                    </button>
+                                  )}
+                                {!installment.isPaid && (
+                                  <button
+                                    onClick={() =>
+                                      handleRequestPayInstallment(installment)
+                                    }
+                                    className="flex items-center px-3 py-2 text-xs font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                                  >
+                                    <svg
+                                      className="w-3 h-3 mr-1"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                      />
+                                    </svg>
+                                    {t('pay')}
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-4">
-                            <div className="text-sm font-semibold text-gray-900">
-                              {formatCurrencyFromCents(installment.amount)}
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* View de Detalhes da Parcela */}
+                {selectedInstallmentForDetails &&
+                  selectedInstallmentForDetails.breakdown && (
+                    <div className="w-full flex-shrink-0 p-6 max-h-96 flex flex-col">
+                      <div className="mb-4 pb-4 border-b border-gray-200 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={handleBackToInstallmentsList}
+                          className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                        >
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 19l-7-7 7-7"
+                            />
+                          </svg>
+                          {t('backToList') || 'Voltar para Lista'}
+                        </button>
+                      </div>
+
+                      <div className="flex-1 overflow-y-auto">
+                        {/* Informações da Parcela */}
+                        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <div className="text-sm font-medium text-gray-600 mb-1">
+                                {t('dueDate')}
+                              </div>
+                              <div className="text-lg font-semibold text-gray-900">
+                                {formatDateSafe(
+                                  selectedInstallmentForDetails.dueDate
+                                )}
+                              </div>
                             </div>
-                            <span
-                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                installment.isPaid
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-yellow-100 text-yellow-800'
-                              }`}
-                            >
-                              {installment.isPaid ? t('paid') : t('pending')}
-                            </span>
-                            <div className="flex items-center space-x-2">
-                              {!installment.isPaid && (
-                                <button
-                                  onClick={() =>
-                                    handleRequestPayInstallment(installment)
-                                  }
-                                  className="flex items-center px-2 py-1 text-xs font-medium text-green-600 bg-green-50 rounded hover:bg-green-100 transition-colors"
-                                >
-                                  <svg
-                                    className="w-3 h-3 mr-1"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                  </svg>
-                                  {t('pay')}
-                                </button>
-                              )}
-                              <button
-                                onClick={() =>
-                                  handleDeleteInstallment(installment)
-                                }
-                                className="flex items-center px-2 py-1 text-xs font-medium text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
-                              >
-                                <svg
-                                  className="w-3 h-3"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
-                                </svg>
-                              </button>
+                            <div>
+                              <div className="text-sm font-medium text-gray-600 mb-1">
+                                {t('totalAmount')}
+                              </div>
+                              <div className="text-lg font-semibold text-gray-900">
+                                {formatCurrencyFromCents(
+                                  selectedInstallmentForDetails.amount
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        {/* Layout Mobile */}
-                        <div className="md:hidden">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="text-sm font-medium text-gray-900">
-                              {t('installment')} {installment.number}
-                            </div>
-                            <span
-                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                installment.isPaid
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-yellow-100 text-yellow-800'
-                              }`}
-                            >
-                              {installment.isPaid ? t('paid') : t('pending')}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="text-sm text-gray-600">
-                              {formatDateSafe(installment.dueDate)}
-                            </div>
-                            <div className="text-sm font-semibold text-gray-900">
-                              {formatCurrencyFromCents(installment.amount)}
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {!installment.isPaid && (
-                              <button
-                                onClick={() =>
-                                  handleRequestPayInstallment(installment)
+                        {/* Contas Vinculadas */}
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                            {t('linkedAccounts') || 'Contas Vinculadas'}
+                          </h3>
+
+                          {selectedInstallmentForDetails.breakdown
+                            .linkedAccounts &&
+                          selectedInstallmentForDetails.breakdown.linkedAccounts
+                            .length > 0 ? (
+                            <div className="space-y-3">
+                              {selectedInstallmentForDetails.breakdown.linkedAccounts.map(
+                                (linkedAccount: any, index: number) => {
+                                  // Pega a data da primeira parcela se existir, senão usa a data da parcela principal
+                                  const firstInstallment =
+                                    linkedAccount.installments?.[0];
+                                  const displayDate = firstInstallment
+                                    ? firstInstallment.dueDate
+                                    : selectedInstallmentForDetails.dueDate;
+
+                                  return (
+                                    <div
+                                      key={linkedAccount.accountId || index}
+                                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <div className="flex-1">
+                                          <h4 className="text-base font-semibold text-gray-900 mb-2">
+                                            {linkedAccount.accountName}
+                                          </h4>
+                                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                            <span>
+                                              {t('dueDate')}:{' '}
+                                              <span className="font-medium text-gray-900">
+                                                {formatDateSafe(displayDate)}
+                                              </span>
+                                            </span>
+                                          </div>
+                                        </div>
+                                        <div className="text-right">
+                                          <div className="text-lg font-semibold text-gray-900">
+                                            {formatCurrencyFromCents(
+                                              linkedAccount.totalAmount
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
                                 }
-                                className="flex items-center px-3 py-2 text-xs font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-                              >
-                                <svg
-                                  className="w-3 h-3 mr-1"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                  />
-                                </svg>
-                                {t('pay')}
-                              </button>
-                            )}
-                            <button
-                              onClick={() =>
-                                handleDeleteInstallment(installment)
-                              }
-                              className="flex items-center px-3 py-2 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-                            >
-                              <svg
-                                className="w-3 h-3 mr-1"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                              {t('delete')}
-                            </button>
-                          </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-center py-8 bg-gray-50 rounded-lg">
+                              <div className="text-gray-400 text-4xl mb-2">
+                                📋
+                              </div>
+                              <p className="text-gray-600">
+                                {t('noLinkedAccounts') ||
+                                  'Nenhuma conta vinculada'}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  )}
               </div>
             </div>
           )}

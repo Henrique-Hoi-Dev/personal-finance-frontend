@@ -10,7 +10,7 @@ export const useEndpointOptions = <T extends Record<string, any>>(
 ): SelectOption[] => {
   return useMemo(() => {
     const options: SelectOption[] = [];
-    
+
     if (placeholder) {
       options.push({
         value: '',
@@ -18,14 +18,17 @@ export const useEndpointOptions = <T extends Record<string, any>>(
         disabled: true,
       });
     }
-    
-    options.push(
-      ...data.map((item) => ({
-        value: String(item[valueKey]),
-        label: String(item[labelKey]),
-      }))
-    );
-    
+
+    // Valida se data é um array válido antes de fazer map
+    if (Array.isArray(data) && data.length > 0) {
+      options.push(
+        ...data.map((item) => ({
+          value: String(item[valueKey]),
+          label: String(item[labelKey]),
+        }))
+      );
+    }
+
     return options;
   }, [data, valueKey, labelKey, placeholder]);
 };
@@ -38,7 +41,7 @@ export const useEnumOptions = (
 ): SelectOption[] => {
   return useMemo(() => {
     const options: SelectOption[] = [];
-    
+
     if (placeholder) {
       options.push({
         value: '',
@@ -46,14 +49,14 @@ export const useEnumOptions = (
         disabled: true,
       });
     }
-    
+
     options.push(
       ...Object.entries(enumObject).map(([key, value]) => ({
         value: value,
         label: translations?.[value] || key,
       }))
     );
-    
+
     return options;
   }, [enumObject, translations, placeholder]);
 };
@@ -65,7 +68,7 @@ export const useCustomOptions = (
 ): SelectOption[] => {
   return useMemo(() => {
     const selectOptions: SelectOption[] = [];
-    
+
     if (placeholder) {
       selectOptions.push({
         value: '',
@@ -73,9 +76,9 @@ export const useCustomOptions = (
         disabled: true,
       });
     }
-    
+
     selectOptions.push(...options);
-    
+
     return selectOptions;
   }, [options, placeholder]);
 };

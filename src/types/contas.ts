@@ -1,3 +1,20 @@
+export interface LinkedAccountInstallment {
+  number: number;
+  amount: number;
+  dueDate: string;
+}
+
+export interface LinkedAccount {
+  accountId: string;
+  accountName: string;
+  totalAmount: number;
+  installments: LinkedAccountInstallment[];
+}
+
+export interface InstallmentBreakdown {
+  linkedAccounts: LinkedAccount[];
+}
+
 export interface Installment {
   id: string;
   amount: number;
@@ -5,6 +22,9 @@ export interface Installment {
   dueDate: string;
   isPaid: boolean;
   paidAt: string | null;
+  referenceMonth?: number;
+  referenceYear?: number;
+  breakdown?: InstallmentBreakdown;
 }
 
 export interface Conta {
@@ -51,6 +71,9 @@ export interface Conta {
     referenceMonth: number;
     referenceYear: number;
   };
+  // Campos específicos para cartão de crédito
+  creditLimit?: number;
+  closingDate?: number;
 }
 
 export interface CreateContaPayload {
@@ -76,6 +99,9 @@ export interface CreateContaPayload {
   dueDay: number;
   referenceMonth?: number;
   referenceYear?: number;
+  // Campos específicos para cartão de crédito
+  creditLimit?: number;
+  closingDate?: number;
 }
 
 export interface UpdateContaPayload {
@@ -87,6 +113,9 @@ export interface UpdateContaPayload {
   isPreview?: boolean;
   startDate?: string;
   dueDay?: number;
+  // Campos específicos para cartão de crédito
+  creditLimit?: number;
+  closingDate?: number;
 }
 
 // Types for installments
@@ -139,7 +168,7 @@ import { PaginatedResponse } from './common';
 export type { PaginatedResponse };
 
 // Types for monthly comparison endpoint
-export interface MonthlyComparisonData {
+export interface ApiMonthlyComparisonData {
   totalIncome: number;
   totalExpenses: number;
   totalBalance: number;
@@ -156,7 +185,7 @@ export interface MonthlyComparisonData {
 }
 
 export interface MonthlyComparisonResponse {
-  docs: MonthlyComparisonData[];
+  docs: ApiMonthlyComparisonData[];
   total: number;
   limit: number;
   offset: number;

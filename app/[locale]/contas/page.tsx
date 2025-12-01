@@ -9,6 +9,7 @@ import {
   MonthlyComparisonTable,
   MonthlyFinancialSummary,
   AccountsTutorial,
+  PluggyConnectButton,
 } from '@/components/molecules';
 import { useContasStore } from '@/store/contas.store';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -16,9 +17,8 @@ import {
   getMonthlyComparison,
   getDashboardAll,
 } from '@/services/contas.service';
-import { MonthlyComparisonData as ApiMonthlyComparisonData } from '@/types/contas';
+import { ApiMonthlyComparisonData } from '@/types/contas';
 import { MonthlyComparisonData } from '@/types/monthly-financial';
-import { formatDateSafe } from '@/utils';
 
 export default function ContasPage() {
   const router = useRouter();
@@ -59,10 +59,38 @@ export default function ContasPage() {
   const handleCreateConta = async (data: any) => {
     setIsCreating(true);
     try {
-      await addConta(data);
-      setIsModalOpen(false);
-      await fetchDashboardData();
-      await fetchMonthlyComparison();
+      // Se for cartão de crédito, criar diretamente para obter o ID
+      if (data.type === 'CREDIT_CARD') {
+        const { useAuthStore } = await import('@/store/auth.store');
+        const { user } = useAuthStore.getState();
+        if (!user?.id) {
+          throw new Error('Usuário não autenticado');
+        }
+
+        const { createConta } = await import('@/services/contas.service');
+        const contaData = {
+          ...data,
+          userId: user.id,
+        };
+        const novaConta = await createConta(contaData);
+
+        // Fechar modal
+        setIsModalOpen(false);
+
+        // Redirecionar para o mês atual na página de detalhes
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = now.getFullYear();
+
+        router.push(
+          `/${locale}/contas/detalhes?month=${currentMonth}&year=${currentYear}&editAccountId=${novaConta.id}`
+        );
+      } else {
+        await addConta(data);
+        setIsModalOpen(false);
+        await fetchDashboardData();
+        await fetchMonthlyComparison();
+      }
     } catch (error) {
       console.error('Erro ao criar conta:', error);
     } finally {
@@ -190,7 +218,8 @@ export default function ContasPage() {
                 </h1>
                 <p className="text-gray-600 text-sm mt-1">{t('description')}</p>
               </div>
-              <div className="flex justify-stretch lg:justify-end">
+              <div className="flex flex-col sm:flex-row gap-2 justify-stretch lg:justify-end">
+                <PluggyConnectButton />
                 <button
                   data-tour-id="add-account-button"
                   onClick={() => setIsModalOpen(true)}

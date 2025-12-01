@@ -27,9 +27,13 @@ export const useCategoriesStore = create<CategoriesStore>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const categories = await getCategories();
-      set({ categories, loading: false });
+      set({
+        categories: Array.isArray(categories) ? categories : [],
+        loading: false,
+      });
     } catch (error: any) {
       set({
+        categories: [], // Mantém array vazio em caso de erro
         error: error.message || 'Erro ao carregar categorias',
         loading: false,
       });

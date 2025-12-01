@@ -11,8 +11,6 @@ interface ContaModalProps {
   onClose: () => void;
   onSubmit: (data: Omit<CreateContaPayload, 'userId'>) => Promise<void>;
   loading?: boolean;
-  referenceMonth?: number;
-  referenceYear?: number;
 }
 
 export function ContaModal({
@@ -20,8 +18,6 @@ export function ContaModal({
   onClose,
   onSubmit,
   loading = false,
-  referenceMonth,
-  referenceYear,
 }: ContaModalProps) {
   const t = useTranslations('Contas');
 
@@ -51,11 +47,6 @@ export function ContaModal({
           onSubmit={handleSubmit}
           onCancel={onClose}
           loading={loading}
-          hideReferenceFields={Boolean(referenceMonth && referenceYear)}
-          initialData={{
-            referenceMonth: referenceMonth,
-            referenceYear: referenceYear,
-          }}
         />
       </div>
     </BaseModal>

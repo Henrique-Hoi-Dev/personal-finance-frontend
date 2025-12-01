@@ -12,3 +12,6 @@ export * from './transacoes';
 
 // Monthly Financial types
 export * from './monthly-financial';
+
+// Pluggy types
+export * from './pluggy';

@@ -20,7 +20,6 @@ interface ContaFormProps {
   onCancel: () => void;
   loading?: boolean;
   initialData?: Partial<Omit<CreateContaPayload, 'userId'>>;
-  hideReferenceFields?: boolean;
 }
 
 export function ContaForm({
@@ -28,7 +27,6 @@ export function ContaForm({
   onCancel,
   loading = false,
   initialData,
-  hideReferenceFields = false,
 }: ContaFormProps) {
   const t = useTranslations('Contas');
   const tCommon = useTranslations('Common');
@@ -39,14 +37,16 @@ export function ContaForm({
     installments: initialData?.installments || 1,
     startDate: initialData?.startDate || '',
     dueDay: initialData?.dueDay || 1,
-    referenceMonth: initialData?.referenceMonth || new Date().getMonth() + 1,
-    referenceYear: initialData?.referenceYear || new Date().getFullYear(),
+    creditLimit: initialData?.creditLimit || 0,
+    closingDate: initialData?.closingDate || 1,
   });
 
   const [hasInstallments, setHasInstallments] = useState(
     initialData?.installments ? initialData.installments > 1 : false
   );
   const [installmentValue, setInstallmentValue] = useState<string>('');
+  const [parceledInstallmentValue, setParceledInstallmentValue] =
+    useState<string>('');
   const [isPreview, setIsPreview] = useState(initialData?.isPreview || false);
 
   // Helper de cálculo por parcela (UX apenas)
@@ -56,7 +56,7 @@ export function ContaForm({
 
   // Função para verificar se preview deve estar desabilitado
   const isPreviewDisabled = () => {
-    return formData.type === 'LOAN';
+    return formData.type === 'LOAN' || formData.type === 'CREDIT_CARD' || formData.type === 'DEBIT_CARD';
   };
 
   // Função para verificar se parcelamento deve estar forçado
@@ -67,7 +67,12 @@ export function ContaForm({
   // Função para verificar se parcelamento deve estar desabilitado
   const isInstallmentsDisabled = () => {
     // Quando preview estiver selecionado no tipo FIXED, não pode ter parcelas
-    return formData.type === 'FIXED' && isPreview;
+    // Cartão de crédito e cartão de débito não podem ter parcelas
+    return (
+      (formData.type === 'FIXED' && isPreview) ||
+      formData.type === 'CREDIT_CARD' ||
+      formData.type === 'DEBIT_CARD'
+    );
   };
 
   // Função para verificar se parcelamento deve estar bloqueado (não pode desativar)
@@ -85,6 +90,16 @@ export function ContaForm({
     if (formData.type === 'LOAN') {
       setIsPreview(false);
     }
+    // Se for CREDIT_CARD, desabilitar preview e parcelas
+    if (formData.type === 'CREDIT_CARD') {
+      setIsPreview(false);
+      setHasInstallments(false);
+    }
+    // Se for DEBIT_CARD, desabilitar preview e parcelas
+    if (formData.type === 'DEBIT_CARD') {
+      setIsPreview(false);
+      setHasInstallments(false);
+    }
   }, [formData.type]);
 
   // Aplicar regras quando preview mudar
@@ -92,12 +107,43 @@ export function ContaForm({
     // Se preview estiver ativo no tipo FIXED, desabilitar parcelas
     if (formData.type === 'FIXED' && isPreview) {
       setHasInstallments(false);
+      // Limpar valor da parcela quando desabilitar parcelas
+      setParceledInstallmentValue('');
+      setDisplayParceledInstallmentValue('');
     }
     // Se preview estiver desativo no tipo FIXED, forçar parcelas
     else if (formData.type === 'FIXED' && !isPreview) {
       setHasInstallments(true);
     }
   }, [isPreview, formData.type]);
+
+  // Limpar valor da parcela quando hasInstallments mudar para false
+  useEffect(() => {
+    if (!hasInstallments && formData.type !== 'LOAN') {
+      setParceledInstallmentValue('');
+      setDisplayParceledInstallmentValue('');
+    }
+  }, [hasInstallments, formData.type]);
+
+  // Recalcular totalAmount quando número de parcelas mudar (se já tiver valor da parcela)
+  useEffect(() => {
+    if (
+      hasInstallments &&
+      formData.type !== 'LOAN' &&
+      parceledInstallmentValue
+    ) {
+      const valueInCents =
+        parseInt(parceledInstallmentValue.replace(/\D/g, '')) || 0;
+      const installmentsCount = formData.installments || 1;
+      const totalAmount = valueInCents * installmentsCount;
+      setFormData((prev) => ({ ...prev, totalAmount }));
+    }
+  }, [
+    formData.installments,
+    hasInstallments,
+    formData.type,
+    parceledInstallmentValue,
+  ]);
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof Omit<CreateContaPayload, 'userId'>, string>>
@@ -106,13 +152,18 @@ export function ContaForm({
   const [displayValue, setDisplayValue] = useState<string>(
     initialData?.totalAmount ? formatCurrency(initialData.totalAmount) : ''
   );
+  const [displayParceledInstallmentValue, setDisplayParceledInstallmentValue] =
+    useState<string>('');
+  const [displayCreditLimit, setDisplayCreditLimit] = useState<string>(
+    initialData?.creditLimit ? formatCurrency(initialData.creditLimit) : ''
+  );
 
   // Opções para o select de tipo de conta
   const tipoContaOptions = useCustomOptions(
-    accountTypes.map((type) => ({
+    accountTypes?.map((type) => ({
       value: type.value,
       label: type.label,
-    }))
+    })) || []
   );
 
   const handleCurrencyChange = (inputValue: string) => {
@@ -151,6 +202,28 @@ export function ContaForm({
     setInstallmentValue(formatCurrency(valueInReais));
   };
 
+  const handleParceledInstallmentValueChange = (inputValue: string) => {
+    const numbersOnly = inputValue.replace(/\D/g, '');
+
+    if (numbersOnly === '') {
+      setParceledInstallmentValue('');
+      setDisplayParceledInstallmentValue('');
+      setFormData((prev) => ({ ...prev, totalAmount: 0 }));
+      return;
+    }
+
+    const valueInCents = parseInt(numbersOnly);
+    const valueInReais = valueInCents / 100;
+
+    setParceledInstallmentValue(formatCurrency(valueInReais));
+    setDisplayParceledInstallmentValue(formatCurrency(valueInReais));
+
+    // Calcular totalAmount automaticamente: valor da parcela * número de parcelas
+    const installmentsCount = formData.installments || 1;
+    const totalAmount = valueInCents * installmentsCount;
+    setFormData((prev) => ({ ...prev, totalAmount }));
+  };
+
   // Helper: mudança do valor por parcela (currency)
   const handleCalcInstallmentValueChange = (inputValue: string) => {
     const numbersOnly = inputValue.replace(/\D/g, '');
@@ -185,6 +258,10 @@ export function ContaForm({
       setInstallmentValue('');
     }
 
+    // Limpar valor da parcela quando tipo mudar
+    setParceledInstallmentValue('');
+    setDisplayParceledInstallmentValue('');
+
     if (errors.type) {
       setErrors((prev) => ({ ...prev, type: undefined }));
     }
@@ -199,8 +276,42 @@ export function ContaForm({
       newErrors.name = tCommon('validation.nameRequired');
     }
 
-    if (formData.totalAmount <= 0) {
+    // Valor Total é obrigatório apenas se for LOAN ou não for parcelado (exceto cartão de crédito)
+    if (
+      (formData.type === 'LOAN' || !hasInstallments) &&
+      formData.type !== 'CREDIT_CARD' &&
+      formData.totalAmount <= 0
+    ) {
       newErrors.totalAmount = tCommon('validation.totalAmountRequired');
+    }
+
+    // Valor da parcela é obrigatório se for parcelado e não for LOAN
+    if (
+      hasInstallments &&
+      formData.type !== 'LOAN' &&
+      formData.type !== 'CREDIT_CARD' &&
+      formData.type !== 'DEBIT_CARD' &&
+      (!parceledInstallmentValue ||
+        parseInt(parceledInstallmentValue.replace(/\D/g, '')) <= 0)
+    ) {
+      newErrors.totalAmount =
+        t('installmentAmountRequired') ||
+        tCommon('validation.totalAmountRequired');
+    }
+
+    if (formData.type === 'CREDIT_CARD') {
+      if (!formData.creditLimit || formData.creditLimit <= 0) {
+        (newErrors as any).creditLimit =
+          t('creditLimitRequired') || 'Limite de crédito é obrigatório';
+      }
+      if (
+        !formData.closingDate ||
+        formData.closingDate < 1 ||
+        formData.closingDate > 31
+      ) {
+        (newErrors as any).closingDate =
+          t('closingDateRequired') || 'Dia de fechamento inválido';
+      }
     }
 
     // Para contas FIXED sem preview, sempre deve ter parcelas
@@ -253,8 +364,6 @@ export function ContaForm({
           isPreview: false, // Sempre false para LOAN
           startDate: formData.startDate,
           dueDay: formData.dueDay,
-          referenceMonth: formData.referenceMonth,
-          referenceYear: formData.referenceYear,
         };
       } else if (formData.type === 'FIXED') {
         // Para contas FIXED, usar o valor do isPreview
@@ -266,8 +375,28 @@ export function ContaForm({
           isPreview: isPreview,
           startDate: formData.startDate,
           dueDay: formData.dueDay,
-          referenceMonth: formData.referenceMonth,
-          referenceYear: formData.referenceYear,
+        };
+      } else if (formData.type === 'CREDIT_CARD') {
+        // Para cartão de crédito
+        dataToSubmit = {
+          name: formData.name,
+          type: formData.type,
+          totalAmount: 0, // Cartão de crédito não tem valor total
+          isPreview: false, // Sempre false para CREDIT_CARD
+          startDate: formData.startDate,
+          dueDay: formData.dueDay,
+          creditLimit: formData.creditLimit,
+          closingDate: formData.closingDate,
+        };
+      } else if (formData.type === 'DEBIT_CARD') {
+        // Para cartão de débito
+        dataToSubmit = {
+          name: formData.name,
+          type: formData.type,
+          totalAmount: formData.totalAmount,
+          isPreview: false, // Sempre false para DEBIT_CARD
+          startDate: formData.startDate,
+          dueDay: formData.dueDay,
         };
       } else if (hasInstallments) {
         // Para outros tipos com parcelas
@@ -284,8 +413,6 @@ export function ContaForm({
           isPreview: isPreview,
           startDate: formData.startDate,
           dueDay: formData.dueDay,
-          referenceMonth: formData.referenceMonth,
-          referenceYear: formData.referenceYear,
         };
       }
 
@@ -362,127 +489,203 @@ export function ContaForm({
           />
         </div>
 
-        <div data-tour-id="field-valor-total">
-          <div className="flex items-center justify-between">
-            <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
-              {t('totalAmount')} <span className="text-red-500">*</span>
-            </BaseLabel>
-            {hasInstallments && formData.type === 'FIXED' && (
-              <button
-                type="button"
-                onClick={() => setShowCalcModal(true)}
-                className="text-xs text-blue-600 hover:text-blue-700"
-              >
-                {t('calcByInstallment')}
-              </button>
-            )}
-          </div>
-          <BaseInput
-            type="text"
-            value={displayValue}
-            onChange={(e) => handleCurrencyChange(e.target.value)}
-            placeholder={tCommon('placeholders.currency')}
-            className={`w-full h-12 text-base ${
-              errors.totalAmount ? 'border-red-500' : ''
-            }`}
-          />
-          {errors.totalAmount && (
-            <p className="text-red-500 text-sm mt-1">{errors.totalAmount}</p>
-          )}
+        {(formData.type === 'LOAN' || !hasInstallments) &&
+          formData.type !== 'CREDIT_CARD' && (
+            <div data-tour-id="field-valor-total">
+              <div className="flex items-center justify-between">
+                <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('totalAmount')} <span className="text-red-500">*</span>
+                </BaseLabel>
+                {hasInstallments && formData.type === 'FIXED' && (
+                  <button
+                    type="button"
+                    onClick={() => setShowCalcModal(true)}
+                    className="text-xs text-blue-600 hover:text-blue-700"
+                  >
+                    {t('calcByInstallment')}
+                  </button>
+                )}
+              </div>
+              <BaseInput
+                type="text"
+                value={displayValue}
+                onChange={(e) => handleCurrencyChange(e.target.value)}
+                placeholder={tCommon('placeholders.currency')}
+                className={`w-full h-12 text-base ${
+                  errors.totalAmount ? 'border-red-500' : ''
+                }`}
+              />
+              {errors.totalAmount && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.totalAmount}
+                </p>
+              )}
 
-          <BaseModal
-            isOpen={showCalcModal}
-            onClose={() => setShowCalcModal(false)}
-            title={t('calcByInstallment')}
-            size="lg"
-          >
-            <div className="p-2 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <BaseLabel className="block text-xs font-medium text-gray-700 mb-1">
-                    {t('installmentAmount')}
-                  </BaseLabel>
-                  <BaseInput
-                    type="text"
-                    value={calcInstallmentValue}
-                    onChange={(e) =>
-                      handleCalcInstallmentValueChange(e.target.value)
-                    }
-                    placeholder={tCommon('placeholders.currency')}
-                    className="w-full h-10 text-sm"
-                  />
-                </div>
-                <div>
-                  <BaseLabel className="block text-xs font-medium text-gray-700 mb-1">
-                    {t('installments')}
-                  </BaseLabel>
-                  <BaseInput
-                    type="number"
-                    value={(formData.installments || 1).toString()}
-                    onChange={(e) => {
-                      const count = parseInt(e.target.value) || 1;
-                      handleInputChange('installments', count);
-                      if (calcSyncEnabled) {
+              <BaseModal
+                isOpen={showCalcModal}
+                onClose={() => setShowCalcModal(false)}
+                title={t('calcByInstallment')}
+                size="lg"
+              >
+                <div className="p-2 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <BaseLabel className="block text-xs font-medium text-gray-700 mb-1">
+                        {t('installmentAmount')}
+                      </BaseLabel>
+                      <BaseInput
+                        type="text"
+                        value={calcInstallmentValue}
+                        onChange={(e) =>
+                          handleCalcInstallmentValueChange(e.target.value)
+                        }
+                        placeholder={tCommon('placeholders.currency')}
+                        className="w-full h-10 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <BaseLabel className="block text-xs font-medium text-gray-700 mb-1">
+                        {t('installments')}
+                      </BaseLabel>
+                      <BaseInput
+                        type="number"
+                        value={(formData.installments || 1).toString()}
+                        onChange={(e) => {
+                          const count = parseInt(e.target.value) || 1;
+                          handleInputChange('installments', count);
+                          if (calcSyncEnabled) {
+                            const cents =
+                              parseInt(
+                                (calcInstallmentValue || '').replace(/\D/g, '')
+                              ) || 0;
+                            setFormData((prev) => ({
+                              ...prev,
+                              totalAmount: cents * count,
+                            }));
+                            setDisplayValue(
+                              formatCurrency((cents / 100) * count)
+                            );
+                          }
+                        }}
+                        min="1"
+                        className="w-full h-10 text-sm"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <label className="inline-flex items-center space-x-2 text-xs text-gray-700">
+                        <input
+                          type="checkbox"
+                          className="rounded"
+                          checked={calcSyncEnabled}
+                          onChange={(e) => setCalcSyncEnabled(e.target.checked)}
+                        />
+                        <span>{t('keepSynced')}</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    {t('calculatedTotal')}:{' '}
+                    <strong>{displayValue || formatCurrency(0)}</strong>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <BaseButton
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setShowCalcModal(false)}
+                    >
+                      {t('cancel')}
+                    </BaseButton>
+                    <BaseButton
+                      type="button"
+                      variant="primary"
+                      onClick={() => {
                         const cents =
                           parseInt(
                             (calcInstallmentValue || '').replace(/\D/g, '')
                           ) || 0;
+                        const count = formData.installments || 1;
+                        const total = cents * count;
                         setFormData((prev) => ({
                           ...prev,
-                          totalAmount: cents * count,
+                          totalAmount: total,
                         }));
-                        setDisplayValue(formatCurrency((cents / 100) * count));
-                      }
-                    }}
-                    min="1"
-                    className="w-full h-10 text-sm"
-                  />
+                        setDisplayValue(formatCurrency(total / 100));
+                        setShowCalcModal(false);
+                      }}
+                    >
+                      {t('useThisTotal')}
+                    </BaseButton>
+                  </div>
                 </div>
-                <div className="flex items-end">
-                  <label className="inline-flex items-center space-x-2 text-xs text-gray-700">
-                    <input
-                      type="checkbox"
-                      className="rounded"
-                      checked={calcSyncEnabled}
-                      onChange={(e) => setCalcSyncEnabled(e.target.checked)}
-                    />
-                    <span>{t('keepSynced')}</span>
-                  </label>
-                </div>
-              </div>
-              <div className="text-sm text-gray-700">
-                {t('calculatedTotal')}:{' '}
-                <strong>{displayValue || formatCurrency(0)}</strong>
-              </div>
-              <div className="flex justify-end space-x-2">
-                <BaseButton
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setShowCalcModal(false)}
-                >
-                  {t('cancel')}
-                </BaseButton>
-                <BaseButton
-                  type="button"
-                  variant="primary"
-                  onClick={() => {
-                    const cents =
-                      parseInt(
-                        (calcInstallmentValue || '').replace(/\D/g, '')
-                      ) || 0;
-                    const count = formData.installments || 1;
-                    const total = cents * count;
-                    setFormData((prev) => ({ ...prev, totalAmount: total }));
-                    setDisplayValue(formatCurrency(total / 100));
-                    setShowCalcModal(false);
-                  }}
-                >
-                  {t('useThisTotal')}
-                </BaseButton>
-              </div>
+              </BaseModal>
             </div>
-          </BaseModal>
-        </div>
+          )}
+
+        {formData.type === 'CREDIT_CARD' && (
+          <>
+            <div>
+              <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+                {t('creditLimit') || 'Limite de Crédito'}{' '}
+                <span className="text-red-500">*</span>
+              </BaseLabel>
+              <BaseInput
+                type="text"
+                value={displayCreditLimit}
+                onChange={(e) => {
+                  const numbersOnly = e.target.value.replace(/\D/g, '');
+                  if (numbersOnly === '') {
+                    setDisplayCreditLimit('');
+                    setFormData((prev) => ({ ...prev, creditLimit: 0 }));
+                    return;
+                  }
+                  const valueInCents = parseInt(numbersOnly);
+                  const valueInReais = valueInCents / 100;
+                  setDisplayCreditLimit(formatCurrency(valueInReais));
+                  setFormData((prev) => ({
+                    ...prev,
+                    creditLimit: valueInCents,
+                  }));
+                }}
+                placeholder={tCommon('placeholders.currency')}
+                className={`w-full h-12 text-base ${
+                  (errors as any).creditLimit ? 'border-red-500' : ''
+                }`}
+              />
+              {(errors as any).creditLimit && (
+                <p className="text-red-500 text-sm mt-1">
+                  {(errors as any).creditLimit}
+                </p>
+              )}
+            </div>
+            <div>
+              <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+                {t('closingDate') || 'Dia de Fechamento'}{' '}
+                <span className="text-red-500">*</span>
+              </BaseLabel>
+              <BaseInput
+                type="number"
+                value={formData.closingDate?.toString() || ''}
+                onChange={(e) =>
+                  handleInputChange(
+                    'closingDate',
+                    parseInt(e.target.value) || 1
+                  )
+                }
+                placeholder="1"
+                min="1"
+                max="31"
+                className={`w-full h-12 text-base ${
+                  (errors as any).closingDate ? 'border-red-500' : ''
+                }`}
+              />
+              {(errors as any).closingDate && (
+                <p className="text-red-500 text-sm mt-1">
+                  {(errors as any).closingDate}
+                </p>
+              )}
+            </div>
+          </>
+        )}
 
         {formData.type === 'LOAN' && (
           <div>
@@ -499,7 +702,34 @@ export function ContaForm({
           </div>
         )}
 
-        {hasInstallments && (
+        {hasInstallments &&
+          formData.type !== 'CREDIT_CARD' &&
+          formData.type !== 'DEBIT_CARD' &&
+          formData.type !== 'LOAN' && (
+            <div data-tour-id="field-valor-parcela">
+              <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
+                {t('installmentAmount')} <span className="text-red-500">*</span>
+              </BaseLabel>
+              <BaseInput
+                type="text"
+                value={displayParceledInstallmentValue}
+                onChange={(e) =>
+                  handleParceledInstallmentValueChange(e.target.value)
+                }
+                placeholder={tCommon('placeholders.currency')}
+                className={`w-full h-12 text-base ${
+                  errors.totalAmount ? 'border-red-500' : ''
+                }`}
+              />
+              {errors.totalAmount && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.totalAmount}
+                </p>
+              )}
+            </div>
+          )}
+
+        {hasInstallments && formData.type !== 'CREDIT_CARD' && formData.type !== 'DEBIT_CARD' && (
           <div data-tour-id="field-parcelas">
             <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
               {t('installments')} <span className="text-red-500">*</span>
@@ -538,65 +768,6 @@ export function ContaForm({
             <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>
           )}
         </div>
-
-        {!hideReferenceFields && (
-          <div className="flex flex-col" data-tour-id="field-referencia">
-            <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
-              {t('accountReference')} <span className="text-red-500">*</span>
-            </BaseLabel>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <BaseInput
-                  type="number"
-                  value={formData.referenceMonth?.toString() || ''}
-                  onChange={(e) =>
-                    handleInputChange(
-                      'referenceMonth',
-                      parseInt(e.target.value) || 1
-                    )
-                  }
-                  placeholder="1"
-                  min="1"
-                  max="12"
-                  className={`w-full h-12 text-base ${
-                    errors.referenceMonth ? 'border-red-500' : ''
-                  }`}
-                />
-                {errors.referenceMonth && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.referenceMonth}
-                  </p>
-                )}
-              </div>
-              <div>
-                {/* <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
-                Ano <span className="text-red-500">*</span>
-              </BaseLabel> */}
-                <BaseInput
-                  type="number"
-                  value={formData.referenceYear?.toString() || ''}
-                  onChange={(e) =>
-                    handleInputChange(
-                      'referenceYear',
-                      parseInt(e.target.value) || new Date().getFullYear()
-                    )
-                  }
-                  placeholder={new Date().getFullYear().toString()}
-                  min="2020"
-                  max="2030"
-                  className={`w-full h-12 text-base ${
-                    errors.referenceYear ? 'border-red-500' : ''
-                  }`}
-                />
-                {errors.referenceYear && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.referenceYear}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         <div data-tour-id="field-vencimento">
           <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">

@@ -21,6 +21,7 @@ export const PeriodAccountsTable: React.FC<PeriodAccountsTableProps> = ({
       FIXED: t('accountTypes.FIXED'),
       LOAN: t('accountTypes.LOAN'),
       CREDIT_CARD: t('accountTypes.CREDIT_CARD'),
+      DEBIT_CARD: t('accountTypes.DEBIT_CARD'),
       SUBSCRIPTION: t('accountTypes.SUBSCRIPTION'),
       OTHER: t('accountTypes.OTHER'),
     };

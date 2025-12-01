@@ -169,3 +169,13 @@ export async function payFullAccount(
   });
   return response.data;
 }
+
+// Associate account to credit card
+export async function associateAccountToCreditCard(
+  creditCardId: string,
+  accountId: string
+): Promise<void> {
+  await apiClient.post(`/v1/accounts/${creditCardId}/credit-card/associate`, {
+    accountId,
+  });
+}
