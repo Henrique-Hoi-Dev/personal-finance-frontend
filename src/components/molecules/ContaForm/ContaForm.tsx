@@ -20,26 +20,53 @@ interface ContaFormProps {
   onCancel: () => void;
   loading?: boolean;
   initialData?: Partial<Omit<CreateContaPayload, 'userId'>>;
+  month?: number;
+  year?: number;
 }
+
+// Função helper para calcular data de início baseada no mês/ano
+const getInitialStartDate = (month?: number, year?: number): string => {
+  const now = new Date();
+  const targetMonth = month || now.getMonth() + 1;
+  const targetYear = year || now.getFullYear();
+  const day = '01';
+  const monthStr = String(targetMonth).padStart(2, '0');
+  return `${targetYear}-${monthStr}-${day}`;
+};
 
 export function ContaForm({
   onSubmit,
   onCancel,
   loading = false,
   initialData,
+  month,
+  year,
 }: ContaFormProps) {
   const t = useTranslations('Contas');
   const tCommon = useTranslations('Common');
+  
+  // Calcular data de início fixa baseada no mês/ano
+  const fixedStartDate = getInitialStartDate(month, year);
+  const isStartDateFixed = month !== undefined && year !== undefined;
+  
   const [formData, setFormData] = useState<Omit<CreateContaPayload, 'userId'>>({
     name: initialData?.name || '',
     type: initialData?.type || 'FIXED',
     totalAmount: initialData?.totalAmount || 0,
     installments: initialData?.installments || 1,
-    startDate: initialData?.startDate || '',
+    startDate: initialData?.startDate || (isStartDateFixed ? fixedStartDate : ''),
     dueDay: initialData?.dueDay || 1,
     creditLimit: initialData?.creditLimit || 0,
     closingDate: initialData?.closingDate || 1,
   });
+  
+  // Atualizar data de início quando month/year mudarem
+  useEffect(() => {
+    if (isStartDateFixed) {
+      const newStartDate = getInitialStartDate(month, year);
+      setFormData((prev) => ({ ...prev, startDate: newStartDate }));
+    }
+  }, [month, year, isStartDateFixed]);
 
   const [hasInstallments, setHasInstallments] = useState(
     initialData?.installments ? initialData.installments > 1 : false
@@ -760,9 +787,10 @@ export function ContaForm({
             type="date"
             value={formData.startDate}
             onChange={(e) => handleInputChange('startDate', e.target.value)}
+            disabled={isStartDateFixed}
             className={`w-full h-12 text-base ${
               errors.startDate ? 'border-red-500' : ''
-            }`}
+            } ${isStartDateFixed ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           />
           {errors.startDate && (
             <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>

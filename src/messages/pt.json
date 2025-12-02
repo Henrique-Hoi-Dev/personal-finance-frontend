@@ -188,7 +188,8 @@
     "backToList": "Voltar para Lista",
     "createAndLink": "Criar e Vincular",
     "accountLinkedSuccess": "Conta criada e vinculada com sucesso!",
-    "installmentAmountRequired": "Valor da parcela é obrigatório"
+    "installmentAmountRequired": "Valor da parcela é obrigatório",
+    "referenceMonth": "Mês de Referência"
   },
   "Transacoes": {
     "title": "Transações",

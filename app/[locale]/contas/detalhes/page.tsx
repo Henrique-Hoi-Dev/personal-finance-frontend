@@ -80,6 +80,16 @@ export default function ContasDetailsPage() {
     return account.dueDay;
   };
 
+  // Função para formatar apenas mês/ano da parcela
+  const formatInstallmentMonthYear = (installment: any): string => {
+    if (installment.referenceMonth && installment.referenceYear) {
+      const monthStr = String(installment.referenceMonth).padStart(2, '0');
+      return `${monthStr}/${installment.referenceYear}`;
+    }
+    // Fallback para dueDate se não tiver referenceMonth/Year
+    return formatDateSafe(installment.dueDate);
+  };
+
   const getAccountDisplayAmount = (account: Conta) => {
     // Se a conta é parcelada, mostra o valor da parcela
     if (
@@ -1120,6 +1130,8 @@ export default function ContasDetailsPage() {
             }
           }}
           loading={isCreating}
+          month={month ? parseInt(month) : undefined}
+          year={year ? parseInt(year) : undefined}
         />
 
         {/* Modal de Confirmação de Exclusão */}
@@ -1207,7 +1219,7 @@ export default function ContasDetailsPage() {
                                   {t('installment')} {installment.number}
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                  {formatDateSafe(installment.dueDate)}
+                                  {formatInstallmentMonthYear(installment)}
                                 </div>
                               </div>
                               <div className="flex items-center space-x-4">
@@ -1305,7 +1317,7 @@ export default function ContasDetailsPage() {
                               </div>
                               <div className="flex items-center justify-between mb-3">
                                 <div className="text-sm text-gray-600">
-                                  {formatDateSafe(installment.dueDate)}
+                                  {formatInstallmentMonthYear(installment)}
                                 </div>
                                 <div className="text-sm font-semibold text-gray-900">
                                   {formatCurrencyFromCents(installment.amount)}
@@ -1410,11 +1422,11 @@ export default function ContasDetailsPage() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <div className="text-sm font-medium text-gray-600 mb-1">
-                                {t('dueDate')}
+                                {t('referenceMonth')}
                               </div>
                               <div className="text-lg font-semibold text-gray-900">
-                                {formatDateSafe(
-                                  selectedInstallmentForDetails.dueDate
+                                {formatInstallmentMonthYear(
+                                  selectedInstallmentForDetails
                                 )}
                               </div>
                             </div>
@@ -1444,12 +1456,8 @@ export default function ContasDetailsPage() {
                             <div className="space-y-3">
                               {selectedInstallmentForDetails.breakdown.linkedAccounts.map(
                                 (linkedAccount: any, index: number) => {
-                                  // Pega a data da primeira parcela se existir, senão usa a data da parcela principal
-                                  const firstInstallment =
-                                    linkedAccount.installments?.[0];
-                                  const displayDate = firstInstallment
-                                    ? firstInstallment.dueDate
-                                    : selectedInstallmentForDetails.dueDate;
+                                  // Usa sempre o dueDate da parcela principal (installmentList.dueDate)
+                                  const displayDate = selectedInstallmentForDetails.dueDate;
 
                                   return (
                                     <div
