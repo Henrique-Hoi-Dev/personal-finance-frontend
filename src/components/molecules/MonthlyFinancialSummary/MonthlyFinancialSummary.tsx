@@ -55,7 +55,7 @@ export const MonthlyFinancialSummary: React.FC<
   const summaryCards = [
     {
       title: t('totalBalance'),
-      value: formatCurrencyFromCents(financialData.totalBalance),
+      value: formatCurrencyFromCents(financialData.monthlySurplus),
       color: 'text-green-600',
     },
     {
@@ -70,9 +70,9 @@ export const MonthlyFinancialSummary: React.FC<
     },
     {
       title: `${t('surplus')} ${monthName}`,
-      value: formatCurrencyFromCents(financialData.monthlySurplus),
+      value: formatCurrencyFromCents(financialData.totalBalance),
       color:
-        financialData.monthlySurplus >= 0 ? 'text-green-600' : 'text-red-600',
+        financialData.totalBalance >= 0 ? 'text-green-600' : 'text-red-600',
     },
   ];
 
