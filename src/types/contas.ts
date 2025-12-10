@@ -61,16 +61,7 @@ export interface Conta {
   // Novos campos da API
   referenceMonth?: number;
   referenceYear?: number;
-  installment?: {
-    amount: number;
-    id: string;
-    number: number;
-    dueDate: string;
-    isPaid: boolean;
-    paidAt: string | null;
-    referenceMonth: number;
-    referenceYear: number;
-  };
+  installment?: Installment;
   // Campos específicos para cartão de crédito
   creditLimit?: number;
   closingDate?: number;

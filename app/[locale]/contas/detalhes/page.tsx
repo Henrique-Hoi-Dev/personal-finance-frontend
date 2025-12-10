@@ -103,6 +103,42 @@ export default function ContasDetailsPage() {
     return account.totalAmount;
   };
 
+  // Verifica se um cartão de crédito tem contas vinculadas
+  const hasLinkedAccounts = (account: Conta): boolean => {
+    if (account.type !== 'CREDIT_CARD') {
+      return true; // Para outros tipos, sempre permite pagar
+    }
+
+    // Verifica se tem parcelas com contas vinculadas
+    if (account.installmentList && account.installmentList.length > 0) {
+      const hasLinked = account.installmentList.some(
+        (installment) =>
+          installment.breakdown &&
+          installment.breakdown.linkedAccounts &&
+          installment.breakdown.linkedAccounts.length > 0
+      );
+      if (hasLinked) return true;
+    }
+
+    // Verifica se a parcela atual tem contas vinculadas
+    if (
+      account.installment &&
+      account.installment.breakdown &&
+      account.installment.breakdown.linkedAccounts &&
+      account.installment.breakdown.linkedAccounts.length > 0
+    ) {
+      return true;
+    }
+
+    // Se tem valor total > 0, provavelmente tem contas vinculadas
+    if (account.totalAmount > 0) {
+      return true;
+    }
+
+    // Se não encontrou nenhuma conta vinculada
+    return false;
+  };
+
   const month = searchParams.get('month');
   const year = searchParams.get('year');
   const editAccountId = searchParams.get('editAccountId');
@@ -744,27 +780,30 @@ export default function ContasDetailsPage() {
                                 account.installment?.isPaid || account.isPaid
                               ) && (
                                 <>
-                                  <button
-                                    onClick={() =>
-                                      handleRequestPayAccount(account)
-                                    }
-                                    className="flex items-center px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-                                  >
-                                    <svg
-                                      className="w-4 h-4 mr-2"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
+                                  {/* Só mostra botão Pagar se não for cartão de crédito ou se tiver contas vinculadas */}
+                                  {hasLinkedAccounts(account) && (
+                                    <button
+                                      onClick={() =>
+                                        handleRequestPayAccount(account)
+                                      }
+                                      className="flex items-center px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
                                     >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                      />
-                                    </svg>
-                                    {t('pay')}
-                                  </button>
+                                      <svg
+                                        className="w-4 h-4 mr-2"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                      </svg>
+                                      {t('pay')}
+                                    </button>
+                                  )}
                                   <button
                                     onClick={() => handleEditAccount(account)}
                                     className="flex items-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
@@ -995,27 +1034,30 @@ export default function ContasDetailsPage() {
                                     account.isPaid
                                   ) && (
                                     <>
-                                      <button
-                                        onClick={() =>
-                                          handleRequestPayAccount(account)
-                                        }
-                                        className="flex items-center px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-                                      >
-                                        <svg
-                                          className="w-4 h-4 mr-2"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          viewBox="0 0 24 24"
+                                      {/* Só mostra botão Pagar se não for cartão de crédito ou se tiver contas vinculadas */}
+                                      {hasLinkedAccounts(account) && (
+                                        <button
+                                          onClick={() =>
+                                            handleRequestPayAccount(account)
+                                          }
+                                          className="flex items-center px-3 py-2 text-sm font-medium text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
                                         >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                          />
-                                        </svg>
-                                        {t('pay')}
-                                      </button>
+                                          <svg
+                                            className="w-4 h-4 mr-2"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            />
+                                          </svg>
+                                          {t('pay')}
+                                        </button>
+                                      )}
                                       <button
                                         onClick={() =>
                                           handleEditAccount(account)
@@ -1120,11 +1162,45 @@ export default function ContasDetailsPage() {
           onSubmit={async (data) => {
             setIsCreating(true);
             try {
-              const { useContasStore } = await import('@/store/contas.store');
-              const addConta = useContasStore.getState().addConta;
-              await addConta(data as any);
-              await fetchAccounts();
-              setShowCreateModal(false);
+              // Se for cartão de crédito, criar diretamente para obter o ID
+              if (data.type === 'CREDIT_CARD') {
+                const { useAuthStore } = await import('@/store/auth.store');
+                const { user } = useAuthStore.getState();
+                if (!user?.id) {
+                  throw new Error('Usuário não autenticado');
+                }
+
+                const { createConta } = await import(
+                  '@/services/contas.service'
+                );
+                const contaData = {
+                  ...data,
+                  userId: user.id,
+                };
+                const novaConta = await createConta(contaData);
+
+                // Fechar modal de criação
+                setShowCreateModal(false);
+
+                // Buscar a conta criada diretamente pela API
+                const contaCriada = await getContaById(novaConta.id);
+
+                // Abrir o modal de edição para vincular contas
+                setSelectedAccount(contaCriada);
+                setShowEditModal(true);
+
+                // Recarregar contas em background
+                await fetchAccounts();
+              } else {
+                const { useContasStore } = await import('@/store/contas.store');
+                const addConta = useContasStore.getState().addConta;
+                await addConta(data as any);
+                await fetchAccounts();
+                setShowCreateModal(false);
+              }
+            } catch (error: any) {
+              console.error('Erro ao criar conta:', error);
+              toast.error(error.message || 'Erro ao criar conta');
             } finally {
               setIsCreating(false);
             }
@@ -1457,7 +1533,8 @@ export default function ContasDetailsPage() {
                               {selectedInstallmentForDetails.breakdown.linkedAccounts.map(
                                 (linkedAccount: any, index: number) => {
                                   // Usa sempre o dueDate da parcela principal (installmentList.dueDate)
-                                  const displayDate = selectedInstallmentForDetails.dueDate;
+                                  const displayDate =
+                                    selectedInstallmentForDetails.dueDate;
 
                                   return (
                                     <div
