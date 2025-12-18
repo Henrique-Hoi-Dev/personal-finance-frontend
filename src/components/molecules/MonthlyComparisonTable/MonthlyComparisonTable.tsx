@@ -147,10 +147,32 @@ export const MonthlyComparisonTable: React.FC<MonthlyComparisonTableProps> = ({
               const statusConfig = getStatusConfig(item.status);
               const isCurrentMonth = item.isCurrent;
 
+              const handleRowClick = (
+                e: React.MouseEvent<HTMLTableRowElement>
+              ) => {
+                // Só permite clique na linha no mobile (telas menores que md = 768px)
+                // No desktop, apenas o botão "Ver mais" funciona
+                if (window.innerWidth >= 768) {
+                  return;
+                }
+
+                // Se clicou no botão ou em um elemento filho do botão, não faz nada
+                const target = e.target as HTMLElement;
+                if (target.closest('button')) {
+                  return;
+                }
+
+                // Chama onViewDetails apenas no mobile
+                if (onViewDetails) {
+                  onViewDetails(item.month, item.year);
+                }
+              };
+
               return (
                 <tr
                   key={index}
-                  className={`hover:bg-gray-50 ${
+                  onClick={handleRowClick}
+                  className={`md:hover:bg-gray-50 md:cursor-default cursor-pointer active:bg-gray-100 transition-colors ${
                     isCurrentMonth ? 'bg-blue-50' : ''
                   }`}
                 >
@@ -203,7 +225,10 @@ export const MonthlyComparisonTable: React.FC<MonthlyComparisonTableProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
-                      onClick={() => onViewDetails?.(item.month, item.year)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewDetails?.(item.month, item.year);
+                      }}
                       className="text-gray-600 hover:text-gray-900 flex items-center gap-1"
                     >
                       <svg

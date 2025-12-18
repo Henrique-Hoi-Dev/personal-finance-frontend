@@ -592,8 +592,17 @@ export default function ContasDetailsPage() {
                 </div>
               ) : (
                 <div className="divide-y divide-gray-200">
-                  {accounts.map((account) => (
-                    <div key={account.id} className="p-6 hover:bg-gray-50">
+                  {accounts.map((account) => {
+                    const isCreditCard = account.type === 'CREDIT_CARD';
+                    const isPending = !(account.installment?.isPaid || account.isPaid);
+                    
+                    return (
+                    <div 
+                      key={account.id} 
+                      className={`p-6 hover:bg-gray-50 ${
+                        isCreditCard ? 'bg-blue-50/30' : ''
+                      }`}
+                    >
                       {/* Layout Desktop - mantém o design atual */}
                       <div className="hidden md:flex items-center justify-between">
                         <div className="flex-1">
@@ -613,6 +622,11 @@ export default function ContasDetailsPage() {
                                   ? t('paid')
                                   : t('pending')}
                               </span>
+                              {isCreditCard && isPending && (
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                  {t('current')}
+                                </span>
+                              )}
                               {account.isPreview && (
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                   {t('previewStatus')}
@@ -689,6 +703,11 @@ export default function ContasDetailsPage() {
                                   ? t('paid')
                                   : t('pending')}
                               </span>
+                              {isCreditCard && isPending && (
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                  {t('current')}
+                                </span>
+                              )}
                               {account.isPreview && (
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                   {t('previewStatus')}
@@ -1111,7 +1130,8 @@ export default function ContasDetailsPage() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
