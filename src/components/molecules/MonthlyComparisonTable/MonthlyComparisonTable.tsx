@@ -104,6 +104,9 @@ export const MonthlyComparisonTable: React.FC<MonthlyComparisonTableProps> = ({
     );
   }
 
+  // Encontrar o mês atual nos dados
+  const currentMonthData = data.find((item) => item.isCurrent);
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="mb-6">
@@ -114,6 +117,103 @@ export const MonthlyComparisonTable: React.FC<MonthlyComparisonTableProps> = ({
           {t('monthlyFinancialEvolution')}
         </p>
       </div>
+
+      {/* Card destacado do mês atual */}
+      {currentMonthData && (
+        <div className="mb-6">
+          <div
+            onClick={() => {
+              if (onViewDetails) {
+                onViewDetails(currentMonthData.month, currentMonthData.year);
+              }
+            }}
+            className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border-2 border-blue-300 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer hover:border-blue-400 active:scale-[0.98]"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <h3 className="text-lg font-bold text-gray-900 capitalize">
+                  {currentMonthData.month} {currentMonthData.year}
+                </h3>
+                <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500 text-white">
+                  {t('current')}
+                </span>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onViewDetails) {
+                    onViewDetails(
+                      currentMonthData.month,
+                      currentMonthData.year
+                    );
+                  }
+                }}
+                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm font-medium"
+              >
+                <span>{t('viewDetails')}</span>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white/80 rounded-lg p-4 border border-blue-200">
+                <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">
+                  {t('income')}
+                </p>
+                <p className="text-xl font-bold text-green-600">
+                  {formatCurrencyFromCents(currentMonthData.income)}
+                </p>
+              </div>
+              <div className="bg-white/80 rounded-lg p-4 border border-blue-200">
+                <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">
+                  {t('expenses')}
+                </p>
+                <p className="text-xl font-bold text-red-600">
+                  {formatCurrencyFromCents(currentMonthData.expenses)}
+                </p>
+              </div>
+              <div className="bg-white/80 rounded-lg p-4 border border-blue-200">
+                <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">
+                  {t('surplus')}
+                </p>
+                <p
+                  className={`text-xl font-bold ${
+                    currentMonthData.surplus >= 0
+                      ? 'text-green-600'
+                      : 'text-red-600'
+                  }`}
+                >
+                  {currentMonthData.surplus >= 0 ? '+' : ''}
+                  {formatCurrencyFromCents(currentMonthData.surplus)}
+                </p>
+              </div>
+              <div className="bg-white/80 rounded-lg p-4 border border-blue-200">
+                <p className="text-xs font-medium text-gray-600 mb-1 uppercase tracking-wide">
+                  {t('status')}
+                </p>
+                <span
+                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusConfig(currentMonthData.status).bgColor} ${getStatusConfig(currentMonthData.status).color}`}
+                >
+                  {getStatusConfig(currentMonthData.status).label}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
