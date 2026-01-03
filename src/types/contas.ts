@@ -183,6 +183,7 @@ export interface MonthlyComparisonResponse {
   page: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
+  currentMonth?: ApiMonthlyComparisonData;
 }
 
 // Types for period accounts endpoint

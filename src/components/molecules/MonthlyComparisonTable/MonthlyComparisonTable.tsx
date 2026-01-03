@@ -16,6 +16,7 @@ interface MonthlyComparisonTableProps {
   totalItems?: number;
   itemsPerPage?: number;
   onPageChange?: (page: number) => void;
+  currentMonth?: MonthlyComparisonData;
 }
 
 export const MonthlyComparisonTable: React.FC<MonthlyComparisonTableProps> = ({
@@ -27,6 +28,7 @@ export const MonthlyComparisonTable: React.FC<MonthlyComparisonTableProps> = ({
   totalItems = 0,
   itemsPerPage = 5,
   onPageChange,
+  currentMonth,
 }) => {
   const t = useTranslations('MonthlyFinancial');
 
@@ -104,8 +106,8 @@ export const MonthlyComparisonTable: React.FC<MonthlyComparisonTableProps> = ({
     );
   }
 
-  // Encontrar o mês atual nos dados
-  const currentMonthData = data.find((item) => item.isCurrent);
+  // Usar o currentMonth passado como prop, ou procurar nos dados se não foi passado
+  const currentMonthData = currentMonth || data.find((item) => item.isCurrent);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -205,7 +207,9 @@ export const MonthlyComparisonTable: React.FC<MonthlyComparisonTableProps> = ({
                   {t('status')}
                 </p>
                 <span
-                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusConfig(currentMonthData.status).bgColor} ${getStatusConfig(currentMonthData.status).color}`}
+                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                    getStatusConfig(currentMonthData.status).bgColor
+                  } ${getStatusConfig(currentMonthData.status).color}`}
                 >
                   {getStatusConfig(currentMonthData.status).label}
                 </span>

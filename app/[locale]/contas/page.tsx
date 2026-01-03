@@ -36,6 +36,9 @@ export default function ContasPage() {
   const [monthlyComparison, setMonthlyComparison] = useState<
     MonthlyComparisonData[]
   >([]);
+  const [currentMonthData, setCurrentMonthData] = useState<
+    MonthlyComparisonData | undefined
+  >(undefined);
   const [monthlyComparisonLoading, setMonthlyComparisonLoading] =
     useState(false);
 
@@ -176,10 +179,25 @@ export default function ContasPage() {
       try {
         const response = await getMonthlyComparison({
           limit,
-          page: page - 1, // API usa 0-based pagination
+          page: page - 1,
         });
+
         const transformedData = transformMonthlyComparisonData(response.docs);
+
+        // Transformar o currentMonth separadamente para passar como prop
+        let currentMonthTransformed: MonthlyComparisonData | undefined;
+        if (response.currentMonth) {
+          const currentMonthData = transformMonthlyComparisonData([
+            response.currentMonth,
+          ]);
+          currentMonthTransformed = currentMonthData[0];
+        }
+
         setMonthlyComparison(transformedData);
+        // Armazenar o currentMonth separadamente para passar como prop
+        if (currentMonthTransformed) {
+          setCurrentMonthData(currentMonthTransformed);
+        }
         setTotalPages(Math.ceil(response.total / limit));
         setTotalItems(response.total);
       } catch (error) {
@@ -266,6 +284,7 @@ export default function ContasPage() {
                 totalItems={totalItems}
                 itemsPerPage={limit}
                 onPageChange={handlePageChange}
+                currentMonth={currentMonthData}
               />
             </div>
           </div>

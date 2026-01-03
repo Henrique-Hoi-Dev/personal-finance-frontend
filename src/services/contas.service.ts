@@ -62,7 +62,11 @@ export async function getMonthlyComparison(params?: {
     '/v1/accounts/reports/monthly-summary',
     params
   );
-  return response.data;
+  const data = response.data as any;
+  if (data?.data) {
+    return data.data as MonthlyComparisonResponse;
+  }
+  return data as MonthlyComparisonResponse;
 }
 
 export async function getDashboardAll(): Promise<DashboardAllResponse> {
