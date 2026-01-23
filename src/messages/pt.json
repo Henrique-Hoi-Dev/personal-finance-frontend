@@ -54,7 +54,96 @@
     "seeAll": "Ver todas",
     "expensesByCategory": "Gastos por Categoria",
     "loading": "Carregando...",
-    "redirecting": "Redirecionando..."
+    "redirecting": "Redirecionando...",
+    "currentSituation": "Situação Atual",
+    "currentSituationSubtitle": "Seu panorama financeiro agora",
+    "trendAnalysis": "Análise de Tendência",
+    "trendAnalysisQuestion": "Suas despesas estão crescendo mais rápido que sua renda?",
+    "last6Months": "Comparação dos últimos 6 meses",
+    "expensesGrowingFaster": "Despesas crescendo mais rápido",
+    "incomeGrowth": "Crescimento da Renda",
+    "expenseGrowth": "Crescimento das Despesas",
+    "incomeCommitment": "Comprometimento da Renda",
+    "incomeCommitmentSubtitle": "Quanto da sua renda já está comprometida?",
+    "fixedExpensesDebtPercentage": "Despesas Fixas + Dívidas como % da Renda",
+    "fixedExpenses": "Despesas Fixas",
+    "debtPayments": "Pagamentos de Dívidas",
+    "ofIncome": "da renda",
+    "attentionCommitment": "Atenção: Você está comprometendo uma porção significativa da sua renda. Seja cauteloso com novos compromissos.",
+    "whereYourMoneyGoes": "Para Onde Vai Seu Dinheiro",
+    "whereYourMoneyGoesSubtitle": "Entendendo sua estrutura de despesas",
+    "expenseStructure": "Estrutura de Despesas",
+    "expenseStructureSubtitle": "Entendendo para onde vai seu dinheiro",
+    "highConcentration": "Alta concentração",
+    "variableExpenses": "Despesas Variáveis",
+    "debtFinancing": "Dívidas / Financiamentos",
+    "ofTotalExpenses": "do total de despesas",
+    "warningExpenseStructure": "Aviso: Despesas Fixas representam mais de 40% do total de suas despesas. Isso cria vulnerabilidade financeira. Considere diversificar sua estrutura de despesas.",
+    "vsLastMonth": "vs mês anterior",
+    "attention": "Atenção",
+    "warning": "Aviso",
+    "critical": "Crítico",
+    "debtObligations": "Obrigações de Dívida",
+    "debtObligationsSubtitle": "Compromissos de longo prazo reduzindo sua flexibilidade",
+    "debtFinancingOverview": "Visão Geral de Dívidas e Financiamentos",
+    "debtFinancingOverviewSubtitle": "Compromissos financeiros de longo prazo",
+    "activeDebts": "dívida(s) ativa(s)",
+    "totalFinanced": "Total Financiado",
+    "monthlyPayment": "Pagamento Mensal",
+    "longestDuration": "Maior Duração",
+    "months": "meses",
+    "activeDebtsList": "Dívidas Ativas",
+    "total": "total",
+    "remaining": "restante",
+    "paid": "pago",
+    "financialPressureAlert": "Alerta de Pressão Financeira",
+    "financialPressureAlertMessage": "Você está comprometido com {amount} em pagamentos mensais de dívidas pelos próximos {months} meses. Isso limita sua flexibilidade financeira e aumenta o risco durante interrupções de renda.",
+    "whatHappensNext": "O Que Acontece a Seguir?",
+    "whatHappensNextSubtitle": "Para onde você está indo se nada mudar?",
+    "futureProjection": "Projeção Futura",
+    "futureProjectionSubtitle": "Com base na renda e despesas atuais",
+    "monthlyNetChange": "Mudança Líquida Mensal",
+    "projectedBalance": "Saldo Projetado",
+    "positiveTrend": "Tendência Positiva",
+    "positiveTrendMessage": "Você está economizando {amount} por mês. Em 3 meses, seu saldo crescerá para {balance}. Continue assim!",
+    "projectionDisclaimer": "Esta é uma estimativa preditiva baseada em padrões atuais. Os resultados reais podem variar.",
+    "totalIncome": "Renda Total",
+    "totalExpenses": "Despesas Totais",
+    "balanceDecliningWarning": "Aviso: Seu saldo está diminuindo. Revise suas despesas cuidadosamente.",
+    "carFinancing": "Financiamento de Carro",
+    "creditCardInstallments": "Parcelas de Cartão de Crédito",
+    "current": "Atual",
+    "monthPlus1": "Mês +1",
+    "monthPlus2": "Mês +2",
+    "monthPlus3": "Mês +3",
+    "transactionPatterns": "Padrões de Transações",
+    "transactionPatternsSubtitle": "Reconheça padrões recorrentes nos seus gastos",
+    "recentTransactions": "Transações Recentes",
+    "recentTransactionsSubtitle": "Agrupadas por tipo para identificar padrões",
+    "fixed": "Fixo",
+    "installment": "Parcela",
+    "variable": "Variável",
+    "recurring": "Recorrente",
+    "patternRecognition": "Reconhecimento de Padrão",
+    "patternRecognitionMessage": "Você tem {recurring} despesas fixas recorrentes e {installments} parcelas ativas. Estes representam compromissos mensais previsíveis.",
+    "timeToReflect": "Momento de Refletir",
+    "isThisSustainable": "Isso é sustentável?",
+    "isThisSustainableAnswer": "Olhe para o indicador de Comprometimento da Renda. Se estiver acima de 70%, você tem muito pouco espaço para emergências ou despesas inesperadas. Uma interrupção de renda pode criar sérios problemas.",
+    "whatNeedsToChange": "O que precisa mudar?",
+    "whatNeedsToChangeAnswer": "Revise sua divisão de despesas. Você pode reduzir despesas fixas? Pode eliminar ou reduzir pagamentos de dívidas? Despesas variáveis são mais fáceis de cortar, mas despesas fixas têm o maior impacto de longo prazo.",
+    "whatsYourTrend": "Qual é sua tendência?",
+    "whatsYourTrendAnswer": "Verifique sua tendência de 6 meses. Se as despesas estão crescendo mais rápido que a renda, você está em um caminho insustentável. A projeção futura mostra onde você estará em 3 meses se nada mudar. Isso é aceitável?",
+    "salary": "Salário",
+    "rentRecurring": "Aluguel Recorrente",
+    "internetUtilitiesRecurring": "Internet e Utilidades Recorrente",
+    "gymMembershipRecurring": "Mensalidade da Academia Recorrente",
+    "streamingServicesRecurring": "Serviços de Streaming Recorrente",
+    "carInsuranceRecurring": "Seguro do Carro Recorrente",
+    "creditCard": "Cartão de Crédito",
+    "groceries": "Mercado",
+    "restaurants": "Restaurantes",
+    "gas": "Combustível",
+    "shopping": "Compras"
   },
   "Contas": {
     "title": "Contas",
@@ -414,39 +503,36 @@
       "content": "Clique aqui para adicionar uma nova conta. Você poderá escolher o tipo: Fixa, Empréstimo, Assinatura ou Cartão de Crédito."
     },
     "step5": {
-      "content": "Aqui você cria uma conta. Tudo que definir será lançado no mês de referência — e, se houver parcelas, cada parcela irá para o mês correspondente."
+      "content": "Aqui você cria novas contas para organizar suas finanças mês a mês.\n\nDefina o tipo da conta, valor, parcelas e datas, e o sistema distribui tudo automaticamente nos meses certos."
     },
     "step6": {
-      "content": "Ative se a conta será parcelada. Com parcelas ligadas, você define a quantidade e o sistema distribui pelos meses."
+      "content": "Dê um nome bem claro para a conta, como \"Aluguel\", \"Luz\", \"Financiamento do carro\" ou \"Cartão Nubank\"."
     },
     "step7": {
-      "content": "Use Preview para contas de valor variável (água, luz, gás). É uma simulação para planejamento e **não pode** ser combinada com parcelas."
+      "content": "Escolha o tipo da conta:\n\n• Fixa: valor igual todo mês (ex: aluguel, financiamento com parcela fechada).\n• Preview: conta variável, usada como previsão (ex: água, luz, internet).\n• Empréstimo: quando você pegou um valor e paga em parcelas, ideal para ver o custo total do financiamento.\n• Cartão de crédito: para organizar compras e faturas do cartão."
     },
     "step8": {
-      "content": "**Fixa**: longo prazo; pode usar calculadora mensal × meses; com Preview não parcela.\n**Empréstimo**: informe total e parcela (com juros); parcelas geradas automaticamente.\n**Assinatura / Cartão**: flexíveis; podem ter parcelas ou serem lançamentos únicos."
+      "content": "Informe quanto será pago em cada mês.\n\nPara contas fixas e empréstimos, é o valor da parcela.\nPara preview, é um valor estimado que você pode ajustar depois."
     },
     "step9": {
-      "content": "Dê um nome claro (ex.: 'Aluguel ap. 301' ou 'Internet Fibra 500M'). Isso melhora seus relatórios."
+      "content": "Informe em quantas vezes essa conta será paga.\n\nO sistema vai distribuir essas parcelas automaticamente pelos meses, a partir da data de início."
     },
     "step10": {
-      "content": "Defina o total desta conta. Use **Calcular por parcela** para multiplicar valor de parcela × quantidade (útil para Empréstimo ou Fixa parcelada)."
+      "content": "Escolha a partir de qual mês essa conta começa a existir.\n\nA partir daqui o sistema usa esse mês como referência para jogar as parcelas nos meses seguintes."
     },
     "step11": {
-      "content": "Informe quantas parcelas. O sistema gera as referências mensais automaticamente a partir da Data de Início."
+      "content": "Informe o dia do mês em que você costuma pagar essa conta.\n\nIsso ajuda a visualizar melhor o fluxo de pagamentos dentro de cada mês."
     },
     "step12": {
-      "content": "A Data de Início define o começo do cronograma da conta. É a partir desta data que o sistema calcula quando cada parcela será devida."
+      "content": "No tipo Empréstimo, você informa o valor que pegou emprestado, o valor da parcela e o número de parcelas.\n\nO sistema mostra quanto você paga no total e ajuda a entender o custo real do financiamento."
     },
     "step13": {
-      "content": "A referência (Mês e Ano) define em qual mês a conta será registrada.\nEsse é o **ponto de ancoragem do sistema financeiro** — é com base nele que a conta aparece no mês certo da listagem e nos relatórios.\nSe a conta tiver parcelas, o sistema cria automaticamente as próximas referências com base neste mês e na Data de Início.\n💡 Exemplo: se a conta começar em **Outubro de 2025** e tiver 3 parcelas, as referências serão Outubro, Novembro e Dezembro de 2025."
+      "content": "No tipo Cartão de crédito, você vai definir limite, dia de início do ciclo, dia de fechamento e dia de vencimento.\n\nDepois, o sistema organiza suas faturas mês a mês e permite vincular compras à vista e parceladas."
     },
     "step14": {
-      "content": "Escolha o dia do mês. Dica: alinhe com seu dia de pagamento para melhorar o fluxo de caixa."
+      "content": "Depois de revisar as informações, clique em \"Criar Conta\".\n\nA conta será adicionada ao mês de referência e o sistema passa a considerar esse valor no seu planejamento."
     },
     "step15": {
-      "content": "Revise os dados e salve. Você pode cancelar se mudar de ideia."
-    },
-    "step16": {
       "content": "Tudo certo! Agora você já entende como funciona o painel de contas e como criar novas contas. Pode começar a usar o sistema!"
     },
     "back": "Voltar",

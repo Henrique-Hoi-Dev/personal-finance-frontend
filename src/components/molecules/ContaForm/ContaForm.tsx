@@ -53,7 +53,7 @@ export function ContaForm({
     name: initialData?.name || '',
     type: initialData?.type || 'FIXED',
     totalAmount: initialData?.totalAmount || 0,
-    installments: initialData?.installments || 1,
+    installments: initialData?.installments || 0,
     startDate: initialData?.startDate || (isStartDateFixed ? fixedStartDate : ''),
     dueDay: initialData?.dueDay || 1,
     creditLimit: initialData?.creditLimit || 0,
@@ -68,9 +68,6 @@ export function ContaForm({
     }
   }, [month, year, isStartDateFixed]);
 
-  const [hasInstallments, setHasInstallments] = useState(
-    initialData?.installments ? initialData.installments > 1 : false
-  );
   const [installmentValue, setInstallmentValue] = useState<string>('');
   const [parceledInstallmentValue, setParceledInstallmentValue] =
     useState<string>('');
@@ -86,29 +83,9 @@ export function ContaForm({
     return formData.type === 'LOAN' || formData.type === 'CREDIT_CARD' || formData.type === 'DEBIT_CARD';
   };
 
-  // Função para verificar se parcelamento deve estar forçado
-  const isInstallmentsForced = () => {
-    return formData.type === 'FIXED' && !isPreview;
-  };
-
-  // Função para verificar se parcelamento deve estar desabilitado
-  const isInstallmentsDisabled = () => {
-    // Quando preview estiver selecionado no tipo FIXED, não pode ter parcelas
-    // Cartão de crédito e cartão de débito não podem ter parcelas
-    return (
-      (formData.type === 'FIXED' && isPreview) ||
-      formData.type === 'CREDIT_CARD' ||
-      formData.type === 'DEBIT_CARD'
-    );
-  };
-
-  // Função para verificar se parcelamento deve estar bloqueado (não pode desativar)
-  const isInstallmentsBlocked = () => {
-    // Para LOAN e FIXED (sem preview), quando ativo, não pode desativar
-    return (
-      (formData.type === 'LOAN' || (formData.type === 'FIXED' && !isPreview)) &&
-      hasInstallments
-    );
+  // Função auxiliar para verificar se tem parcelas (installments > 0)
+  const hasInstallments = () => {
+    return (formData.installments || 0) > 0;
   };
 
   // Aplicar regras automaticamente quando o tipo mudar
@@ -117,45 +94,41 @@ export function ContaForm({
     if (formData.type === 'LOAN') {
       setIsPreview(false);
     }
-    // Se for CREDIT_CARD, desabilitar preview e parcelas
+    // Se for CREDIT_CARD, desabilitar preview e zerar parcelas
     if (formData.type === 'CREDIT_CARD') {
       setIsPreview(false);
-      setHasInstallments(false);
+      setFormData((prev) => ({ ...prev, installments: 0 }));
     }
-    // Se for DEBIT_CARD, desabilitar preview e parcelas
+    // Se for DEBIT_CARD, desabilitar preview e zerar parcelas
     if (formData.type === 'DEBIT_CARD') {
       setIsPreview(false);
-      setHasInstallments(false);
+      setFormData((prev) => ({ ...prev, installments: 0 }));
     }
   }, [formData.type]);
 
   // Aplicar regras quando preview mudar
   useEffect(() => {
-    // Se preview estiver ativo no tipo FIXED, desabilitar parcelas
+    // Se preview estiver ativo no tipo FIXED, zerar parcelas
     if (formData.type === 'FIXED' && isPreview) {
-      setHasInstallments(false);
-      // Limpar valor da parcela quando desabilitar parcelas
+      setFormData((prev) => ({ ...prev, installments: 0 }));
+      // Limpar valor da parcela quando zerar parcelas
       setParceledInstallmentValue('');
       setDisplayParceledInstallmentValue('');
-    }
-    // Se preview estiver desativo no tipo FIXED, forçar parcelas
-    else if (formData.type === 'FIXED' && !isPreview) {
-      setHasInstallments(true);
     }
   }, [isPreview, formData.type]);
 
-  // Limpar valor da parcela quando hasInstallments mudar para false
+  // Limpar valor da parcela quando installments for 0
   useEffect(() => {
-    if (!hasInstallments && formData.type !== 'LOAN') {
+    if ((formData.installments || 0) === 0 && formData.type !== 'LOAN') {
       setParceledInstallmentValue('');
       setDisplayParceledInstallmentValue('');
     }
-  }, [hasInstallments, formData.type]);
+  }, [formData.installments, formData.type]);
 
   // Recalcular totalAmount quando número de parcelas mudar (se já tiver valor da parcela)
   useEffect(() => {
     if (
-      hasInstallments &&
+      (formData.installments || 0) > 0 &&
       formData.type !== 'LOAN' &&
       parceledInstallmentValue
     ) {
@@ -167,7 +140,6 @@ export function ContaForm({
     }
   }, [
     formData.installments,
-    hasInstallments,
     formData.type,
     parceledInstallmentValue,
   ]);
@@ -279,7 +251,6 @@ export function ContaForm({
     setFormData((prev) => ({ ...prev, type: newType }));
 
     if (newType === 'LOAN') {
-      setHasInstallments(true);
       setFormData((prev) => ({ ...prev, installments: 1 }));
     } else {
       setInstallmentValue('');
@@ -303,18 +274,19 @@ export function ContaForm({
       newErrors.name = tCommon('validation.nameRequired');
     }
 
-    // Valor Total é obrigatório apenas se for LOAN ou não for parcelado (exceto cartão de crédito)
+    // Valor Total é obrigatório apenas se for LOAN ou não for parcelado (exceto cartão de crédito e FIXED)
     if (
-      (formData.type === 'LOAN' || !hasInstallments) &&
+      (formData.type === 'LOAN' || !hasInstallments()) &&
       formData.type !== 'CREDIT_CARD' &&
+      formData.type !== 'FIXED' &&
       formData.totalAmount <= 0
     ) {
       newErrors.totalAmount = tCommon('validation.totalAmountRequired');
     }
 
-    // Valor da parcela é obrigatório se for parcelado e não for LOAN
+    // Valor da parcela é obrigatório se for parcelado (installments > 0) e não for LOAN
     if (
-      hasInstallments &&
+      hasInstallments() &&
       formData.type !== 'LOAN' &&
       formData.type !== 'CREDIT_CARD' &&
       formData.type !== 'DEBIT_CARD' &&
@@ -350,10 +322,6 @@ export function ContaForm({
       newErrors.installments = tCommon('validation.installmentsRequired');
     }
 
-    if (hasInstallments && (formData.installments || 0) < 1) {
-      newErrors.installments = tCommon('validation.installmentsRequired');
-    }
-
     if (!formData.startDate) {
       newErrors.startDate = tCommon('validation.startDateRequired');
     }
@@ -382,27 +350,46 @@ export function ContaForm({
           ? parseInt(installmentValue.replace(/\D/g, ''))
           : 0;
 
+        // LOAN sempre tem parcelas, então sempre enviar installments e installmentAmount
         dataToSubmit = {
           name: formData.name,
           type: formData.type,
           totalAmount: formData.totalAmount,
-          installments: formData.installments,
+          installments: formData.installments || 0,
           installmentAmount: installmentValueInCents,
           isPreview: false, // Sempre false para LOAN
           startDate: formData.startDate,
           dueDay: formData.dueDay,
         };
       } else if (formData.type === 'FIXED') {
-        // Para contas FIXED, usar o valor do isPreview
-        dataToSubmit = {
-          name: formData.name,
-          type: formData.type,
-          totalAmount: formData.totalAmount,
-          installments: hasInstallments ? formData.installments : undefined,
-          isPreview: isPreview,
-          startDate: formData.startDate,
-          dueDay: formData.dueDay,
-        };
+        // Para contas FIXED sem preview (com parcelas), usar installmentAmount em vez de totalAmount
+        if (!isPreview && hasInstallments()) {
+          const installmentAmountInCents = parceledInstallmentValue
+            ? parseInt(parceledInstallmentValue.replace(/\D/g, ''))
+            : 0;
+
+          // Para FIXED sem preview, não enviar totalAmount, apenas installmentAmount
+          dataToSubmit = {
+            name: formData.name,
+            type: formData.type,
+            installments: formData.installments,
+            installmentAmount: installmentAmountInCents,
+            isPreview: isPreview,
+            startDate: formData.startDate,
+            dueDay: formData.dueDay,
+          } as Omit<CreateContaPayload, 'userId'>;
+        } else {
+          // Para FIXED com preview ou sem parcelas (installments = 0), usar totalAmount
+          // Não enviar installments nem installmentAmount quando for 0
+          dataToSubmit = {
+            name: formData.name,
+            type: formData.type,
+            totalAmount: formData.totalAmount,
+            isPreview: isPreview,
+            startDate: formData.startDate,
+            dueDay: formData.dueDay,
+          };
+        }
       } else if (formData.type === 'CREDIT_CARD') {
         // Para cartão de crédito
         dataToSubmit = {
@@ -425,14 +412,25 @@ export function ContaForm({
           startDate: formData.startDate,
           dueDay: formData.dueDay,
         };
-      } else if (hasInstallments) {
-        // Para outros tipos com parcelas
+      } else if (hasInstallments()) {
+        // Para outros tipos com parcelas (installments > 0)
+        const installmentAmountInCents = parceledInstallmentValue
+          ? parseInt(parceledInstallmentValue.replace(/\D/g, ''))
+          : 0;
+
         dataToSubmit = {
-          ...formData,
+          name: formData.name,
+          type: formData.type,
+          totalAmount: formData.totalAmount,
+          installments: formData.installments,
+          installmentAmount: installmentAmountInCents,
           isPreview: isPreview,
+          startDate: formData.startDate,
+          dueDay: formData.dueDay,
         };
       } else {
-        // Para contas sem parcelas
+        // Para contas sem parcelas (installments = 0 ou não definido)
+        // Não enviar installments nem installmentAmount quando for 0
         dataToSubmit = {
           name: formData.name,
           type: formData.type,
@@ -464,13 +462,6 @@ export function ContaForm({
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Toggles no topo */}
       <div className="flex flex-col gap-4 py-4 border-b border-gray-200">
-        <BaseToggleSwitch
-          data-tour-id="toggle-parcelas"
-          checked={hasInstallments}
-          onChange={setHasInstallments}
-          label={tCommon('hasInstallments')}
-          disabled={isInstallmentsDisabled() || isInstallmentsBlocked()}
-        />
         <BaseToggleSwitch
           data-tour-id="toggle-preview"
           checked={isPreview}
@@ -516,14 +507,14 @@ export function ContaForm({
           />
         </div>
 
-        {(formData.type === 'LOAN' || !hasInstallments) &&
+        {(formData.type === 'LOAN' || !hasInstallments()) &&
           formData.type !== 'CREDIT_CARD' && (
             <div data-tour-id="field-valor-total">
               <div className="flex items-center justify-between">
                 <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
                   {t('totalAmount')} <span className="text-red-500">*</span>
                 </BaseLabel>
-                {hasInstallments && formData.type === 'FIXED' && (
+                {hasInstallments() && formData.type === 'FIXED' && (
                   <button
                     type="button"
                     onClick={() => setShowCalcModal(true)}
@@ -649,7 +640,7 @@ export function ContaForm({
           )}
 
         {formData.type === 'CREDIT_CARD' && (
-          <>
+          <div data-tour-id="field-credit-card-section">
             <div>
               <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
                 {t('creditLimit') || 'Limite de Crédito'}{' '}
@@ -711,11 +702,11 @@ export function ContaForm({
                 </p>
               )}
             </div>
-          </>
+          </div>
         )}
 
         {formData.type === 'LOAN' && (
-          <div>
+          <div data-tour-id="field-loan-section">
             <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
               {t('installmentAmount')} <span className="text-red-500">*</span>
             </BaseLabel>
@@ -729,7 +720,7 @@ export function ContaForm({
           </div>
         )}
 
-        {hasInstallments &&
+        {hasInstallments() &&
           formData.type !== 'CREDIT_CARD' &&
           formData.type !== 'DEBIT_CARD' &&
           formData.type !== 'LOAN' && (
@@ -756,19 +747,20 @@ export function ContaForm({
             </div>
           )}
 
-        {hasInstallments && formData.type !== 'CREDIT_CARD' && formData.type !== 'DEBIT_CARD' && (
+        {/* Campo de parcelas sempre visível (exceto para cartões) */}
+        {formData.type !== 'CREDIT_CARD' && formData.type !== 'DEBIT_CARD' && (
           <div data-tour-id="field-parcelas">
             <BaseLabel className="block text-sm font-medium text-gray-700 mb-2">
-              {t('installments')} <span className="text-red-500">*</span>
+              {t('installments')}
             </BaseLabel>
             <BaseInput
               type="number"
-              value={(formData.installments || 1).toString()}
+              value={(formData.installments || 0).toString()}
               onChange={(e) =>
-                handleInputChange('installments', parseInt(e.target.value) || 1)
+                handleInputChange('installments', parseInt(e.target.value) || 0)
               }
-              placeholder="1"
-              min="1"
+              placeholder="0"
+              min="0"
               className={`w-full h-12 text-base ${
                 errors.installments ? 'border-red-500' : ''
               }`}
@@ -839,6 +831,7 @@ export function ContaForm({
           loading={loading}
           disabled={loading}
           className="h-12 px-6 text-base"
+          data-tour-id="button-criar-conta"
         >
           {loading ? t('creating') : t('create')}
         </BaseButton>

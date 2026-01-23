@@ -1,0 +1,2 @@
+export { ExpenseStructure } from './ExpenseStructure';
+

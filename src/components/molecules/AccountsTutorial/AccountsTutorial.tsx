@@ -68,63 +68,59 @@ export const AccountsTutorial: React.FC<AccountsTutorialProps> = ({
     },
     // Passos do modal (quando estiver aberto)
     {
-      target: '[data-tour-id="modal-title"]',
+      target: '[data-tour-id="modal-container"]',
       content: t('step5.content'),
-      placement: 'bottom' as const,
-    },
-    {
-      target: '[data-tour-id="toggle-parcelas"]',
-      content: t('step6.content'),
-      placement: 'right' as const,
-    },
-    {
-      target: '[data-tour-id="toggle-preview"]',
-      content: t('step7.content'),
-      placement: 'right' as const,
-    },
-    {
-      target: '[data-tour-id="field-tipo"]',
-      content: t('step8.content'),
-      placement: 'bottom' as const,
+      placement: 'center' as const,
+      disableBeacon: true,
     },
     {
       target: '[data-tour-id="field-nome"]',
-      content: t('step9.content'),
+      content: t('step6.content'),
+      placement: 'bottom' as const,
+    },
+    {
+      target: '[data-tour-id="field-tipo"]',
+      content: t('step7.content'),
       placement: 'bottom' as const,
     },
     {
       target: '[data-tour-id="field-valor-total"]',
-      content: t('step10.content'),
+      content: t('step8.content'),
       placement: 'bottom' as const,
     },
     {
       target: '[data-tour-id="field-parcelas"]',
-      content: t('step11.content'),
+      content: t('step9.content'),
       placement: 'bottom' as const,
     },
     {
       target: '[data-tour-id="field-data-inicio"]',
-      content: t('step12.content'),
-      placement: 'bottom' as const,
-    },
-    {
-      target: '[data-tour-id="field-referencia"]',
-      content: t('step13.content'),
+      content: t('step10.content'),
       placement: 'bottom' as const,
     },
     {
       target: '[data-tour-id="field-vencimento"]',
-      content: t('step14.content'),
+      content: t('step11.content'),
       placement: 'bottom' as const,
     },
     {
-      target: '[data-tour-id="modal-actions"]',
-      content: t('step15.content'),
+      target: '[data-tour-id="field-loan-section"]',
+      content: t('step12.content'),
+      placement: 'bottom' as const,
+    },
+    {
+      target: '[data-tour-id="field-credit-card-section"]',
+      content: t('step13.content'),
+      placement: 'bottom' as const,
+    },
+    {
+      target: '[data-tour-id="button-criar-conta"]',
+      content: t('step14.content'),
       placement: 'top' as const,
     },
     {
       target: 'body',
-      content: t('step16.content'),
+      content: t('step15.content'),
       placement: 'center' as const,
       disableBeacon: true,
     },
@@ -148,8 +144,14 @@ export const AccountsTutorial: React.FC<AccountsTutorialProps> = ({
     }
 
     if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
-      // Pequeno delay para transições suaves
-      setTimeout(() => {}, 100);
+      // Se o target não foi encontrado (elemento condicional não existe), avançar automaticamente
+      if (type === EVENTS.TARGET_NOT_FOUND && action === 'next') {
+        // O react-joyride já avança automaticamente, mas podemos adicionar um pequeno delay
+        setTimeout(() => {}, 100);
+      } else {
+        // Pequeno delay para transições suaves
+        setTimeout(() => {}, 100);
+      }
     }
   };
 

@@ -1,0 +1,2 @@
+export { IncomeCommitment } from './IncomeCommitment';
+

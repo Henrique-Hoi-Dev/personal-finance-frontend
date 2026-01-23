@@ -10,6 +10,7 @@ interface BaseModalProps {
   closeOnBackdropClick?: boolean;
   closeOnEsc?: boolean;
   titleProps?: React.HTMLAttributes<HTMLHeadingElement>;
+  containerProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
 export const BaseModal: React.FC<BaseModalProps> = ({
@@ -22,6 +23,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
   closeOnBackdropClick = false,
   closeOnEsc = false,
   titleProps = {},
+  containerProps = {},
 }) => {
   const handleClose = useCallback(() => {
     onClose();
@@ -70,6 +72,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
         <div
           className={`relative w-full ${sizeClasses[size]} transform overflow-hidden rounded-lg bg-white shadow-xl transition-all ${className}`}
           onClick={(e) => e.stopPropagation()}
+          {...containerProps}
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">

@@ -4,6 +4,14 @@ import {
   SummaryCard,
   TransactionItem,
   CategoryItem,
+  CurrentSituationCard,
+  IncomeExpensesChart,
+  IncomeCommitment,
+  ExpenseStructure,
+  DebtObligations,
+  FutureProjection,
+  TransactionPatterns,
+  TimeToReflect,
 } from '@/components/molecules';
 import {
   getBalance,
@@ -70,12 +78,15 @@ export const Dashboard: React.FC = () => {
         setCategories(categoriesData?.categories || []);
       } catch (error) {
         console.error('Dashboard: Erro ao carregar dados:', error);
+        // Em caso de erro, não seta loading como false para mostrar dados hardcoded
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    // Comentado temporariamente para usar dados hardcoded
+    // fetchData();
+    setLoading(false);
   }, [selectedYear, selectedMonth]);
 
   if (loading) {
@@ -270,12 +281,318 @@ export const Dashboard: React.FC = () => {
     percentage: category.percentage,
   }));
 
+  // Dados hardcoded para Current Situation
+  const currentSituationData = {
+    balance: {
+      value: 'R$ 8.450,00',
+      change: {
+        amount: 'R$ 1.750,00',
+        percentage: '-17.2%',
+        isPositive: false,
+      },
+      warning:
+        'Warning: Your balance is declining. Review your expenses carefully.',
+      trend: 'down' as const,
+    },
+    income: {
+      value: 'R$ 5.194,00',
+      change: {
+        amount: 'R$ 556,00',
+        percentage: '+12.0%',
+        isPositive: true,
+      },
+      trend: 'up' as const,
+    },
+    expenses: {
+      value: 'R$ 4.319,00',
+      change: {
+        amount: 'R$ 1.139,00',
+        percentage: '+35.8%',
+        isPositive: false,
+      },
+      trend: 'up' as const,
+    },
+  };
+
+  // Dados hardcoded para o gráfico de tendência (últimos 6 meses)
+  const chartData = [
+    { month: 'Jan', income: 4638, expenses: 3000 },
+    { month: 'Feb', income: 4780, expenses: 3100 },
+    { month: 'Mar', income: 4950, expenses: 3200 },
+    { month: 'Apr', income: 4850, expenses: 3300 },
+    { month: 'May', income: 5100, expenses: 3400 },
+    { month: 'Jun', income: 5194, expenses: 4319 },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {t('currentSituation')}: {t('currentSituationSubtitle')}
+        </h1>
         <p className="mt-1 text-sm text-gray-600">{t('subtitle')}</p>
+      </div>
+
+      {/* Current Situation Section */}
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">
+          {t('currentSituation')}
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <CurrentSituationCard
+            title={t('currentBalance')}
+            value={currentSituationData.balance.value}
+            change={currentSituationData.balance.change}
+            warning={t('balanceDecliningWarning')}
+            trend={currentSituationData.balance.trend}
+          />
+          <CurrentSituationCard
+            title={t('totalIncome')}
+            value={currentSituationData.income.value}
+            change={currentSituationData.income.change}
+            trend={currentSituationData.income.trend}
+          />
+          <CurrentSituationCard
+            title={t('totalExpenses')}
+            value={currentSituationData.expenses.value}
+            change={currentSituationData.expenses.change}
+            trend={currentSituationData.expenses.trend}
+          />
+        </div>
+      </div>
+
+      {/* Trend Analysis Section */}
+      <div className="mb-8">
+        <IncomeExpensesChart
+          data={chartData}
+          incomeGrowth="+15.4%"
+          expenseGrowth="+35.0%"
+        />
+      </div>
+
+      {/* Income Commitment Section */}
+      <div className="mb-8">
+        <IncomeCommitment
+          percentage={56}
+          totalIncome={5194}
+          committedAmount={2900}
+          fixedExpenses={{
+            amount: 2100,
+            percentage: 40.4,
+          }}
+          debtPayments={{
+            amount: 800,
+            percentage: 15.4,
+          }}
+        />
+      </div>
+
+      {/* Expense Structure Section */}
+      <div className="mb-8">
+        <ExpenseStructure
+          categories={[
+            {
+              name: t('fixedExpenses'),
+              amount: 2100,
+              percentage: 48.6,
+              color: '#9ca3af', // gray
+            },
+            {
+              name: t('variableExpenses'),
+              amount: 1419,
+              percentage: 32.9,
+              color: '#3b82f6', // blue
+            },
+            {
+              name: t('debtFinancing'),
+              amount: 800,
+              percentage: 18.5,
+              color: '#ef4444', // red
+            },
+          ]}
+          totalExpenses={4319}
+        />
+      </div>
+
+      {/* Debt Obligations Section */}
+      <div className="mb-8">
+        <DebtObligations
+          totalFinanced={29800}
+          monthlyPayment={800}
+          longestDuration={36}
+          activeDebts={[
+            {
+              id: '1',
+              name: t('carFinancing'),
+              totalAmount: 28000,
+              monthlyPayment: 650,
+              remainingMonths: 36,
+              totalMonths: 60,
+              paidPercentage: 40,
+            },
+            {
+              id: '2',
+              name: t('creditCardInstallments'),
+              totalAmount: 1800,
+              monthlyPayment: 150,
+              remainingMonths: 10,
+              totalMonths: 12,
+              paidPercentage: 17,
+            },
+          ]}
+        />
+      </div>
+
+      {/* Future Projection Section */}
+      <div className="mb-8">
+        <FutureProjection
+          data={[
+            { period: t('current'), balance: 8500 },
+            { period: t('monthPlus1'), balance: 9300 },
+            { period: t('monthPlus2'), balance: 10200 },
+            { period: t('monthPlus3'), balance: 11075 },
+          ]}
+          monthlyNetChange={875}
+          projectedBalance={11075}
+        />
+      </div>
+
+      {/* Transaction Patterns Section */}
+      <div className="mb-8">
+        <TransactionPatterns
+          groups={[
+            {
+              type: 'income',
+              count: 1,
+              total: 5194,
+              transactions: [
+                {
+                  id: '1',
+                  description: t('salary'),
+                  date: '2024-06-05',
+                  amount: 5194,
+                },
+              ],
+            },
+            {
+              type: 'fixed',
+              count: 5,
+              total: 2100,
+              transactions: [
+                {
+                  id: '2',
+                  description: t('rentRecurring'),
+                  date: '2024-06-01',
+                  amount: 1500,
+                  isRecurring: true,
+                },
+                {
+                  id: '3',
+                  description: t('internetUtilitiesRecurring'),
+                  date: '2024-06-03',
+                  amount: 280,
+                  isRecurring: true,
+                },
+                {
+                  id: '4',
+                  description: t('gymMembershipRecurring'),
+                  date: '2024-06-02',
+                  amount: 120,
+                  isRecurring: true,
+                },
+                {
+                  id: '5',
+                  description: t('streamingServicesRecurring'),
+                  date: '2024-06-01',
+                  amount: 85,
+                  isRecurring: true,
+                },
+                {
+                  id: '6',
+                  description: t('carInsuranceRecurring'),
+                  date: '2024-06-10',
+                  amount: 115,
+                  isRecurring: true,
+                },
+              ],
+            },
+            {
+              type: 'installment',
+              count: 2,
+              total: 800,
+              transactions: [
+                {
+                  id: '7',
+                  description: t('carFinancing'),
+                  date: '2024-06-05',
+                  amount: 650,
+                  installmentInfo: '24/60',
+                },
+                {
+                  id: '8',
+                  description: t('creditCard'),
+                  date: '2024-06-15',
+                  amount: 150,
+                  installmentInfo: '2/12',
+                },
+              ],
+            },
+            {
+              type: 'variable',
+              count: 4,
+              total: 1419,
+              transactions: [
+                {
+                  id: '9',
+                  description: t('groceries'),
+                  date: '2024-06-12',
+                  amount: 620,
+                },
+                {
+                  id: '10',
+                  description: t('restaurants'),
+                  date: '2024-06-18',
+                  amount: 340,
+                },
+                {
+                  id: '11',
+                  description: t('gas'),
+                  date: '2024-06-08',
+                  amount: 280,
+                },
+                {
+                  id: '12',
+                  description: t('shopping'),
+                  date: '2024-06-20',
+                  amount: 179,
+                },
+              ],
+            },
+          ]}
+          recurringCount={5}
+          installmentCount={2}
+        />
+      </div>
+
+      {/* Time to Reflect Section */}
+      <div className="mb-8">
+        <TimeToReflect
+          cards={[
+            {
+              question: t('isThisSustainable'),
+              answer: t('isThisSustainableAnswer'),
+            },
+            {
+              question: t('whatNeedsToChange'),
+              answer: t('whatNeedsToChangeAnswer'),
+            },
+            {
+              question: t('whatsYourTrend'),
+              answer: t('whatsYourTrendAnswer'),
+            },
+          ]}
+        />
       </div>
 
       {/* Filtros de Data */}

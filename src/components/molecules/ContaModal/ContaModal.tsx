@@ -45,6 +45,9 @@ export function ContaModal({
           'data-tour-id': 'modal-title',
         } as React.HTMLAttributes<HTMLHeadingElement>
       }
+      containerProps={{
+        'data-tour-id': 'modal-container',
+      }}
     >
       <div className="p-6">
         <ContaForm

@@ -24,6 +24,14 @@ const nextConfig = {
       config.externals.push('pluggy-connect-sdk');
     }
 
+    // Configuração para recharts funcionar corretamente
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      };
+    }
+
     return config;
   },
 };

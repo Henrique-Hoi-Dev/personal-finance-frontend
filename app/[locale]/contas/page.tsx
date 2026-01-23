@@ -9,7 +9,6 @@ import {
   MonthlyComparisonTable,
   MonthlyFinancialSummary,
   AccountsTutorial,
-  PluggyConnectButton,
 } from '@/components/molecules';
 import { useContasStore } from '@/store/contas.store';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -219,7 +218,6 @@ export default function ContasPage() {
                 <p className="text-gray-600 text-sm mt-1">{t('description')}</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2 justify-stretch lg:justify-end">
-                <PluggyConnectButton />
                 <button
                   data-tour-id="add-account-button"
                   onClick={() => setIsModalOpen(true)}
