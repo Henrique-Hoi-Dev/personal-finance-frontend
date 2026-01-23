@@ -26,23 +26,14 @@ export async function loadPluggySDK() {
     return sdkLoadPromise;
   }
 
-  // Inicia o carregamento
-  isSDKLoading = true;
-  sdkLoadPromise = import('pluggy-connect-sdk')
-    .then((module) => {
-      // O SDK exporta PluggyConnect como default ou named export
-      PluggyConnectSDK = module.default || module.PluggyConnect || module;
-      isSDKLoading = false;
-      return PluggyConnectSDK;
-    })
-    .catch((error) => {
-      isSDKLoading = false;
-      sdkLoadPromise = null;
-      console.error('Erro ao carregar pluggy-connect-sdk:', error);
-      throw error;
-    });
-
-  return sdkLoadPromise;
+  // SDK DESATIVADO - não carrega o pluggy-connect-sdk
+  // sdkLoadPromise = import('pluggy-connect-sdk')
+  isSDKLoading = false;
+  sdkLoadPromise = null;
+  PluggyConnectSDK = null;
+  
+  console.warn('SDK do Pluggy Connect está desativado');
+  return Promise.resolve(null);
 }
 
 /**
