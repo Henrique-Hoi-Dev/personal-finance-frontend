@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { PasswordField } from '@/components/molecules';
 import { BaseButton, BaseCPFInput, BaseLabel } from '@/components/atoms';
 import { LoginPayload } from '@/types/auth';
@@ -21,6 +23,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const t = useTranslations('Login');
   const router = useRouter();
+  const params = useParams();
+  const locale = (params?.locale as string) || 'pt';
   const [formData, setFormData] = useState<LoginPayload>({
     cpf: '',
     password: '',
@@ -113,15 +117,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
       </form>
 
-      <div className="mt-8 text-center">
+      <div className="mt-6 text-center">
+        <Link
+          href={`/${locale}/forgot-password`}
+          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+        >
+          {t('forgotPassword')}
+        </Link>
+      </div>
+
+      <div className="mt-6 text-center">
         <p className="text-base text-gray-600">
           {t('signup')}{' '}
-          <a
-            href="/pt/signup"
+          <Link
+            href={`/${locale}/signup`}
             className="text-blue-600 hover:text-blue-800 font-medium"
           >
             {t('signup')}
-          </a>
+          </Link>
         </p>
       </div>
     </div>

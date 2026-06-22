@@ -9,6 +9,9 @@ import {
   ChangePasswordPayload,
 } from '@/types/auth';
 
+// Prefixo da API: nunca usar variável que possa ser undefined (evita URL .../undefined/forgetpassword/...)
+const API_PREFIX = process.env.NEXT_PUBLIC_API_VERSION ?? 'v1';
+
 export async function login(data: LoginPayload): Promise<LoginResponse> {
   const response = await apiClient.post<LoginResponse>('/users/login', data);
   return response.data;
@@ -58,6 +61,10 @@ export async function changePassword(
   data: ChangePasswordPayload
 ): Promise<void> {
   await apiClient.patch<void>('/users/password', data);
+}
+
+export async function requestForgotPassword(email: string): Promise<void> {
+  await apiClient.post<void>(`/${API_PREFIX}/forgetpassword/${encodeURIComponent(email)}`);
 }
 
 export async function updateUserAvatar(file: File): Promise<UserProfile> {

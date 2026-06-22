@@ -4,6 +4,7 @@
     "cpf": "CPF",
     "password": "Senha",
     "submit": "Entrar",
+    "forgotPassword": "Recuperar senha",
     "signup": "Não tem conta?",
     "loading": "Carregando...",
     "required": "obrigatório",
@@ -28,6 +29,20 @@
     "emailPlaceholder": "seu@email.com",
     "cpfPlaceholder": "000.000.000-00",
     "passwordPlaceholder": "********"
+  },
+  "ForgotPassword": {
+    "title": "Recuperar senha",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "seu@email.com",
+    "emailHint": "Digite o e-mail da sua conta para receber o código de verificação.",
+    "submit": "Enviar",
+    "emailSent": "Se o e-mail existir, você receberá um código de verificação.",
+    "errorSend": "Erro ao enviar. Tente novamente.",
+    "codeLabel": "Código de verificação",
+    "codePlaceholder": "Digite o código",
+    "codeSentHint": "Verifique sua caixa de entrada e digite o código abaixo.",
+    "codeHint": "O código pode levar alguns minutos para chegar.",
+    "backToLogin": "Voltar ao login"
   },
   "App": {
     "title": "FinanceApp"

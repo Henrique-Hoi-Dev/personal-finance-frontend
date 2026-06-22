@@ -105,8 +105,11 @@ class ApiClient {
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        // Só redireciona para login se for erro 401 e não for endpoint de registro
-        if (response.status === 401 && !endpoint.includes('/users/register')) {
+        // Não redireciona para login em 401 em endpoints públicos (registro, recuperar senha)
+        const isPublicEndpoint =
+          endpoint.includes('/users/register') ||
+          endpoint.includes('/forgetpassword');
+        if (response.status === 401 && !isPublicEndpoint) {
           this.handleTokenExpiration();
         }
 
